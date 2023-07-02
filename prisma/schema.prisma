@@ -10,8 +10,9 @@ datasource db {
 
 
 model Student{
-    studentId String @db.Char(9) @unique @id
-    name String 
+    studentId Int @id @default(autoincrement())
+    student9DigitId String @db.Char(9) @unique 
+    name String  // issue: first and last name?
     phone String
     email String
     departmentId Int 
@@ -22,6 +23,10 @@ model Student{
     batch Batch @relation(fields: [batchId], references: [batchId])
     levelTerm LevelTerm @relation(fields: [levelTermId], references: [levelTermId])
     residency Residency @relation(fields: [residencyId], references: [residencyId])
+    newApplications NewApplication[]
+    tempApplications TempApplication[]
+    roomChangeApplications RoomChangeApplication[]
+    votes Vote[]
 }
 
 model Department{
@@ -45,4 +50,132 @@ model Residency{
     students Student[]
 }
 
+// Application
 
+
+model NewApplication{
+    applicationId Int @default(autoincrement()) @id // issue: larger id?
+    createdAt DateTime
+    lastUpdate DateTime // issue: better name?
+
+
+    questionnaireId Int
+    studentId Int
+    statusId Int 
+
+    questionnaire NewSeatQuestionnaire @relation(fields: [questionnaireId], references: [questionnaireId])
+    student Student @relation(fields: [studentId], references: [studentId])
+    status ApplicationStatus @relation(fields: [statusId], references: [statusId]) 
+
+    attachedFiles AttachedFiles[]
+    revisions Revision[]
+}
+
+model AttachedFiles{
+    fileId Int @id @default(autoincrement())
+    
+    fileName String
+    filePath String
+
+    applicationId Int
+    application NewApplication @relation(fields: [applicationId], references: [applicationId])
+
+}
+
+
+model TempApplication{
+    applicationId Int @default(autoincrement()) @id // issue: larger id?
+    createdAt DateTime
+    lastUpdate DateTime // issue: better name?
+    fromTime DateTime
+    days Int
+
+
+    questionnaireId Int
+    studentId Int
+    statusId Int 
+    prefRoomId Int
+
+    questionnaire TempQuestionnaire @relation(fields: [questionnaireId], references: [questionnaireId])
+    student Student @relation(fields: [studentId], references: [studentId])
+    status ApplicationStatus @relation(fields: [statusId], references: [statusId])
+    prefRoom Room @relation(fields: [prefRoomId], references: [roomId])
+
+}
+
+model TempQuestionnaire{
+    questionnaireId Int @default(autoincrement()) @id
+    tempApplications TempApplication[] 
+}
+
+model Revision{
+    revisionId Int @id @default(autoincrement())
+    reason String // issue: better name?
+    createdAt DateTime
+
+    applicationId Int
+
+    application NewApplication @relation(fields: [applicationId], references: [applicationId])
+
+}
+
+model Room{
+    roomId Int @id @default(autoincrement())
+    roomNo String
+    tempApplications TempApplication[]
+    roomChangeApplications RoomChangeApplication[]
+    // issue : more fields?
+}
+
+model RoomChangeApplication{
+    applicationId Int @default(autoincrement()) @id // issue: larger id?
+    createdAt DateTime
+    lastUpdate DateTime // issue: better name?
+    reason String
+
+    studentId Int
+    statusId Int 
+    toRoomId Int
+    
+    student Student @relation(fields: [studentId], references: [studentId])
+    status ApplicationStatus @relation(fields: [statusId], references: [statusId])
+    toRoom Room @relation(fields: [toRoomId], references: [roomId])
+
+    votes Vote[]
+}
+
+model NewSeatQuestionnaire{
+    questionnaireId Int @default(autoincrement()) @id
+    newApplications NewApplication[] 
+}
+
+model ApplicationStatus{
+    statusId Int @id @default(autoincrement())
+    label String
+    newApplications NewApplication[]
+    tempApplications TempApplication[]
+    roomChangeApplications RoomChangeApplication[]
+}
+
+model Vote{
+    voteId Int @id @default(autoincrement())
+    reason String
+    lastUpdated DateTime
+
+
+    applicationId Int
+    studentId Int
+    statusId Int
+    
+    application RoomChangeApplication @relation(fields: [applicationId], references: [applicationId])
+    student Student @relation(fields: [studentId], references: [studentId])
+    status VoteStatus @relation(fields: [statusId], references: [voteStatusId])
+
+    @@unique([applicationId, studentId])
+}
+
+model VoteStatus{
+    voteStatusId Int @id @default(autoincrement())
+    label String
+    votes Vote[]
+}
