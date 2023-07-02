@@ -27,6 +27,9 @@ model Student{
     tempApplications TempApplication[]
     roomChangeApplications RoomChangeApplication[]
     votes Vote[]
+    preferences Preference[]
+    optedOutOf MealPlan[]
+    ratings Rating[]
 }
 
 model Department{
@@ -192,6 +195,7 @@ model Item{
 
     meals Meal[]
     cupCounts CupCount[]
+    preferences Preference[]
 }
 model Photo{
     photoId Int @id @default(autoincrement())
@@ -221,6 +225,8 @@ model MealPlan{
     meal Meal @relation(fields: [mealId], references: [mealId])
     mealTime MealTime @relation(fields: [mealTimeId], references: [mealTimeId])
     cupCount CupCount[]
+    preferences Preference[]
+    optedOut Student[]
 }
 
 model MealTime{
@@ -242,3 +248,54 @@ model CupCount{
     mealPlan MealPlan @relation(fields: [mealPlanId], references: [mealPlanId])
     item Item @relation(fields: [itemId], references: [itemId])
 }
+
+model Preference{
+    order Int
+    
+    mealPlanId Int
+    itemId Int
+    studentId Int
+
+    mealPlan MealPlan @relation(fields: [mealPlanId], references: [mealPlanId])
+    item Item @relation(fields: [itemId], references: [itemId])
+    student Student @relation(fields: [studentId], references: [studentId])
+
+    @@id([mealPlanId, itemId, studentId])
+}
+
+model Feedback{
+    feedbackId Int @id @default(autoincrement())
+    week DateTime // issue : different data type?
+
+    ratings Rating[]
+}
+
+model Rating{
+    rating Float
+
+    feedbackId Int
+    typeId Int
+    studentId Int
+
+    feedback Feedback @relation(fields: [feedbackId], references: [feedbackId])
+    type RatingType @relation(fields: [typeId], references: [ratingTypeId])
+    student Student @relation(fields: [studentId], references: [studentId])
+
+    @@id([feedbackId, studentId, typeId])
+}
+
+model RatingType{
+    ratingTypeId Int @id @default(autoincrement())
+    label String
+    ratings Rating[]
+}
+
+// model OptOut{
+//     studentId Int
+//     mealPlanId Int
+
+//     student Student @relation(fields: [studentId], references: [studentId])
+//     mealPlan MealPlan @relation(fields: [mealPlanId], references: [mealPlanId])
+
+//     @@id([mealPlanId, studentId])
+// }
