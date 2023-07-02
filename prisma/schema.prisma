@@ -1,0 +1,48 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model Student{
+    studentId String @db.Char(9) @unique @id
+    name String 
+    phone String
+    email String
+    departmentId Int 
+    batchId Int
+    levelTermId Int
+    residencyId Int
+    department Department @relation(fields: [departmentId], references: [departmentId])
+    batch Batch @relation(fields: [batchId], references: [batchId])
+    levelTerm LevelTerm @relation(fields: [levelTermId], references: [levelTermId])
+    residency Residency @relation(fields: [residencyId], references: [residencyId])
+}
+
+model Department{
+    departmentId Int @id @default(autoincrement())
+    name String
+    students Student[] 
+}
+model Batch{
+    batchId Int @id @default(autoincrement())
+    year String @db.Char(4)
+    students Student[]
+}
+model LevelTerm{
+    levelTermId Int @id @default(autoincrement())
+    label String
+    students Student[]
+}
+model Residency{
+    residencyId Int @id @default(autoincrement())
+    label String
+    students Student[]
+}
+
+
