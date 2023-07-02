@@ -179,3 +179,66 @@ model VoteStatus{
     label String
     votes Vote[]
 }
+
+model Item{
+    itemId Int @id @default(autoincrement())
+    name String
+    
+    photoId Int?
+    itemTypeId Int
+
+    photo Photo? @relation(fields: [photoId], references: [photoId])
+    type ItemType @relation(fields: [itemTypeId], references: [itemTypeId])
+
+    meals Meal[]
+    cupCounts CupCount[]
+}
+model Photo{
+    photoId Int @id @default(autoincrement())
+    filePath String
+    item Item[]
+}
+model ItemType{
+    itemTypeId Int @id @default(autoincrement())
+    item Item[]
+}
+
+model Meal{
+    mealId Int @id @default(autoincrement())
+    createdAt DateTime
+    items Item[] 
+
+    mealPlans MealPlan[]
+}
+
+model MealPlan{
+    mealPlanId Int @id @default(autoincrement())
+    day DateTime
+
+    mealId Int
+    mealTimeId Int
+
+    meal Meal @relation(fields: [mealId], references: [mealId])
+    mealTime MealTime @relation(fields: [mealTimeId], references: [mealTimeId])
+    cupCount CupCount[]
+}
+
+model MealTime{
+    mealTimeId Int @id @default(autoincrement())
+    time String
+
+    mealPlans MealPlan[]
+
+}
+
+model CupCount{
+    cupcount Int
+    
+    mealPlanId Int
+    itemId Int
+
+    @@id([mealPlanId, itemId])
+
+    mealPlan MealPlan @relation(fields: [mealPlanId], references: [mealPlanId])
+    item Item @relation(fields: [itemId], references: [itemId])
+}
