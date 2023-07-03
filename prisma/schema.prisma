@@ -15,14 +15,16 @@ model Student{
     name String  // issue: first and last name?
     phone String
     email String
+    residencyStatus ResidencyStatus
+
     departmentId Int 
     batchId Int
     levelTermId Int
-    residencyId Int
+    
     department Department @relation(fields: [departmentId], references: [departmentId])
     batch Batch @relation(fields: [batchId], references: [batchId])
     levelTerm LevelTerm @relation(fields: [levelTermId], references: [levelTermId])
-    residency Residency @relation(fields: [residencyId], references: [residencyId])
+    
     newApplications NewApplication[]
     tempApplications TempApplication[]
     roomChangeApplications RoomChangeApplication[]
@@ -50,10 +52,10 @@ model LevelTerm{
     label String
     students Student[]
 }
-model Residency{
-    residencyId Int @id @default(autoincrement())
-    label String
-    students Student[]
+enum ResidencyStatus{
+    ATTACHED
+    RESIDENT
+    TEMP_RESIDENT
 }
 
 // Application
@@ -63,15 +65,14 @@ model NewApplication{
     applicationId Int @default(autoincrement()) @id // issue: larger id?
     createdAt DateTime
     lastUpdate DateTime // issue: better name?
+    status ApplicationStatus
 
 
     questionnaireId Int
     studentId Int
-    statusId Int 
-
+  
     questionnaire NewSeatQuestionnaire @relation(fields: [questionnaireId], references: [questionnaireId])
     student Student @relation(fields: [studentId], references: [studentId])
-    status ApplicationStatus @relation(fields: [statusId], references: [statusId]) 
 
     attachedFiles AttachedFiles[]
     revisions Revision[]
@@ -95,16 +96,15 @@ model TempApplication{
     lastUpdate DateTime // issue: better name?
     fromTime DateTime
     days Int
+    status ApplicationStatus
 
 
     questionnaireId Int
     studentId Int
-    statusId Int 
     prefRoomId Int
 
     questionnaire TempQuestionnaire @relation(fields: [questionnaireId], references: [questionnaireId])
     student Student @relation(fields: [studentId], references: [studentId])
-    status ApplicationStatus @relation(fields: [statusId], references: [statusId])
     prefRoom Room @relation(fields: [prefRoomId], references: [roomId])
 
 }
@@ -138,13 +138,12 @@ model RoomChangeApplication{
     createdAt DateTime
     lastUpdate DateTime // issue: better name?
     reason String
+    status ApplicationStatus
 
     studentId Int
-    statusId Int 
     toRoomId Int
     
     student Student @relation(fields: [studentId], references: [studentId])
-    status ApplicationStatus @relation(fields: [statusId], references: [statusId])
     toRoom Room @relation(fields: [toRoomId], references: [roomId])
 
     votes Vote[]
@@ -155,46 +154,40 @@ model NewSeatQuestionnaire{
     newApplications NewApplication[] 
 }
 
-model ApplicationStatus{
-    statusId Int @id @default(autoincrement())
-    label String
-    newApplications NewApplication[]
-    tempApplications TempApplication[]
-    roomChangeApplications RoomChangeApplication[]
+enum ApplicationStatus{
+    PENDING
+    ACCEPTED
+    REJECTED
 }
 
 model Vote{
     voteId Int @id @default(autoincrement())
     reason String
     lastUpdated DateTime
-
+    status VoteStatus
 
     applicationId Int
     studentId Int
-    statusId Int
     
     application RoomChangeApplication @relation(fields: [applicationId], references: [applicationId])
     student Student @relation(fields: [studentId], references: [studentId])
-    status VoteStatus @relation(fields: [statusId], references: [voteStatusId])
 
     @@unique([applicationId, studentId])
 }
 
-model VoteStatus{
-    voteStatusId Int @id @default(autoincrement())
-    label String
-    votes Vote[]
+enum VoteStatus{
+    YES
+    NO
+    NOT_VOTED
 }
 
 model Item{
     itemId Int @id @default(autoincrement())
     name String
+    type ItemType
     
     photoId Int?
-    itemTypeId Int
-
     photo Photo? @relation(fields: [photoId], references: [photoId])
-    type ItemType @relation(fields: [itemTypeId], references: [itemTypeId])
 
     meals Meal[]
     cupCounts CupCount[]
@@ -205,9 +198,11 @@ model Photo{
     filePath String
     item Item[]
 }
-model ItemType{
-    itemTypeId Int @id @default(autoincrement())
-    item Item[]
+
+enum ItemType{
+    RICE
+    VEG 
+    NON_VEG
 }
 
 model Meal{
@@ -275,33 +270,22 @@ model Feedback{
 
 model Rating{
     rating Float
+    type RatingType
 
     feedbackId Int
-    typeId Int
     studentId Int
-
+    
     feedback Feedback @relation(fields: [feedbackId], references: [feedbackId])
-    type RatingType @relation(fields: [typeId], references: [ratingTypeId])
     student Student @relation(fields: [studentId], references: [studentId])
 
-    @@id([feedbackId, studentId, typeId])
+    @@id([feedbackId, studentId, type])
 }
 
-model RatingType{
-    ratingTypeId Int @id @default(autoincrement())
-    label String
-    ratings Rating[]
+enum RatingType{
+    QUALITY
+    QUANTITY
+    MANAGEMENT
 }
-
-// model OptOut{
-//     studentId Int
-//     mealPlanId Int
-
-//     student Student @relation(fields: [studentId], references: [studentId])
-//     mealPlan MealPlan @relation(fields: [mealPlanId], references: [mealPlanId])
-
-//     @@id([mealPlanId, studentId])
-// }
 
 model MessManager{
     messManagerId Int @id @default(autoincrement())
