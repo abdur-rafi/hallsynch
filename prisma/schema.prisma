@@ -30,6 +30,9 @@ model Student{
     preferences Preference[]
     optedOutOf MealPlan[]
     ratings Rating[]
+    messManagerRoles MessManager[]
+    messManagerApplications MessManagerApplication[]
+    complaints Complaint[]
 }
 
 model Department{
@@ -299,3 +302,40 @@ model RatingType{
 
 //     @@id([mealPlanId, studentId])
 // }
+
+model MessManager{
+    messManagerId Int @id @default(autoincrement())
+    from DateTime
+    to DateTime
+    assingedAt DateTime
+
+    studentId Int
+    student Student @relation(fields: [studentId], references: [studentId])
+}
+
+model MessManagerApplication{
+    applicationId Int @id @default(autoincrement())
+    preferredTimeRange DateTime // issue : from to?
+    appliedAt DateTime
+
+    studentId Int
+    student Student @relation(fields: [studentId], references: [studentId])
+}
+
+model Complaint{
+    complainId Int @id @default(autoincrement())
+    // issue : longer id?
+    title String
+    details String
+    createdAt DateTime
+    type ComplaintType
+
+    studentId Int
+    student Student @relation(fields: [studentId], references: [studentId])
+}
+
+enum ComplaintType{
+    RESOURCE
+    STUDENT
+    STUFF
+}
