@@ -216,24 +216,26 @@ model Meal{
 model MealPlan{
     mealPlanId Int @id @default(autoincrement())
     day DateTime
+    mealTime MealTime
 
     mealId Int
-    mealTimeId Int
 
     meal Meal @relation(fields: [mealId], references: [mealId])
-    mealTime MealTime @relation(fields: [mealTimeId], references: [mealTimeId])
     cupCount CupCount[]
     preferences Preference[]
     optedOut Student[]
 }
 
-model MealTime{
-    mealTimeId Int @id @default(autoincrement())
-    time String
-
-    mealPlans MealPlan[]
-
+enum MealTime{
+    LUNCH
+    DINNER
 }
+
+// model MealTime{
+//     mealTimeId Int @id @default(autoincrement())
+//     time String
+//     mealPlans MealPlan[]
+// }
 
 model CupCount{
     cupcount Int
