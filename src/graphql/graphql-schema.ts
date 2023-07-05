@@ -44,6 +44,7 @@ export class LevelTerm{
 }
 
 
+
 @ObjectType()
 export class Student{
     @Field()
@@ -78,6 +79,65 @@ export class Student{
     
 
 }
+
+
+@ObjectType()
+export class Residency{
+    @Field()
+    residencyId : number;
+
+    @Field()
+    from : Date
+
+    @Field()
+    studentId : number
+    
+    @Field()
+    roomId : number
+    
+    @Field(type => Student)
+    student : Student
+}
+
+
+
+@ObjectType()
+export class Floor{
+    @Field()
+    floorId : number;
+
+    @Field()
+    floorNo : number;
+
+    @Field()
+    roomLabelLen : number;
+
+    @Field(type => [Room])
+    rooms : [Room]
+
+}
+
+
+
+
+@ObjectType()
+export class Room{
+    @Field()
+    roomId : number;
+
+    @Field()
+    roomNo : number;
+
+    @Field()
+    roomCapacity : number;
+
+    @Field()
+    floorId : number;
+
+    @Field(type => Floor)
+    floor : Floor;
+}
+
 
 
 
