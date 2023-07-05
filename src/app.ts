@@ -1,3 +1,4 @@
+require('dotenv').config()
 import "reflect-metadata";
 
 import express from "express";
@@ -6,14 +7,20 @@ import { queryResolver } from "./graphql/resolvers/queryResolver";
 import { ApolloServer } from "apollo-server-express";
 import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
 import {createServer} from 'http'
+import { Context } from "./graphql/interface";
+import { PrismaClient } from "@prisma/client";
+import { mutationResolver } from "./graphql/resolvers/mutationResolvers";
+import { StudentResolver } from "./graphql/resolvers/FieldResolvers/studentFieldResolver";
 
+const client = new PrismaClient()
 
 buildSchema({
-    resolvers : [queryResolver]
+    resolvers : [queryResolver, mutationResolver, StudentResolver]
 }).then(schema => {
     
     const app = express();
     const httpServer = createServer(app);
+
     
     const server = new ApolloServer({
         schema : schema,
@@ -26,6 +33,11 @@ buildSchema({
             //     };
             // }
         }],
+        context : ({req}) : Context =>{
+            return {
+                prisma : client
+            }
+        }
         // context : ({req}) : Context =>{
         //     let token = ''
         //     let userId : number | undefined;
