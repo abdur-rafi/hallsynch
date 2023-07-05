@@ -2,7 +2,7 @@ import "reflect-metadata";
 
 import express from "express";
 import { buildSchema } from "type-graphql";
-import { queryResolver } from "../graphql/resolvers/queryResolver";
+import { queryResolver } from "./graphql/resolvers/queryResolver";
 import { ApolloServer } from "apollo-server-express";
 import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
 import {createServer} from 'http'

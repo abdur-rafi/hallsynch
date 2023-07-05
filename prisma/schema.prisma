@@ -16,15 +16,20 @@ model Student{
     phone String
     email String
     residencyStatus ResidencyStatus
+    password String
 
     departmentId Int 
     batchId Int
     levelTermId Int
-    
+    // residencyId Int
+
     department Department @relation(fields: [departmentId], references: [departmentId])
     batch Batch @relation(fields: [batchId], references: [batchId])
     levelTerm LevelTerm @relation(fields: [levelTermId], references: [levelTermId])
-    
+    residency Residency?
+
+    // residency Residency @relation(fields: [residencyId], references: [residencyId])
+
     newApplications NewApplication[]
     tempApplications TempApplication[]
     roomChangeApplications RoomChangeApplication[]
@@ -40,6 +45,8 @@ model Student{
 model Department{
     departmentId Int @id @default(autoincrement())
     name String
+    shortName String
+    deptCode String @db.Char(2)
     students Student[] 
 }
 model Batch{
@@ -56,6 +63,18 @@ enum ResidencyStatus{
     ATTACHED
     RESIDENT
     TEMP_RESIDENT
+}
+
+model Residency{
+    residencyId Int @id @default(autoincrement())
+    from DateTime
+    
+    studentId Int @unique
+    roomId Int
+
+    room Room @relation(fields: [roomId], references: [roomId])
+    student Student @relation(fields: [studentId], references: [studentId])
+    
 }
 
 // Application
@@ -127,10 +146,23 @@ model Revision{
 
 model Room{
     roomId Int @id @default(autoincrement())
-    roomNo String
+    roomNo Int
+    roomCapacity Int
+    floorId Int
+    
+
+    floor Floor @relation(fields: [floorId], references: [floorId])
     tempApplications TempApplication[]
     roomChangeApplications RoomChangeApplication[]
+    residencies Residency[]
     // issue : more fields?
+}
+
+model Floor{
+    floorId Int @id @default(autoincrement())
+    floorNo Int
+    roomLabelLen Int
+    rooms Room[]
 }
 
 model RoomChangeApplication{
