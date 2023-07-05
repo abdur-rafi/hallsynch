@@ -14,6 +14,7 @@ import { StudentResolver } from "./graphql/resolvers/FieldResolvers/studentField
 import { DepartmentResolver } from "./graphql/resolvers/FieldResolvers/departmentFieldResolver";
 import { BatchResolver } from "./graphql/resolvers/FieldResolvers/batchFieldResolver";
 import { LevelTermResolver } from "./graphql/resolvers/FieldResolvers/levelTermFieldResolver";
+import { ResidencyResolver } from "./graphql/resolvers/FieldResolvers/residencyFieldResolver";
 
 const client = new PrismaClient()
 
@@ -24,7 +25,8 @@ buildSchema({
         StudentResolver, 
         DepartmentResolver,
         BatchResolver,
-        LevelTermResolver
+        LevelTermResolver,
+        ResidencyResolver
         
     ]
 }).then(schema => {

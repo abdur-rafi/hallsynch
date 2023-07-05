@@ -45,59 +45,7 @@ export class LevelTerm{
 
 
 
-@ObjectType()
-export class Student{
-    @Field()
-    studentId : number
-    @Field()
-    student9DigitId : string
-    @Field()
-    name : string 
-    @Field()
-    phone : string
-    @Field()
-    email : string
-    @Field(type => ResidencyStatus)
-    residencyStatus : ResidencyStatus
 
-
-    @Field()
-    departmentId : number 
-    @Field()
-    batchId : number
-    @Field()
-    levelTermId : number
-
-    @Field(type => Department)
-    department : Department
-
-    @Field(type => Batch)
-    batch : Batch
-    
-    @Field(type => LevelTerm)
-    levelTerm : LevelTerm
-    
-
-}
-
-
-@ObjectType()
-export class Residency{
-    @Field()
-    residencyId : number;
-
-    @Field()
-    from : Date
-
-    @Field()
-    studentId : number
-    
-    @Field()
-    roomId : number
-    
-    @Field(type => Student)
-    student : Student
-}
 
 
 
@@ -138,6 +86,65 @@ export class Room{
     floor : Floor;
 }
 
+@ObjectType()
+export class Residency{
+    @Field()
+    residencyId : number;
+
+    @Field()
+    from : Date
+
+    @Field()
+    studentId : number
+    
+    @Field()
+    roomId : number
+    
+    // @Field(type => Student)
+    // student : Student
+
+    @Field(type => Room)
+    room : Room
+    
+}
+
+
+@ObjectType()
+export class Student{
+    @Field()
+    studentId : number
+    @Field()
+    student9DigitId : string
+    @Field()
+    name : string 
+    @Field()
+    phone : string
+    @Field()
+    email : string
+    @Field(type => ResidencyStatus)
+    residencyStatus : ResidencyStatus
+
+
+    @Field()
+    departmentId : number 
+    @Field()
+    batchId : number
+    @Field()
+    levelTermId : number
+
+    @Field(type => Department)
+    department : Department
+
+    @Field(type => Batch)
+    batch : Batch
+    
+    @Field(type => LevelTerm)
+    levelTerm : LevelTerm
+
+    @Field(type => Residency, {nullable : true})
+    residency? : Residency
+    
+}
 
 
 

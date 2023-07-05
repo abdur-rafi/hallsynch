@@ -40,6 +40,7 @@ model Student{
     messManagerRoles MessManager[]
     messManagerApplications MessManagerApplication[]
     complaints Complaint[]
+    // applications Application[]
 }
 
 model Department{
@@ -79,6 +80,17 @@ model Residency{
 
 // Application
 
+
+// model Application{
+//     applicationId Int @default(autoincrement()) @id // issue: larger id?
+//     createdAt DateTime
+//     lastUpdate DateTime // issue: better name?
+//     status ApplicationStatus
+
+//     studentId Int
+//     student Student @relation(fields: [studentId], references: [studentId])
+
+// }
 
 model NewApplication{
     applicationId Int @default(autoincrement()) @id // issue: larger id?
