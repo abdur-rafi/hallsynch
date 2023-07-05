@@ -8,7 +8,41 @@ export class Department{
 
     @Field()
     name : string
+
+    @Field()
+    shortName : string
+    
+    @Field()
+    deptCode : string
+    
+    @Field(type => [Student])
+    students : [Student]
 }
+
+@ObjectType()
+export class Batch{
+    @Field()
+    batchId : number;
+
+    @Field()
+    year : string
+
+    @Field(type => [Student])
+    students : [Student]
+}
+
+@ObjectType()
+export class LevelTerm{
+    @Field()
+    levelTermId : number;
+
+    @Field()
+    label : string
+
+    @Field(type => [Student])
+    students : [Student]
+}
+
 
 @ObjectType()
 export class Student{
@@ -32,7 +66,19 @@ export class Student{
     batchId : number
     @Field()
     levelTermId : number
+
+    @Field(type => Department)
+    department : Department
+
+    @Field(type => Batch)
+    batch : Batch
+    
+    @Field(type => LevelTerm)
+    levelTerm : LevelTerm
+    
+
 }
+
 
 
 export enum ResidencyStatus{

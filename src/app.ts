@@ -11,11 +11,22 @@ import { Context } from "./graphql/interface";
 import { PrismaClient } from "@prisma/client";
 import { mutationResolver } from "./graphql/resolvers/mutationResolvers";
 import { StudentResolver } from "./graphql/resolvers/FieldResolvers/studentFieldResolver";
+import { DepartmentResolver } from "./graphql/resolvers/FieldResolvers/departmentFieldResolver";
+import { BatchResolver } from "./graphql/resolvers/FieldResolvers/batchFieldResolver";
+import { LevelTermResolver } from "./graphql/resolvers/FieldResolvers/levelTermFieldResolver";
 
 const client = new PrismaClient()
 
 buildSchema({
-    resolvers : [queryResolver, mutationResolver, StudentResolver]
+    resolvers : [
+        queryResolver, 
+        mutationResolver, 
+        StudentResolver, 
+        DepartmentResolver,
+        BatchResolver,
+        LevelTermResolver
+        
+    ]
 }).then(schema => {
     
     const app = express();
