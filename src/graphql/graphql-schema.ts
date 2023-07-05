@@ -172,7 +172,8 @@ export class UserWithToken{
 export enum ApplicationStatus{
     PENDING,
     ACCEPTED,
-    REJECTED
+    REJECTED,
+    REVISE
 }
 
 
@@ -200,6 +201,9 @@ export class SeatApplication{
     
     @Field(type => Student)
     student : Student    
+
+    @Field(type => NewApplication)
+    newApplication? : () => NewApplication
 
 }
 

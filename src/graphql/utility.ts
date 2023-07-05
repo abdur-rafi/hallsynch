@@ -34,3 +34,12 @@ export function getIdentity(headers : IncomingHttpHeaders | null){
     }
     else return null;
 }
+
+export const roles = {
+    PROVOST : 'provost',
+    STUDENT_ATTACHED : 'student-attached'
+}
+
+export const params = {
+    provostApplicationCount : 10
+}

@@ -10,12 +10,15 @@ import {createServer} from 'http'
 import { Context } from "./graphql/interface";
 import { PrismaClient } from "@prisma/client";
 import { mutationResolver } from "./graphql/resolvers/mutationResolvers";
-import { StudentResolver } from "./graphql/resolvers/FieldResolvers/studentFieldResolver";
-import { DepartmentResolver } from "./graphql/resolvers/FieldResolvers/departmentFieldResolver";
-import { BatchResolver } from "./graphql/resolvers/FieldResolvers/batchFieldResolver";
-import { LevelTermResolver } from "./graphql/resolvers/FieldResolvers/levelTermFieldResolver";
-import { ResidencyResolver } from "./graphql/resolvers/FieldResolvers/residencyFieldResolver";
+import { StudentResolver } from "./graphql/resolvers/FieldResolvers/student";
+import { DepartmentResolver } from "./graphql/resolvers/FieldResolvers/department";
+import { BatchResolver } from "./graphql/resolvers/FieldResolvers/batch";
+import { LevelTermResolver } from "./graphql/resolvers/FieldResolvers/levelTerm";
+import { ResidencyResolver } from "./graphql/resolvers/FieldResolvers/residency";
 import { getIdentity } from "./graphql/utility";
+import { authChecker } from "./graphql/resolvers/authChecker";
+import { NewApplicationResolver } from "./graphql/resolvers/FieldResolvers/newApplication";
+import { SeatApplicationResolver } from "./graphql/resolvers/FieldResolvers/seatApplication";
 
 const client = new PrismaClient()
 
@@ -27,9 +30,12 @@ buildSchema({
         DepartmentResolver,
         BatchResolver,
         LevelTermResolver,
-        ResidencyResolver
+        ResidencyResolver,
+        NewApplicationResolver,
+        SeatApplicationResolver
         
-    ]
+    ],
+    authChecker : authChecker
 }).then(schema => {
     
     const app = express();

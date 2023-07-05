@@ -86,9 +86,9 @@ model SeatApplication{
     studentId Int
     student Student @relation(fields: [studentId], references: [studentId])
 
-    newApplications NewApplication[]
-    tempApplications TempApplication[]
-    roomChangeApplications RoomChangeApplication[]
+    newApplications NewApplication?
+    tempApplications TempApplication?
+    roomChangeApplications RoomChangeApplication?
     revisions Revision[]
 
 
@@ -185,6 +185,8 @@ model RoomChangeApplication{
 
 model NewSeatQuestionnaire{
     questionnaireId Int @default(autoincrement()) @id
+    q1 Boolean 
+    q2 Boolean
     newApplications NewApplication[] 
 }
 
@@ -192,6 +194,7 @@ enum ApplicationStatus{
     PENDING
     ACCEPTED
     REJECTED
+    REVISE
 }
 
 model Vote{
