@@ -29,10 +29,6 @@ model Student{
     residency Residency?
 
     // residency Residency @relation(fields: [residencyId], references: [residencyId])
-
-    newApplications NewApplication[]
-    tempApplications TempApplication[]
-    roomChangeApplications RoomChangeApplication[]
     votes Vote[]
     preferences Preference[]
     optedOutOf MealPlan[]
@@ -40,7 +36,7 @@ model Student{
     messManagerRoles MessManager[]
     messManagerApplications MessManagerApplication[]
     complaints Complaint[]
-    // applications Application[]
+    applications SeatApplication[]
 }
 
 model Department{
@@ -81,32 +77,34 @@ model Residency{
 // Application
 
 
-// model Application{
-//     applicationId Int @default(autoincrement()) @id // issue: larger id?
-//     createdAt DateTime
-//     lastUpdate DateTime // issue: better name?
-//     status ApplicationStatus
-
-//     studentId Int
-//     student Student @relation(fields: [studentId], references: [studentId])
-
-// }
-
-model NewApplication{
+model SeatApplication{
     applicationId Int @default(autoincrement()) @id // issue: larger id?
     createdAt DateTime
     lastUpdate DateTime // issue: better name?
     status ApplicationStatus
 
-
-    questionnaireId Int
     studentId Int
-  
-    questionnaire NewSeatQuestionnaire @relation(fields: [questionnaireId], references: [questionnaireId])
     student Student @relation(fields: [studentId], references: [studentId])
 
-    attachedFiles AttachedFiles[]
+    newApplications NewApplication[]
+    tempApplications TempApplication[]
+    roomChangeApplications RoomChangeApplication[]
     revisions Revision[]
+
+
+}
+
+model NewApplication{
+    newApplicationId Int @id @default(autoincrement())
+
+    applicationId Int @unique
+
+    questionnaireId Int @unique
+    application SeatApplication @relation(fields: [applicationId], references: [applicationId])
+    questionnaire NewSeatQuestionnaire @relation(fields: [questionnaireId], references: [questionnaireId])
+
+
+    attachedFiles AttachedFiles[]
 }
 
 model AttachedFiles{
@@ -115,27 +113,22 @@ model AttachedFiles{
     fileName String
     filePath String
 
-    applicationId Int
-    application NewApplication @relation(fields: [applicationId], references: [applicationId])
+    newApplicationId Int
+    application NewApplication @relation(fields: [newApplicationId], references: [newApplicationId])
 
 }
 
 
 model TempApplication{
-    applicationId Int @default(autoincrement()) @id // issue: larger id?
-    createdAt DateTime
-    lastUpdate DateTime // issue: better name?
     fromTime DateTime
     days Int
-    status ApplicationStatus
 
-
+    applicationId Int @unique // issue: larger id?
     questionnaireId Int
-    studentId Int
     prefRoomId Int
 
+    applicaiton SeatApplication @relation(fields: [applicationId], references: [applicationId])
     questionnaire TempQuestionnaire @relation(fields: [questionnaireId], references: [questionnaireId])
-    student Student @relation(fields: [studentId], references: [studentId])
     prefRoom Room @relation(fields: [prefRoomId], references: [roomId])
 
 }
@@ -152,7 +145,7 @@ model Revision{
 
     applicationId Int
 
-    application NewApplication @relation(fields: [applicationId], references: [applicationId])
+    application SeatApplication @relation(fields: [applicationId], references: [applicationId])
 
 }
 
@@ -178,16 +171,13 @@ model Floor{
 }
 
 model RoomChangeApplication{
-    applicationId Int @default(autoincrement()) @id // issue: larger id?
-    createdAt DateTime
-    lastUpdate DateTime // issue: better name?
+    roomChangeApplicationId Int @id @default(autoincrement())
     reason String
-    status ApplicationStatus
 
-    studentId Int
+    applicationId Int @unique // issue: larger id?
     toRoomId Int
-    
-    student Student @relation(fields: [studentId], references: [studentId])
+
+    application SeatApplication @relation(fields: [applicationId], references: [applicationId])    
     toRoom Room @relation(fields: [toRoomId], references: [roomId])
 
     votes Vote[]
@@ -210,13 +200,13 @@ model Vote{
     lastUpdated DateTime
     status VoteStatus
 
-    applicationId Int
+    roomChangeApplicationId Int
     studentId Int
     
-    application RoomChangeApplication @relation(fields: [applicationId], references: [applicationId])
+    roomChangeApplication RoomChangeApplication @relation(fields: [roomChangeApplicationId], references: [roomChangeApplicationId])
     student Student @relation(fields: [studentId], references: [studentId])
 
-    @@unique([applicationId, studentId])
+    @@unique([roomChangeApplicationId, studentId])
 }
 
 enum VoteStatus{

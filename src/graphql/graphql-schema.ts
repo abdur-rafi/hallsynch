@@ -1,6 +1,8 @@
 import { Field, ObjectType, registerEnumType } from "type-graphql";
 
 
+
+
 @ObjectType()
 export class Department{
     @Field()
@@ -42,11 +44,6 @@ export class LevelTerm{
     @Field(type => [Student])
     students : [Student]
 }
-
-
-
-
-
 
 
 @ObjectType()
@@ -143,6 +140,9 @@ export class Student{
 
     @Field(type => Residency, {nullable : true})
     residency? : Residency
+
+    @Field(type =>[SeatApplication])
+    applications : [SeatApplication]
     
 }
 
@@ -153,6 +153,7 @@ export enum ResidencyStatus{
     RESIDENT,
     TEMP_RESIDENT
 }
+
 
 registerEnumType(ResidencyStatus , {
     name : 'ResidencyStatus'
@@ -166,3 +167,93 @@ export class UserWithToken{
     @Field()
     token : string
 }
+
+
+export enum ApplicationStatus{
+    PENDING,
+    ACCEPTED,
+    REJECTED
+}
+
+
+registerEnumType(ApplicationStatus , {
+    name : 'ApplicationStatus'
+})
+
+
+@ObjectType()
+export class SeatApplication{
+    @Field()
+    applicationId : number;
+
+    @Field()
+    createdAt : Date
+
+    @Field()
+    lastUpdate : Date
+
+    @Field(type => ApplicationStatus)
+    status : ApplicationStatus
+
+    @Field()
+    studentId : number
+    
+    @Field(type => Student)
+    student : Student    
+
+}
+
+@ObjectType()
+export class NewSeatQuestionnaire{
+    @Field()
+    questionnaireId : number;
+
+    @Field(type => NewApplication)
+    application : ()=> NewApplication
+}
+
+@ObjectType()
+export class NewApplication{
+    @Field()
+    newApplicationId : number;
+
+    @Field()
+    applicationId : number;
+
+    @Field()
+    questionnaireId : number;
+
+    @Field(type => SeatApplication)
+    application : SeatApplication
+
+    @Field(type => NewSeatQuestionnaire)
+    questionnaire : NewSeatQuestionnaire
+
+    @Field(type => [AttachedFiles])
+    attachedFiles : [AttachedFiles]
+
+    
+}
+
+
+@ObjectType()
+export class AttachedFiles{
+    @Field()
+    fileId : number;
+
+    @Field()
+    fileName : string;
+
+    @Field()
+    filePath : string;
+
+    @Field()
+    newApplicationId : number;
+
+
+    @Field(type => NewApplication)
+    application : NewApplication
+
+}
+
+

@@ -15,6 +15,7 @@ import { DepartmentResolver } from "./graphql/resolvers/FieldResolvers/departmen
 import { BatchResolver } from "./graphql/resolvers/FieldResolvers/batchFieldResolver";
 import { LevelTermResolver } from "./graphql/resolvers/FieldResolvers/levelTermFieldResolver";
 import { ResidencyResolver } from "./graphql/resolvers/FieldResolvers/residencyFieldResolver";
+import { getIdentity } from "./graphql/utility";
 
 const client = new PrismaClient()
 
@@ -48,6 +49,7 @@ buildSchema({
         }],
         context : ({req}) : Context =>{
             return {
+                identity : getIdentity(req.headers),
                 prisma : client
             }
         }

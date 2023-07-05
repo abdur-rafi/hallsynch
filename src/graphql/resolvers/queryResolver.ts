@@ -14,4 +14,6 @@ export class queryResolver{
     ){
         return await ctx.prisma.department.findMany();
     }
+
+    // @Query
 }
