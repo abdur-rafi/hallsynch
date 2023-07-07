@@ -1,9 +1,10 @@
-import { Arg, Authorized, Ctx, Mutation } from "type-graphql";
-import { Context} from "../interface";
+import {Arg, Authorized, Ctx, Mutation} from "type-graphql";
+import {Context} from "../interface";
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import { NewApplication, SeatApplication, UserWithToken } from "../graphql-schema";
-import { roles } from "../utility";
+import {CupCount, NewApplication, UserWithToken} from "../graphql-schema";
+import {roles} from "../utility";
+import {ItemType, MealTime} from "@prisma/client";
 
 export class mutationResolver{
     
@@ -84,8 +85,140 @@ export class mutationResolver{
         })
 
         return application
-
     }
-    
 
+    @Authorized(roles.STUDENT_MESS_MANAGER)
+    @Mutation(returns => CupCount)
+    async addNewMealItem(
+        @Ctx() ctx : Context,
+        @Arg('name') name : string,
+        @Arg('type') type : string,
+        @Arg('cupCount') cupCount : number,
+        @Arg('photoLocation') photoLocation : string = "",
+        @Arg('date') date : string,
+        @Arg('mealTime') mealtime : string
+    ){
+
+        let itemType : ItemType;
+        if(type.toLowerCase() == 'rice') itemType = ItemType.RICE;
+        else if(type.toLowerCase() == 'veg') itemType = ItemType.VEG;
+        else itemType = ItemType.NON_VEG;
+
+        let mealTime : MealTime;
+        if(mealtime.toLowerCase() == 'lunch') mealTime = MealTime.LUNCH;
+        else mealTime = MealTime.DINNER;
+
+
+        let newItem = await ctx.prisma.item.create({
+            data : {
+                name : name,
+                type : itemType,
+                photo : {
+                    create : {
+                        filePath : photoLocation
+                    }
+                }
+            },
+            include : {
+                photo : true
+            }
+        });
+
+        let newMealPan = await ctx.prisma.mealPlan.create({
+            data : {
+                day: new Date(date),
+                mealTime : mealTime,
+                meal : {
+                    create : {
+                        createdAt : new Date(date),
+                    }
+                }
+            },
+            include : {
+                meal : true
+            }
+        });
+
+        let newCupCount = await ctx.prisma.cupCount.create({
+            data : {
+                cupcount : cupCount,
+                item : {
+                    connect : {
+                        itemId : newItem.itemId
+                    }
+                },
+                mealPlan : {
+                    connect : {
+                        mealPlanId : newMealPan.mealPlanId
+                    }
+                }
+            },
+            include : {
+                item : true,
+                mealPlan : true
+            }
+        });
+
+        return newCupCount;
+    }
+
+    @Authorized(roles.STUDENT_MESS_MANAGER)
+    @Mutation(returns => CupCount)
+    async addOldMealItem(
+        @Ctx() ctx : Context,
+        @Arg('name') name : string,
+        @Arg('type') type : string,
+        @Arg('cupCount') cupCount : number,
+        @Arg('date') date : string,
+        @Arg('mealTime') mealtime : string
+    ){
+
+        let itemType : ItemType;
+        if(type.toLowerCase() == 'rice') itemType = ItemType.RICE;
+        else if(type.toLowerCase() == 'veg') itemType = ItemType.VEG;
+        else itemType = ItemType.NON_VEG;
+
+        let mealTime : MealTime;
+        if(mealtime.toLowerCase() == 'lunch') mealTime = MealTime.LUNCH;
+        else mealTime = MealTime.DINNER;
+
+        let item = await ctx.prisma.item.findFirst({
+            where : {
+                name : name,
+                type : itemType
+            }
+        });
+
+        if(!item){
+            throw new Error("No such item found");
+        }
+
+        let newCupCount = await ctx.prisma.cupCount.create({
+            data : {
+                cupcount : cupCount,
+                mealPlan : {
+                    create : {
+                        day: new Date(date),
+                        mealTime : mealTime,
+                        meal : {
+                            create : {
+                                createdAt : new Date(date),
+                            }
+                        }
+                    }
+                },
+                item : {
+                    connect : {
+                        itemId : item.itemId
+                    }
+                }
+            },
+            include : {
+                item : true,
+                mealPlan : true
+            }
+        });
+
+        return newCupCount;
+    }
 }

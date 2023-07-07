@@ -19,6 +19,11 @@ import { getIdentity } from "./graphql/utility";
 import { authChecker } from "./graphql/resolvers/authChecker";
 import { NewApplicationResolver } from "./graphql/resolvers/FieldResolvers/newApplication";
 import { SeatApplicationResolver } from "./graphql/resolvers/FieldResolvers/seatApplication";
+import {CupCountResolver} from "./graphql/resolvers/FieldResolvers/cupCount";
+import {ItemResolver} from "./graphql/resolvers/FieldResolvers/item";
+import {MealPlanResolver} from "./graphql/resolvers/FieldResolvers/mealPlan";
+import {MealResolver} from "./graphql/resolvers/FieldResolvers/meal";
+
 
 const client = new PrismaClient()
 
@@ -32,8 +37,11 @@ buildSchema({
         LevelTermResolver,
         ResidencyResolver,
         NewApplicationResolver,
-        SeatApplicationResolver
-        
+        SeatApplicationResolver,
+        CupCountResolver,
+        ItemResolver,
+        MealPlanResolver,
+        MealResolver
     ],
     authChecker : authChecker
 }).then(schema => {

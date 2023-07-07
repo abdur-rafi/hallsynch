@@ -1,4 +1,3 @@
-import { Request } from 'express';
 import jwt from 'jsonwebtoken';
 import { Identity } from './interface';
 import { IncomingHttpHeaders } from 'http';
@@ -37,7 +36,8 @@ export function getIdentity(headers : IncomingHttpHeaders | null){
 
 export const roles = {
     PROVOST : 'provost',
-    STUDENT_ATTACHED : 'student-attached'
+    STUDENT_ATTACHED : 'student-attached',
+    STUDENT_MESS_MANAGER : 'student-mess-manager',
 }
 
 export const params = {
