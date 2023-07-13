@@ -217,6 +217,16 @@ export class NewSeatQuestionnaire{
 }
 
 @ObjectType()
+export class TempQuestionnaire{
+    @Field()
+    questionnaireId : number;
+
+    @Field(type => TempApplication)
+    application : ()=> TempApplication
+}
+
+
+@ObjectType()
 export class NewApplication{
     @Field()
     newApplicationId : number;
@@ -239,6 +249,89 @@ export class NewApplication{
     
 }
 
+@ObjectType()
+export class TempApplication{
+    
+    @Field()
+    fromTime : Date
+
+    @Field()
+    days : number
+    
+    @Field()
+    applicationId : number;
+
+    @Field()
+    questionnaireId : number;
+    
+    @Field()
+    prefRoomId : number;
+
+
+    @Field(type => SeatApplication)
+    application : SeatApplication
+
+    @Field(type => TempQuestionnaire)
+    questionnaire : TempQuestionnaire
+
+    @Field(type => Room)
+    attachedFiles : Room
+
+}
+
+
+@ObjectType()
+export class RoomChangeApplication{
+    
+    @Field()
+    roomChangeApplicationId : number
+    
+    @Field()
+    reason : string;
+
+    @Field()
+    applicationId : number;
+    
+    @Field()
+    toRoomId : number;
+
+    @Field(type => SeatApplication)
+    application : SeatApplication
+
+    @Field(type => Room)
+    toRoom : Room
+
+    @Field(type => [Vote])
+    votes : [Vote]
+}
+
+@ObjectType()
+export class Vote{
+    @Field()
+    voteId : number
+
+    @Field()
+    reason : string
+    
+    @Field()
+    lastUpdated : Date;
+
+    @Field(type => VoteStatus)
+    status : VoteStatus;
+    
+    @Field()
+    roomChangeApplicationId : number;
+
+    @Field()
+    studentId : number;
+
+    @Field(type => RoomChangeApplication)
+    roomChangeApplication : RoomChangeApplication
+
+    @Field(type => Student)
+    student : Student;
+ 
+}
 
 @ObjectType()
 export class AttachedFiles{
@@ -278,6 +371,15 @@ export enum ItemType{
 
 registerEnumType(ItemType , {
     name : 'ItemType'
+})
+
+export enum VoteStatus{
+    YES,
+    NO,
+    NOT_VOTED
+}
+registerEnumType(VoteStatus , {
+    name : 'VoteStatus'
 })
 
 
@@ -402,4 +504,17 @@ export class Preference {
 
     @Field(returns => Student)
     student : Student;
+}
+
+@ObjectType()
+export class Arr{
+    
+    @Field(returns => [Dummy])
+    vals : [Dummy];
+}
+
+@ObjectType()
+class Dummy{
+    @Field()
+    val : number;
 }

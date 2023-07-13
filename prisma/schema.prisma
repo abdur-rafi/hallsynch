@@ -120,7 +120,7 @@ model AttachedFiles{
 
 
 model TempApplication{
-    fromTime DateTime
+    from DateTime @db.Date
     days Int
 
     applicationId Int @unique // issue: larger id?

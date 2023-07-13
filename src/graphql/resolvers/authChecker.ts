@@ -4,34 +4,25 @@ import { roles } from "../utility";
 
 export const authChecker : AuthChecker<Context> = async ({context}, currRoles)=>{
 
-    // return context.userId != null;
-    if(currRoles.includes(roles.STUDENT_ATTACHED)){
-        console.log(context.identity);
-        if(context.identity && context.identity.studentId){
+    
+    if(context.identity && context.identity.studentId){
 
-            const std = await context.prisma.student.findUnique({
-                where : {
-                    studentId : context.identity.studentId
-                }
-            })
+        const std = await context.prisma.student.findUnique({
+            where : {
+                studentId : context.identity.studentId
+            }
+        })
+        if(currRoles.includes(roles.STUDENT_ATTACHED)){
             return std.residencyStatus == 'ATTACHED';
-        }
-        else
-            return false;
-
-    } else if(currRoles.includes(roles.STUDENT_MESS_MANAGER)){
-        console.log(context.identity);
-        if(context.identity && context.identity.studentId){
-
-            const std = await context.prisma.student.findUnique({
-                where : {
-                    studentId : context.identity.studentId
-                }
-            })
+    
+        } else if(currRoles.includes(roles.STUDENT_MESS_MANAGER)){
             return std.residencyStatus == 'RESIDENT';     // here additional checking may be required
         }
-        else
-            return false;
+        else if(currRoles.includes(roles.STUDENT_RESIDENT)){
+            console.log(context);
+            return std.residencyStatus == 'RESIDENT' ;        
+        }
     }
+    // return context.userId != null;
     return true;
 }

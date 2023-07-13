@@ -2,7 +2,7 @@ import {Arg, Authorized, Ctx, Mutation} from "type-graphql";
 import {Context} from "../interface";
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import {CupCount, NewApplication, UserWithToken} from "../graphql-schema";
+import {Arr, CupCount, NewApplication, RoomChangeApplication, TempApplication, UserWithToken} from "../graphql-schema";
 import {roles} from "../utility";
 import {ItemType, MealTime} from "@prisma/client";
 
@@ -41,19 +41,19 @@ export class mutationResolver{
     async newSeatApplication(
         @Ctx() ctx : Context,
         @Arg('q1') q1 : boolean,
-        @Arg('q2') q2 : boolean
+        @Arg('q2') q2 : boolean,
+        @Arg('attachedFileIds') attachedFileIds : string
     ){
 
         let pendingApplication = await ctx.prisma.newApplication.findFirst({
             where : {
-                AND : [
-                    {
-                        application : {
-                            status : 'PENDING',
-                            studentId : ctx.identity.studentId
-                        }
-                    }
-                ]
+                application : {
+                    OR : [
+                        {status : "PENDING"},
+                        {status : "REVISE"}
+                    ],
+                    studentId : ctx.identity.studentId
+                }
             }
         })
 
@@ -76,7 +76,14 @@ export class mutationResolver{
                         q1 : q1,
                         q2 : q2
                     }
-                }
+                },
+                // attachedFiles : {
+                //     connect : 
+                //         attachedFileIds.split(" ").map(v => ({
+                //             fileId : parseInt(v)
+                //         }))
+                    
+                // }
             },
             include : {
                 application : true,
@@ -86,6 +93,126 @@ export class mutationResolver{
 
         return application
     }
+
+
+    @Authorized(roles.STUDENT_ATTACHED)
+    @Mutation(returns => TempApplication)
+    async tempSeatApplication(
+        @Ctx() ctx : Context,
+        @Arg('q1') q1 : boolean,
+        @Arg('q2') q2 : boolean,
+        @Arg('roomPref') roomPref : number,
+        @Arg('days') days : number,
+        @Arg('from') from : string
+    ){
+
+        let pendingApplication = await ctx.prisma.tempApplication.findFirst({
+            where : {
+                AND : [
+                    {
+                        applicaiton : {
+                            OR : [
+                                {status : "PENDING"},
+                                {status : "REVISE"}
+                            ],
+                            studentId : ctx.identity.studentId
+                        }
+                    }
+                ]
+            }
+        })
+
+        if( pendingApplication ){
+            throw new Error("One application still pending");
+        }
+        
+        
+
+        let application = await ctx.prisma.tempApplication.create({
+            data : {
+                applicaiton : {
+                    create : {
+                        createdAt : new Date(),
+                        lastUpdate : new Date(),
+                        status : 'PENDING',
+                        studentId : ctx.identity.studentId
+                    }
+                },
+                questionnaire : {
+                    create : {
+
+                    }
+                },
+                prefRoom : {
+                    connect : {
+                        roomId : roomPref
+                    }
+                },
+                days : days,
+                from : new Date(from)
+            },
+            include : {
+                applicaiton : true,
+                questionnaire : true
+            }
+        })
+
+        return application
+    }
+
+    
+    @Authorized(roles.STUDENT_RESIDENT)
+    @Mutation(returns => RoomChangeApplication)
+    async roomChangeApplication(
+        @Ctx() ctx : Context,
+        @Arg('roomId') roomId : number,
+        @Arg('reason') reason : string
+    ){
+        let pendingApplication = await ctx.prisma.roomChangeApplication.findFirst({
+            where : {
+                application : {
+                    OR : [
+                        {status : "PENDING"},
+                        {status : "REVISE"}
+                    ],
+                    studentId : ctx.identity.studentId
+                }
+            }
+        })
+
+
+
+        if( pendingApplication ){
+            throw new Error("One application still pending");
+        }
+
+        let application = await ctx.prisma.roomChangeApplication.create({
+            data : {
+                application : {
+                    create : {
+                        createdAt : new Date(),
+                        lastUpdate : new Date(),
+                        status : 'PENDING',
+                        studentId : ctx.identity.studentId
+                    }
+                },
+                toRoom : {
+                    connect : {
+                        roomId : roomId
+                    }
+                },
+                reason : reason
+            },
+            include : {
+                application : true
+            }
+        })
+
+        return application
+    }
+
+    
+
 
     @Authorized(roles.STUDENT_MESS_MANAGER)
     @Mutation(returns => CupCount)
