@@ -36,6 +36,7 @@ export function getIdentity(headers : IncomingHttpHeaders | null){
 
 export const roles = {
     PROVOST : 'provost',
+    STUDENT : 'student',
     STUDENT_ATTACHED : 'student-attached',
     STUDENT_MESS_MANAGER : 'student-mess-manager',
     STUDENT_RESIDENT : 'student-resident'

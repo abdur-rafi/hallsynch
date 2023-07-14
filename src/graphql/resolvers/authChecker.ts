@@ -4,7 +4,7 @@ import { roles } from "../utility";
 
 export const authChecker : AuthChecker<Context> = async ({context}, currRoles)=>{
 
-    
+    console.log("in auth checker", context.identity);
     if(context.identity && context.identity.studentId){
 
         const std = await context.prisma.student.findUnique({

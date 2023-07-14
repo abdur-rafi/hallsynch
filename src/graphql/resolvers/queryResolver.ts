@@ -28,5 +28,21 @@ export class queryResolver{
             }
         })
     }
+
+    @Authorized(roles.STUDENT)
+    @Query(returns =>[SeatApplication])
+    async myapplications(
+        @Ctx() ctx : Context
+    ){
+        return await ctx.prisma.seatApplication.findMany({
+            orderBy : {
+                createdAt : 'desc'
+            },
+            where : {
+                studentId : ctx.identity.studentId
+            }
+        })
+    }
+    
     // @Query
 }

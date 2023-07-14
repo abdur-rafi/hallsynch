@@ -275,7 +275,7 @@ export class TempApplication{
     questionnaire : TempQuestionnaire
 
     @Field(type => Room)
-    attachedFiles : Room
+    prefRoom : Room
 
 }
 
@@ -504,17 +504,4 @@ export class Preference {
 
     @Field(returns => Student)
     student : Student;
-}
-
-@ObjectType()
-export class Arr{
-    
-    @Field(returns => [Dummy])
-    vals : [Dummy];
-}
-
-@ObjectType()
-class Dummy{
-    @Field()
-    val : number;
 }

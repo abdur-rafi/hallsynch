@@ -86,9 +86,9 @@ model SeatApplication{
     studentId Int
     student Student @relation(fields: [studentId], references: [studentId])
 
-    newApplications NewApplication?
-    tempApplications TempApplication?
-    roomChangeApplications RoomChangeApplication?
+    newApplication NewApplication?
+    tempApplication TempApplication?
+    roomChangeApplication RoomChangeApplication?
     revisions Revision[]
 
 

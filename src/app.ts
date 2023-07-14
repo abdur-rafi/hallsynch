@@ -23,6 +23,8 @@ import {CupCountResolver} from "./graphql/resolvers/FieldResolvers/cupCount";
 import {ItemResolver} from "./graphql/resolvers/FieldResolvers/item";
 import {MealPlanResolver} from "./graphql/resolvers/FieldResolvers/mealPlan";
 import {MealResolver} from "./graphql/resolvers/FieldResolvers/meal";
+import { TempApplicationResolver } from "./graphql/resolvers/FieldResolvers/tempApplication";
+import { RoomChangeApplicationResolver } from "./graphql/resolvers/FieldResolvers/roomChangeApplication";
 
 
 const client = new PrismaClient()
@@ -41,7 +43,9 @@ buildSchema({
         CupCountResolver,
         ItemResolver,
         MealPlanResolver,
-        MealResolver
+        MealResolver,
+        TempApplicationResolver,
+        RoomChangeApplicationResolver
     ],
     authChecker : authChecker
 }).then(schema => {

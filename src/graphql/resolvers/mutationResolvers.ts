@@ -2,7 +2,7 @@ import {Arg, Authorized, Ctx, Mutation} from "type-graphql";
 import {Context} from "../interface";
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import {Arr, CupCount, NewApplication, RoomChangeApplication, TempApplication, UserWithToken} from "../graphql-schema";
+import {CupCount, NewApplication, RoomChangeApplication, TempApplication, UserWithToken, Vote} from "../graphql-schema";
 import {roles} from "../utility";
 import {ItemType, MealTime} from "@prisma/client";
 
@@ -177,6 +177,13 @@ export class mutationResolver{
                     ],
                     studentId : ctx.identity.studentId
                 }
+            },
+            include : {
+                toRoom : {
+                    include : {
+                        residencies : true
+                    }
+                }
             }
         })
 
@@ -185,6 +192,22 @@ export class mutationResolver{
         if( pendingApplication ){
             throw new Error("One application still pending");
         }
+
+        // let roomMembers = await ctx.prisma.residency.findMany({
+        //     where : {
+        //         roomId : roomId
+        //     }
+        // });
+
+        let roomMembers = pendingApplication.toRoom.residencies;
+        console.log(roomMembers);
+        // await ctx.prisma.vote.createMany({
+        //     data : roomMembers.map(r =>({
+        //         lastUpdated : new Date(),
+        //         reason : '',
+        //         roomChangeApplicationId : 
+        //     }))
+        // })
 
         let application = await ctx.prisma.roomChangeApplication.create({
             data : {
@@ -201,7 +224,17 @@ export class mutationResolver{
                         roomId : roomId
                     }
                 },
-                reason : reason
+                reason : reason,
+                votes : {
+                    createMany : {
+                        data : roomMembers.map(r =>({
+                            lastUpdated : new Date(),
+                            reason : '',
+                            status : 'NOT_VOTED',
+                            studentId : ctx.identity.studentId
+                        }))
+                    }
+                }
             },
             include : {
                 application : true
@@ -348,4 +381,29 @@ export class mutationResolver{
 
         return newCupCount;
     }
+
+
+
+    @Authorized(roles.STUDENT)
+    @Mutation(returns => Vote)
+    async vote(
+        @Ctx() ctx : Context,
+        @Arg('voteId') voteId : number,
+        @Arg('vote') vote : 'YES' | 'NO',
+        @Arg('reason') reason : string,
+        
+    ){
+        return await ctx.prisma.vote.update({
+            where : {
+                voteId : voteId
+            },
+            data : {
+                lastUpdated : new Date(),
+                status : vote,
+                reason : reason
+            }
+        })
+    }
+
+    
 }
