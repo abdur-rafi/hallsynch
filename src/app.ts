@@ -4,8 +4,9 @@ import "reflect-metadata";
 import express from "express";
 import { buildSchema } from "type-graphql";
 import { queryResolver } from "./graphql/resolvers/queryResolver";
-import { ApolloServer } from "apollo-server-express";
-import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
+import { ApolloServer } from "@apollo/server";
+import { expressMiddleware } from '@apollo/server/express4';
+import { ApolloServerPluginLandingPageLocalDefault } from "@apollo/server/plugin/landingPage/default";
 import {createServer} from 'http'
 import { Context } from "./graphql/interface";
 import { PrismaClient } from "@prisma/client";
@@ -26,6 +27,8 @@ import {MealResolver} from "./graphql/resolvers/FieldResolvers/meal";
 import { TempApplicationResolver } from "./graphql/resolvers/FieldResolvers/tempApplication";
 import { RoomChangeApplicationResolver } from "./graphql/resolvers/FieldResolvers/roomChangeApplication";
 
+import cors from 'cors'
+import {json} from 'body-parser'
 
 const client = new PrismaClient()
 
@@ -54,9 +57,9 @@ buildSchema({
     const httpServer = createServer(app);
 
     
-    const server = new ApolloServer({
+    const server = new ApolloServer<Context>({
         schema : schema,
-        plugins: [ApolloServerPluginLandingPageGraphQLPlayground(), {
+        plugins: [ApolloServerPluginLandingPageLocalDefault(), {
             // async serverWillStart() {
             //     return {
             //         async drainServer() {
@@ -65,12 +68,12 @@ buildSchema({
             //     };
             // }
         }],
-        context : ({req}) : Context =>{
-            return {
-                identity : getIdentity(req.headers),
-                prisma : client
-            }
-        }
+        // context : ({req}) : Context =>{
+        //     return {
+        //         identity : getIdentity(req.headers),
+        //         prisma : client
+        //     }
+        // }
         // context : ({req}) : Context =>{
         //     let token = ''
         //     let userId : number | undefined;
@@ -90,11 +93,25 @@ buildSchema({
     })
 
     server.start().then(()=>{
-        server.applyMiddleware({
-            app,
-            path: '/graphql'
-        });
+        // server.applyMiddleware({
+        //     app,
+        //     path: '/graphql'
+        // });
         
+        app.use(
+            '/graphql',
+            cors<cors.CorsRequest>(),
+            json(),
+            expressMiddleware(server,{
+                context : async ({req}) =>{
+                    return {
+                        identity : getIdentity(req.headers),
+                        prisma : client
+                    }
+                }
+            })
+        )
+
         app.use('/', (req, res, next)=>{
             res.send('response')
         })

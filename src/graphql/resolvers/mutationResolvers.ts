@@ -161,13 +161,14 @@ export class mutationResolver{
     }
 
     
-    @Authorized(roles.STUDENT_RESIDENT)
+    // @Authorized(roles.STUDENT_RESIDENT) // adding this is causing the server to not respond to reqs. why????
     @Mutation(returns => RoomChangeApplication)
     async roomChangeApplication(
         @Ctx() ctx : Context,
         @Arg('roomId') roomId : number,
         @Arg('reason') reason : string
     ){
+        console.log("in room change application\n");
         let pendingApplication = await ctx.prisma.roomChangeApplication.findFirst({
             where : {
                 application : {
@@ -176,13 +177,6 @@ export class mutationResolver{
                         {status : "REVISE"}
                     ],
                     studentId : ctx.identity.studentId
-                }
-            },
-            include : {
-                toRoom : {
-                    include : {
-                        residencies : true
-                    }
                 }
             }
         })
@@ -198,9 +192,11 @@ export class mutationResolver{
         //         roomId : roomId
         //     }
         // });
-
-        let roomMembers = pendingApplication.toRoom.residencies;
-        console.log(roomMembers);
+        let roomMembers = await ctx.prisma.residency.findMany({
+            where : {
+                roomId : roomId
+            }
+        })
         // await ctx.prisma.vote.createMany({
         //     data : roomMembers.map(r =>({
         //         lastUpdated : new Date(),
@@ -231,7 +227,7 @@ export class mutationResolver{
                             lastUpdated : new Date(),
                             reason : '',
                             status : 'NOT_VOTED',
-                            studentId : ctx.identity.studentId
+                            studentId : r.studentId
                         }))
                     }
                 }
