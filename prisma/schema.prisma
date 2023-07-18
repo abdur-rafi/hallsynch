@@ -8,7 +8,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model Student{
     studentId Int @id @default(autoincrement())
     student9DigitId String @db.Char(9) @unique 

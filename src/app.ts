@@ -29,6 +29,7 @@ import { RoomChangeApplicationResolver } from "./graphql/resolvers/FieldResolver
 
 import cors from 'cors'
 import {json} from 'body-parser'
+import { VoteResolver } from "./graphql/resolvers/FieldResolvers/vote";
 
 const client = new PrismaClient()
 
@@ -48,7 +49,8 @@ buildSchema({
         MealPlanResolver,
         MealResolver,
         TempApplicationResolver,
-        RoomChangeApplicationResolver
+        RoomChangeApplicationResolver,
+        VoteResolver
     ],
     authChecker : authChecker
 }).then(schema => {

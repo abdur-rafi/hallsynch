@@ -202,8 +202,14 @@ export class SeatApplication{
     @Field(type => Student)
     student : Student    
 
-    @Field(type => NewApplication)
+    @Field(type => NewApplication, {nullable : true})
     newApplication? : () => NewApplication
+
+    @Field(type => TempApplication, {nullable : true})
+    tempApplication? : () => TempApplication
+
+    @Field(type => RoomChangeApplication, {nullable : true})
+    roomChangeApplication? : () => RoomChangeApplication
 
 }
 

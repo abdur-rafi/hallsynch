@@ -240,6 +240,27 @@ export class mutationResolver{
         return application
     }
 
+    @Authorized(roles.STUDENT)
+    @Mutation(returns => Vote)
+    async vote(
+        @Ctx() ctx : Context,
+        @Arg('voteId') voteId : number,
+        @Arg('vote') vote : 'YES' | 'NO',
+        @Arg('reason') reason : string,
+        
+    ){
+        return await ctx.prisma.vote.update({
+            where : {
+                voteId : voteId
+            },
+            data : {
+                lastUpdated : new Date(),
+                status : vote,
+                reason : reason
+            }
+        })
+    }
+
     
 
 
@@ -379,27 +400,6 @@ export class mutationResolver{
     }
 
 
-
-    @Authorized(roles.STUDENT)
-    @Mutation(returns => Vote)
-    async vote(
-        @Ctx() ctx : Context,
-        @Arg('voteId') voteId : number,
-        @Arg('vote') vote : 'YES' | 'NO',
-        @Arg('reason') reason : string,
-        
-    ){
-        return await ctx.prisma.vote.update({
-            where : {
-                voteId : voteId
-            },
-            data : {
-                lastUpdated : new Date(),
-                status : vote,
-                reason : reason
-            }
-        })
-    }
 
     
 }

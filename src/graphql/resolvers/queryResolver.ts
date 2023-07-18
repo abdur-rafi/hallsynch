@@ -1,5 +1,5 @@
 import {Authorized, Ctx, Query, Resolver} from 'type-graphql'
-import { Department, SeatApplication, Student } from '../graphql-schema'
+import { Department, SeatApplication, Student, Vote } from '../graphql-schema'
 import { Context } from '../interface'
 import { params, roles } from '../utility';
 @Resolver()
@@ -40,6 +40,19 @@ export class queryResolver{
             },
             where : {
                 studentId : ctx.identity.studentId
+            }
+        })
+    }
+
+    @Authorized(roles.STUDENT_RESIDENT)
+    @Query(returns => [Vote])
+    async pendingVotes(
+        @Ctx() ctx : Context
+    ){
+        return await ctx.prisma.vote.findMany({
+            where : {
+                studentId : ctx.identity.studentId,
+                status : "NOT_VOTED"
             }
         })
     }
