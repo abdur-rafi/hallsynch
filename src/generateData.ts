@@ -200,6 +200,37 @@ async function generateResidency(){
 
 }
 
+async function generateAuthority(){
+    let pass = 'password'
+    let salt = await bcrypt.genSalt()
+    let epass = await bcrypt.hash(pass, salt);
+    await prisma.authority.createMany({
+        data : [
+            {
+                email : 'email1',
+                name : 'authority',
+                password : epass,
+                role : 'PROVOST',
+                phone : '1234567'
+            },
+            {
+                email : 'email2',
+                name : 'authority',
+                password : epass,
+                role : 'ASSISTANT_PROVOST',
+                phone : '1234567'
+            },
+            {
+                email : 'email3',
+                name : 'authority',
+                password : epass,
+                role : 'DINING_STUFF',
+                phone : '1234567'
+            }
+        ]
+    })
+}
+
 // async function generate
 
 
@@ -219,6 +250,7 @@ async function generateAll(){
     await generateFloors()
     await generateRooms()
     await generateResidency()
+    await generateAuthority();
 }
 
 generateAll();

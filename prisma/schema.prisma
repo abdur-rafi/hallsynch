@@ -361,3 +361,18 @@ enum ComplaintType{
     STUDENT
     STUFF
 }
+
+model Authority{
+    authorityId Int @id @default(autoincrement())
+    name String
+    email String @unique
+    phone String?
+    role AuthorityRole
+    password String
+}
+
+enum AuthorityRole{
+    PROVOST
+    ASSISTANT_PROVOST
+    DINING_STUFF
+}

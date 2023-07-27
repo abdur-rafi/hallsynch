@@ -1,5 +1,5 @@
 import { Ctx, FieldResolver, Resolver, Root } from "type-graphql";
-import { ApplicationStatus, NewApplication, RoomChangeApplication, SeatApplication, TempApplication } from "../../graphql-schema";
+import { ApplicationStatus, NewApplication, RoomChangeApplication, SeatApplication, Student, TempApplication } from "../../graphql-schema";
 import { Context } from "../../interface";
 
 @Resolver(of => SeatApplication)
@@ -49,5 +49,18 @@ export class SeatApplicationResolver{
             }
         })
     }
+    
+    @FieldResolver(type => Student)
+    async student(
+        @Ctx() ctx : Context,
+        @Root() app : SeatApplication
+    ){
+        return await ctx.prisma.student.findUnique({
+            where : {
+                studentId : app.studentId
+            }
+        })
+    }
+    
     
 }

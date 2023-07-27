@@ -14,23 +14,40 @@ export class mutationResolver{
         @Arg('id') id : string,
         @Arg('password') password : string
     ){
-        console.log(id);
+        // console.log(id);
         let student = await ctx.prisma.student.findUnique({where : {student9DigitId : id}})
-        console.log(student)
+        // console.log(student)
+        let authority;
         if(!student){
-            throw new Error("No User Found");
+            authority = await ctx.prisma.authority.findUnique({
+                where : {email : id}
+            })
+            if(!authority)
+                throw new Error("No User Found");
+
         }
-        let b = await bcrypt.compare(password, student.password)
+        let b = await bcrypt.compare(password, (student??authority).password)
         if(!b){
             throw new Error("Invalid password");
         }
 
-        let token = jwt.sign({
-            studentId : student.studentId
-        }, process.env.JWTSECRET!)
+        let payload = {};
+        if(student){
+            payload = {
+                studentId : student.studentId
+            }
+        }
+        else{
+            payload = {
+                authorityId : authority.authorityId
+            }
+        }
+
+        let token = jwt.sign(payload, process.env.JWTSECRET!)
         // console.log(token)
         return {
             student : student,
+            authority : authority,
             token : token
         }
 

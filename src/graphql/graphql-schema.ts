@@ -161,12 +161,43 @@ registerEnumType(ResidencyStatus , {
 
 @ObjectType()
 export class UserWithToken{
-    @Field()
-    student : Student
+    @Field(type => Student, {nullable : true})
+    student? : Student
 
     @Field()
     token : string
+    
+    @Field(type => Authority, {nullable : true})
+    authority? : ()=> Authority
 }
+
+@ObjectType()
+export class Authority{
+    @Field()
+    authorityId : number
+    @Field()
+    name : string
+    @Field()
+    email : string 
+    @Field()
+    phone : string
+    @Field()
+    password : string
+    @Field(type => AuthorityRole)
+    role :  AuthorityRole
+
+}
+
+export enum AuthorityRole{
+    PROVOST,
+    ASSISTANT_PROVOST,
+    DINING_STUFF
+}
+
+
+registerEnumType(AuthorityRole , {
+    name : 'AuthorityRole'
+})
 
 
 export enum ApplicationStatus{
@@ -180,6 +211,8 @@ export enum ApplicationStatus{
 registerEnumType(ApplicationStatus , {
     name : 'ApplicationStatus'
 })
+
+
 
 
 @ObjectType()
