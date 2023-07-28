@@ -78,8 +78,8 @@ model Residency{
 
 model SeatApplication{
     applicationId Int @default(autoincrement()) @id // issue: larger id?
-    createdAt DateTime
-    lastUpdate DateTime // issue: better name?
+    createdAt DateTime @default(now())
+    lastUpdate DateTime @default(now()) // issue: better name? 
     status ApplicationStatus
 
     studentId Int
@@ -140,7 +140,7 @@ model TempQuestionnaire{
 model Revision{
     revisionId Int @id @default(autoincrement())
     reason String // issue: better name?
-    createdAt DateTime
+    createdAt DateTime @default(now())
 
     applicationId Int
 
@@ -243,7 +243,7 @@ enum ItemType{
 
 model Meal{
     mealId Int @id @default(autoincrement())
-    createdAt DateTime
+    createdAt DateTime @default(now())
     items Item[] 
 
     mealPlans MealPlan[]
@@ -329,7 +329,7 @@ model MessManager{
     messManagerId Int @id @default(autoincrement())
     from DateTime
     to DateTime
-    assingedAt DateTime
+    assingedAt DateTime @default(now())
 
     studentId Int
     student Student @relation(fields: [studentId], references: [studentId])
@@ -338,7 +338,7 @@ model MessManager{
 model MessManagerApplication{
     applicationId Int @id @default(autoincrement())
     preferredTimeRange DateTime // issue : from to?
-    appliedAt DateTime
+    appliedAt DateTime @default(now())
 
     studentId Int
     student Student @relation(fields: [studentId], references: [studentId])
@@ -349,7 +349,7 @@ model Complaint{
     // issue : longer id?
     title String
     details String
-    createdAt DateTime
+    createdAt DateTime @default(now())
     type ComplaintType
 
     studentId Int

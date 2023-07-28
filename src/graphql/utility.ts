@@ -45,3 +45,14 @@ export const roles = {
 export const params = {
     provostApplicationCount : 10
 }
+
+export const applicationTypes = {
+    new : 'New Seat',
+    temp : 'Temporary Seat',
+    room : 'Room Change'
+}
+
+export const sortVals = {
+    newest : 'Newest',
+    oldest : 'Oldest'
+}

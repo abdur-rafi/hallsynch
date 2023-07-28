@@ -1,7 +1,8 @@
-import {Authorized, Ctx, Query, Resolver} from 'type-graphql'
-import { Department, SeatApplication, Student, Vote } from '../graphql-schema'
+import {Arg, Authorized, Ctx, Query, Resolver} from 'type-graphql'
+import { Batch, Department, FilterInput, SeatApplication, SortInput, Student, Vote } from '../graphql-schema'
 import { Context } from '../interface'
-import { params, roles } from '../utility';
+import { applicationTypes, params, roles, sortVals } from '../utility';
+import { ApplicationStatus, Prisma } from '@prisma/client';
 @Resolver()
 export class queryResolver{
     @Query(returns => String)
@@ -19,12 +20,91 @@ export class queryResolver{
     @Authorized(roles.PROVOST)
     @Query(returns =>[SeatApplication])
     async applications(
-        @Ctx() ctx : Context
+        @Ctx() ctx : Context,
+        @Arg('filters', {nullable : true}) filters? : FilterInput,
+        @Arg('sort', {nullable : true}) sort? : SortInput
     ){
+        let ands : Prisma.SeatApplicationWhereInput[] = []
+        if(filters){
+            if(filters.batch){
+                ands.push({
+                    student : {
+                        batch : {
+                            year : filters.batch as string
+                        }
+                    }
+                })
+            }
+            if(filters.dept){
+                ands.push({
+                    student : {
+                        department : {
+                            shortName : filters.dept as string
+                        }
+                    }
+                })
+            }
+            if(filters.status){
+                console.log(filters.status);
+                let enumVal = undefined;
+                if(filters.status == 'ACCEPTED'){
+                    enumVal = ApplicationStatus.ACCEPTED;
+                }
+                else if(filters.status == 'REJECTED')
+                    enumVal = ApplicationStatus.REJECTED;                
+                else if(filters.status == 'PENDING')
+                    enumVal = ApplicationStatus.PENDING;
+                else if(filters.status == 'REVISE')
+                    enumVal = ApplicationStatus.REVISE;
+
+                if(enumVal)
+                    ands.push({
+                        status : enumVal
+                    })
+            }
+            if(filters.type){
+                if(filters.type == applicationTypes.new ){
+                    ands.push({
+                        NOT : { newApplication : null}
+                    })
+                }
+                else if(filters.type == applicationTypes.room){
+                    ands.push({
+                        NOT : { roomChangeApplication : null}
+                    })
+                }
+                else if(filters.type == applicationTypes.temp){
+                    ands.push({
+                        NOT : { tempApplication : null}
+                    })
+                }
+            }
+        
+        }
+        let order : Prisma.SeatApplicationOrderByWithRelationInput = {}
+        if(sort){
+            if(sort.orderBy && sort.order ){
+                if(sort.orderBy == 'Batch')
+                    order = {   
+                        student : {
+                            batch : {
+                                year : (sort.order == sortVals.oldest) ? 'asc' : 'desc'
+                            }
+                        }
+                    }   
+                else
+                    order = {   
+                        createdAt : sort.order == sortVals.oldest ? 'asc' : 'desc'
+                    }
+            }
+            
+            // console.log(order);
+        }
         return await ctx.prisma.seatApplication.findMany({
             take : params.provostApplicationCount,
-            orderBy : {
-                createdAt : 'desc'
+            orderBy : order,
+            where : {
+                AND : ands,   
             }
         })
     }
@@ -56,6 +136,42 @@ export class queryResolver{
             }
         })
     }
+    
+    @Query(returns => [Batch])
+    async batches(
+        @Ctx() ctx : Context
+    ){
+        return await ctx.prisma.batch.findMany({
+            orderBy : {
+                year : 'asc'
+            }
+        })
+    }
+    
+    
+    @Query(returns => [String])
+    async applicationStatus(
+        @Ctx() ctx : Context
+    ){
+        return [
+            'PENDING',
+            'ACCEPTED',
+            'REJECTED',
+            'REVISE'
+        ]
+    }
+
+    @Query(returns => [String])
+    async applicationTypes(
+        @Ctx() ctx : Context
+    ){
+        return [
+            applicationTypes.new,
+            applicationTypes.temp,
+            applicationTypes.room
+        ]
+    }
+    
     
     // @Query
 }

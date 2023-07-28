@@ -231,6 +231,40 @@ async function generateAuthority(){
     })
 }
 
+
+async function generateApplications(){
+    let students = await prisma.student.findMany({
+    })
+    
+    students.forEach(async s =>{
+        if(s.residencyStatus == 'ATTACHED'){
+
+            if(Math.random() > .5) return;
+    
+            await prisma.newApplication.create({
+                data : {
+                    application : {
+                        create : {
+                            status : 'PENDING',
+                            studentId : s.studentId
+                        }
+                    },
+                    questionnaire : {
+                        create : {
+                            q1 : Math.random() > .5,
+                            q2 : Math.random() < .5
+                        }
+                    }
+                }
+            })
+        }
+        // else if(s.residencyStatus == 'RESIDENT'){
+
+        // }
+    })
+
+}
+
 // async function generate
 
 
@@ -246,11 +280,12 @@ async function generateAll(){
     // await generateBatches()
     // await generateDept()
     // await generateLT()
-    await generateStudents()
-    await generateFloors()
-    await generateRooms()
-    await generateResidency()
-    await generateAuthority();
+    // await generateStudents()
+    // await generateFloors()
+    // await generateRooms()
+    // await generateResidency()
+    // await generateAuthority();
+    await generateApplications();
 }
 
 generateAll();

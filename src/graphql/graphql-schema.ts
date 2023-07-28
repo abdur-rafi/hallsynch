@@ -1,4 +1,4 @@
-import { Field, ObjectType, registerEnumType } from "type-graphql";
+import { Field, InputType, ObjectType, registerEnumType } from "type-graphql";
 
 
 
@@ -543,4 +543,32 @@ export class Preference {
 
     @Field(returns => Student)
     student : Student;
+}
+
+
+@InputType()
+export class FilterInput{
+
+    @Field({nullable : true})
+    batch? : String;
+
+    @Field({nullable : true})
+    dept? : String;
+
+    @Field({nullable : true})
+    status? : String;
+
+    @Field({nullable : true})
+    type? : String;
+
+}
+
+@InputType()
+export class SortInput{
+
+    @Field({nullable : true})
+    orderBy? : String;
+
+    @Field({nullable : true})
+    order? : String;
 }
