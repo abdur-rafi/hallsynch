@@ -549,20 +549,20 @@ export class Preference {
 @InputType()
 export class FilterInput{
 
-    @Field({nullable : true})
-    batch? : String;
+    @Field(type => [String])
+    batch : String[];
 
-    @Field({nullable : true})
-    dept? : String;
+    @Field(type => [String])
+    dept : String[];
 
-    @Field({nullable : true})
-    status? : String;
+    @Field(type => [String])
+    status : String[];
 
-    @Field({nullable : true})
-    type? : String;
+    @Field(type => [String])
+    type : String[];
 
-    @Field({nullable : true})
-    lt? : String;
+    @Field(type => [String])
+    lt : String[];
 
 }
 

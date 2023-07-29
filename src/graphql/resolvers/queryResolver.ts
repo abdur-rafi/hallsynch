@@ -28,64 +28,79 @@ export class queryResolver{
     ){
         let ands : Prisma.SeatApplicationWhereInput[] = []
         if(filters){
-            if(filters.batch){
+            if(filters.batch.length ){
                 ands.push({
                     student : {
                         batch : {
-                            year : filters.batch as string
+                            year : {
+                                in : filters.batch as string[]
+                            }
                         }
                     }
                 })
             }
-            if(filters.dept){
+            if(filters.dept.length){
                 ands.push({
                     student : {
                         department : {
-                            shortName : filters.dept as string
+                            shortName : {
+                                in : filters.dept as string[]
+                            }
                         }
                     }
                 })
             }
-            if(filters.status){
+            if(filters.status.length){
                 console.log(filters.status);
-                let enumVal = undefined;
-                if(filters.status == 'ACCEPTED'){
-                    enumVal = ApplicationStatus.ACCEPTED;
+                let enumVal : ApplicationStatus[] = [];
+                if(filters.status.includes('ACCEPTED')){
+                    enumVal.push(ApplicationStatus.ACCEPTED);
                 }
-                else if(filters.status == 'REJECTED')
-                    enumVal = ApplicationStatus.REJECTED;                
-                else if(filters.status == 'PENDING')
-                    enumVal = ApplicationStatus.PENDING;
-                else if(filters.status == 'REVISE')
-                    enumVal = ApplicationStatus.REVISE;
+                if(filters.status.includes('REJECTED')){
+                    enumVal.push(ApplicationStatus.REJECTED);
+                }
+                if(filters.status.includes('REVISE')){
+                    enumVal.push(ApplicationStatus.REVISE)
+                }
+                if(filters.status.includes('PENDING')){
+                    enumVal.push(ApplicationStatus.PENDING)
+                }
 
                 if(enumVal)
                     ands.push({
-                        status : enumVal
+                        status : {
+                            in : enumVal
+                        }
                     })
-            }
+            }0
             if(filters.type){
-                if(filters.type == applicationTypes.new ){
-                    ands.push({
+                let ors : Prisma.SeatApplicationWhereInput[] = [];
+                if(filters.type.includes(applicationTypes.new) ){
+                    ors.push({
                         NOT : { newApplication : null}
                     })
                 }
-                else if(filters.type == applicationTypes.room){
-                    ands.push({
+                if(filters.type.includes(applicationTypes.room)){
+                    ors.push({
                         NOT : { roomChangeApplication : null}
                     })
                 }
-                else if(filters.type == applicationTypes.temp){
-                    ands.push({
+                if(filters.type.includes(applicationTypes.temp)){
+                    ors.push({
                         NOT : { tempApplication : null}
                     })
                 }
+                ands.push({
+                    OR : ors
+                })
             }
-            if(filters.lt){
+            if(filters.lt.length){
                 ands.push({
                     student : {
                         levelTerm : {
-                            label : filters.lt as string
+                            label :  {
+                                in : filters.lt as string[]
+                            }
                         }
                     }
                 })
@@ -144,7 +159,8 @@ export class queryResolver{
                 skip : (page-1) * params.provostApplicationPerPageCount,
                 where : {
                     AND : ands
-                }
+                },
+                orderBy : order
             }),
             
         ])
