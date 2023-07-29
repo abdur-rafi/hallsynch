@@ -1,5 +1,5 @@
 import {Arg, Authorized, Ctx, Query, Resolver} from 'type-graphql'
-import { Batch, Department, FilterInput, LevelTerm, SearchInput, SeatApplication, SortInput, Student, Vote } from '../graphql-schema'
+import { Batch, Department, FilterInput, LevelTerm, SearchInput, SeatApplication, SeatApplicationsWithCount, SortInput, Student, Vote } from '../graphql-schema'
 import { Context } from '../interface'
 import { applicationTypes, params, roles, sortVals } from '../utility';
 import { ApplicationStatus, Prisma } from '@prisma/client';
@@ -18,12 +18,13 @@ export class queryResolver{
     }
 
     @Authorized(roles.PROVOST)
-    @Query(returns =>[SeatApplication])
+    @Query(returns =>SeatApplicationsWithCount)
     async applications(
         @Ctx() ctx : Context,
+        @Arg('page') page : number,
         @Arg('filters', {nullable : true}) filters? : FilterInput,
         @Arg('sort', {nullable : true}) sort? : SortInput,
-        @Arg('search', {nullable : true}) search? : SearchInput
+        @Arg('search', {nullable : true}) search? : SearchInput,
     ){
         let ands : Prisma.SeatApplicationWhereInput[] = []
         if(filters){
@@ -130,13 +131,37 @@ export class queryResolver{
             
             // console.log(order);
         }
-        return await ctx.prisma.seatApplication.findMany({
-            take : params.provostApplicationCount,
-            orderBy : order,
-            where : {
-                AND : ands,   
-            }
-        })
+        // let count = await 
+
+        let result = await ctx.prisma.$transaction([
+            ctx.prisma.seatApplication.count({
+                where : {
+                    AND : ands
+                }
+            }),
+            ctx.prisma.seatApplication.findMany({
+                take : params.provostApplicationPerPageCount,
+                skip : (page-1) * params.provostApplicationPerPageCount,
+                where : {
+                    AND : ands
+                }
+            }),
+            
+        ])
+
+        return {
+            applications : result[1],
+            count : result[0]
+        }
+
+        // return await ctx.prisma.seatApplication.findMany({
+        //     // take : params.provostApplicationCount,
+            
+        //     orderBy : order,
+        //     where : {
+        //         AND : ands,   
+        //     }
+        // })
     }
 
     @Authorized(roles.STUDENT)

@@ -581,3 +581,12 @@ export class SearchInput{
     @Field({nullable : true})
     searchBy? : String;
 }
+
+@ObjectType()
+export class SeatApplicationsWithCount{
+    @Field(returns => [SeatApplication])
+    applications : SeatApplication[];
+
+    @Field()
+    count : number;
+}
