@@ -561,6 +561,9 @@ export class FilterInput{
     @Field({nullable : true})
     type? : String;
 
+    @Field({nullable : true})
+    lt? : String;
+
 }
 
 @InputType()
@@ -571,4 +574,10 @@ export class SortInput{
 
     @Field({nullable : true})
     order? : String;
+}
+
+@InputType()
+export class SearchInput{
+    @Field({nullable : true})
+    searchBy? : String;
 }

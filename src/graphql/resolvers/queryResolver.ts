@@ -1,5 +1,5 @@
 import {Arg, Authorized, Ctx, Query, Resolver} from 'type-graphql'
-import { Batch, Department, FilterInput, SeatApplication, SortInput, Student, Vote } from '../graphql-schema'
+import { Batch, Department, FilterInput, LevelTerm, SearchInput, SeatApplication, SortInput, Student, Vote } from '../graphql-schema'
 import { Context } from '../interface'
 import { applicationTypes, params, roles, sortVals } from '../utility';
 import { ApplicationStatus, Prisma } from '@prisma/client';
@@ -22,7 +22,8 @@ export class queryResolver{
     async applications(
         @Ctx() ctx : Context,
         @Arg('filters', {nullable : true}) filters? : FilterInput,
-        @Arg('sort', {nullable : true}) sort? : SortInput
+        @Arg('sort', {nullable : true}) sort? : SortInput,
+        @Arg('search', {nullable : true}) search? : SearchInput
     ){
         let ands : Prisma.SeatApplicationWhereInput[] = []
         if(filters){
@@ -79,7 +80,36 @@ export class queryResolver{
                     })
                 }
             }
+            if(filters.lt){
+                ands.push({
+                    student : {
+                        levelTerm : {
+                            label : filters.lt as string
+                        }
+                    }
+                })
+            }
         
+        }
+        if(search && search.searchBy && search.searchBy.trim().length > 0){
+            ands.push({
+                OR : [
+                    {
+                        student : {
+                            name : {
+                                contains : search.searchBy as string
+                            }
+                        }
+                    },
+                    {
+                        student : {
+                            student9DigitId : {
+                                contains : search.searchBy as string
+                            }
+                        }
+                    }
+                ]
+            })
         }
         let order : Prisma.SeatApplicationOrderByWithRelationInput = {}
         if(sort){
@@ -172,6 +202,12 @@ export class queryResolver{
         ]
     }
     
+    @Query(returns => [LevelTerm])
+    async levelTerms(
+        @Ctx() ctx : Context
+    ){
+        return await ctx.prisma.levelTerm.findMany();
+    }
     
     // @Query
 }
