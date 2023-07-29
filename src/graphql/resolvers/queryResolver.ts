@@ -1,5 +1,5 @@
 import {Arg, Authorized, Ctx, Query, Resolver} from 'type-graphql'
-import { Batch, Department, FilterInput, LevelTerm, SearchInput, SeatApplication, SeatApplicationsWithCount, SortInput, Student, Vote } from '../graphql-schema'
+import { Batch, Department, FilterInput, LevelTerm, SearchInput, SeatApplication, SeatApplicationsWithCount, SortInput, StatusWithDefaultSelect, Student, Vote } from '../graphql-schema'
 import { Context } from '../interface'
 import { applicationTypes, params, roles, sortVals } from '../utility';
 import { ApplicationStatus, Prisma } from '@prisma/client';
@@ -220,15 +220,26 @@ export class queryResolver{
     }
     
     
-    @Query(returns => [String])
+    @Query(returns => [StatusWithDefaultSelect])
     async applicationStatus(
         @Ctx() ctx : Context
     ){
-        return [
-            'PENDING',
-            'ACCEPTED',
-            'REJECTED',
-            'REVISE'
+        return [{
+            status : 'PENDING',
+            select : true
+        },
+        {
+            status : 'REVISE',
+            select : true
+        },
+        {
+            status : 'ACCEPTED',
+            select : false
+        },
+        {
+            status : 'REJECTED',
+            select : false
+        }
         ]
     }
 

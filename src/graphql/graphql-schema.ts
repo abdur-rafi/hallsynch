@@ -590,3 +590,12 @@ export class SeatApplicationsWithCount{
     @Field()
     count : number;
 }
+
+@ObjectType()
+export class StatusWithDefaultSelect{
+    @Field()
+    status : String;
+
+    @Field()
+    select : Boolean;
+};
