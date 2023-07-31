@@ -277,14 +277,14 @@ async function generateApplications(){
 // generateResidency()
  
 async function generateAll(){
-    // await generateBatches()
-    // await generateDept()
-    // await generateLT()
-    // await generateStudents()
-    // await generateFloors()
-    // await generateRooms()
-    // await generateResidency()
-    // await generateAuthority();
+    await generateBatches()
+    await generateDept()
+    await generateLT()
+    await generateStudents()
+    await generateFloors()
+    await generateRooms()
+    await generateResidency()
+    await generateAuthority();
     await generateApplications();
 }
 
