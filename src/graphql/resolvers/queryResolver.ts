@@ -82,7 +82,7 @@ export class queryResolver{
                 }
                 if(filters.type.includes(applicationTypes.room)){
                     ors.push({
-                        NOT : { roomChangeApplication : null}
+                        NOT : { seatChangeApplication : null}
                     })
                 }
                 if(filters.type.includes(applicationTypes.temp)){
@@ -268,7 +268,8 @@ export class queryResolver{
     ){
         return await ctx.prisma.seat.findFirst({
             where : {
-                residency : null
+                residency : null,
+                tempResidency : null
             }
         })
     }

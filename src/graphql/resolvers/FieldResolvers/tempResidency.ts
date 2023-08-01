@@ -1,14 +1,14 @@
 import { Ctx, FieldResolver, Resolver, Root } from "type-graphql";
-import { Batch, Department, LevelTerm, Residency, ResidencyStatus, Room, Seat, Student } from "../../graphql-schema";
+import { Batch, Department, LevelTerm, Residency, ResidencyStatus, Room, Seat, Student, TempResidency } from "../../graphql-schema";
 import { Context } from "../../interface";
 
-@Resolver(of => Residency)
-export class ResidencyResolver{
+@Resolver(of => TempResidency)
+export class TempResidencyResolver{
 
     @FieldResolver(type => Student)
     async student(
         @Ctx() ctx : Context,
-        @Root() residency : Residency
+        @Root() residency : TempResidency
     ){
         return await ctx.prisma.student.findUnique({
             where : {
@@ -20,7 +20,7 @@ export class ResidencyResolver{
     @FieldResolver(type => Seat)
     async seat(
         @Ctx() ctx : Context,
-        @Root() residency : Residency
+        @Root() residency : TempResidency
     ){
         return await ctx.prisma.seat.findUnique({
             where : {

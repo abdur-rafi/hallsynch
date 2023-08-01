@@ -34,6 +34,7 @@ import { AuthorityResolver } from "./graphql/resolvers/FieldResolvers/authority"
 import { SeatResolver } from "./graphql/resolvers/FieldResolvers/seat";
 import { FloorResolver } from "./graphql/resolvers/FieldResolvers/floor";
 import { RoomResolver } from "./graphql/resolvers/FieldResolvers/room";
+import { TempResidency } from "./graphql/graphql-schema";
 
 const client = new PrismaClient()
 
@@ -58,7 +59,8 @@ buildSchema({
         AuthorityResolver,
         SeatResolver,
         RoomResolver,
-        FloorResolver
+        FloorResolver,
+        TempResidency
     ],
     authChecker : authChecker
 }).then(schema => {

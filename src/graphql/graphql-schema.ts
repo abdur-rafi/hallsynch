@@ -125,15 +125,41 @@ export class Residency{
     studentId : number
     
     @Field()
-    roomId : number
+    seatId : number
     
     // @Field(type => Student)
     // student : Student
 
-    @Field(type => Room)
-    room : Room
+    @Field(type => Seat)
+    seat : Seat
     
 }
+
+@ObjectType()
+export class TempResidency{
+    @Field()
+    residencyId : number;
+
+    @Field()
+    from : Date
+
+    @Field()
+    studentId : number
+    
+    @Field()
+    seatId : number
+    
+    @Field()
+    days : number
+
+    // @Field(type => Student)
+    // student : Student
+
+    @Field(type => Seat)
+    seat : Seat
+    
+}
+
 
 
 @ObjectType()

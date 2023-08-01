@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,282 +7,296 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Student{
-    studentId Int @id @default(autoincrement())
-    student9DigitId String @db.Char(9) @unique 
-    name String  // issue: first and last name?
-    phone String
-    email String
-    residencyStatus ResidencyStatus
-    password String
+model Student {
+  studentId       Int             @id @default(autoincrement())
+  student9DigitId String          @unique @db.Char(9)
+  name            String // issue: first and last name?
+  phone           String
+  email           String
+  residencyStatus ResidencyStatus
+  password        String
 
-    departmentId Int 
-    batchId Int
-    levelTermId Int
-    // residencyId Int
+  departmentId Int
+  batchId      Int
+  levelTermId  Int
+  // residencyId Int
 
-    department Department @relation(fields: [departmentId], references: [departmentId])
-    batch Batch @relation(fields: [batchId], references: [batchId])
-    levelTerm LevelTerm @relation(fields: [levelTermId], references: [levelTermId])
-    residency Residency?
+  department Department @relation(fields: [departmentId], references: [departmentId])
+  batch      Batch      @relation(fields: [batchId], references: [batchId])
+  levelTerm  LevelTerm  @relation(fields: [levelTermId], references: [levelTermId])
+  residency  Residency?
 
-    // residency Residency @relation(fields: [residencyId], references: [residencyId])
-    votes Vote[]
-    preferences Preference[]
-    optedOutOf MealPlan[]
-    ratings Rating[]
-    messManagerRoles MessManager[]
-    messManagerApplications MessManagerApplication[]
-    complaints Complaint[]
-    applications SeatApplication[]
+  // residency Residency @relation(fields: [residencyId], references: [residencyId])
+  votes                   Vote[]
+  preferences             Preference[]
+  optedOutOf              MealPlan[]
+  ratings                 Rating[]
+  messManagerRoles        MessManager[]
+  messManagerApplications MessManagerApplication[]
+  complaints              Complaint[]
+  applications            SeatApplication[]
+  tempResidency           TempResidency?
 }
 
-model Department{
-    departmentId Int @id @default(autoincrement())
-    name String
-    shortName String
-    deptCode String @db.Char(2)
-    students Student[] 
-}
-model Batch{
-    batchId Int @id @default(autoincrement())
-    year String @db.Char(4)
-    students Student[]
-}
-model LevelTerm{
-    levelTermId Int @id @default(autoincrement())
-    label String
-    students Student[]
-}
-enum ResidencyStatus{
-    ATTACHED
-    RESIDENT
-    TEMP_RESIDENT
+model Department {
+  departmentId Int       @id @default(autoincrement())
+  name         String
+  shortName    String
+  deptCode     String    @db.Char(2)
+  students     Student[]
 }
 
-model Residency{
-    residencyId Int @id @default(autoincrement())
-    from DateTime
-    
-    studentId Int @unique
-    
-    seatId Int @unique
+model Batch {
+  batchId  Int       @id @default(autoincrement())
+  year     String    @db.Char(4)
+  students Student[]
+}
 
-    seat Seat @relation(fields: [seatId], references: [seatId])
-    student Student @relation(fields: [studentId], references: [studentId])
-    
+model LevelTerm {
+  levelTermId Int       @id @default(autoincrement())
+  label       String
+  students    Student[]
+}
+
+enum ResidencyStatus {
+  ATTACHED
+  RESIDENT
+  TEMP_RESIDENT
+}
+
+model Residency {
+  residencyId Int      @id @default(autoincrement())
+  from        DateTime
+
+  studentId Int @unique
+
+  seatId Int @unique
+
+  seat    Seat    @relation(fields: [seatId], references: [seatId])
+  student Student @relation(fields: [studentId], references: [studentId])
+}
+
+model TempResidency {
+  tempResidencyId Int      @id @default(autoincrement())
+  from            DateTime
+  days            Int
+
+  studentId Int @unique
+
+  seatId Int @unique
+
+  seat    Seat    @relation(fields: [seatId], references: [seatId])
+  student Student @relation(fields: [studentId], references: [studentId])
 }
 
 // Application
 
+model SeatApplication {
+  applicationId Int               @id @default(autoincrement()) // issue: larger id?
+  createdAt     DateTime          @default(now())
+  lastUpdate    DateTime          @default(now()) // issue: better name? 
+  status        ApplicationStatus
 
-model SeatApplication{
-    applicationId Int @default(autoincrement()) @id // issue: larger id?
-    createdAt DateTime @default(now())
-    lastUpdate DateTime @default(now()) // issue: better name? 
-    status ApplicationStatus
+  studentId Int
+  student   Student @relation(fields: [studentId], references: [studentId])
 
-    studentId Int
-    student Student @relation(fields: [studentId], references: [studentId])
+  newApplication        NewApplication?
+  tempApplication       TempApplication?
+  seatChangeApplication SeatChangeApplication?
+  revisions             Revision[]
+  approveHisotry        ApplicationApproveHistory?
 
-    newApplication NewApplication?
-    tempApplication TempApplication?
-    roomChangeApplication RoomChangeApplication?
-    revisions Revision[]
-    approveHisotry ApplicationApproveHistory?
-
+  rejectionHistory RejectionHistory?
 }
 
-model NewApplication{
-    newApplicationId Int @id @default(autoincrement())
+model NewApplication {
+  newApplicationId Int @id @default(autoincrement())
 
-    applicationId Int @unique
+  applicationId Int @unique
 
-    questionnaireId Int @unique
-    application SeatApplication @relation(fields: [applicationId], references: [applicationId])
-    questionnaire NewSeatQuestionnaire @relation(fields: [questionnaireId], references: [questionnaireId])
+  questionnaireId Int                  @unique
+  application     SeatApplication      @relation(fields: [applicationId], references: [applicationId])
+  questionnaire   NewSeatQuestionnaire @relation(fields: [questionnaireId], references: [questionnaireId])
 
-
-    attachedFiles AttachedFiles[]
+  attachedFiles AttachedFiles[]
 }
 
-model AttachedFiles{
-    fileId Int @id @default(autoincrement())
-    
-    fileName String
-    filePath String
+model AttachedFiles {
+  fileId Int @id @default(autoincrement())
 
-    newApplicationId Int
-    application NewApplication @relation(fields: [newApplicationId], references: [newApplicationId])
+  fileName String
+  filePath String
 
+  newApplicationId Int
+  application      NewApplication @relation(fields: [newApplicationId], references: [newApplicationId])
 }
 
+model TempApplication {
+  from DateTime @db.Date
+  days Int
 
-model TempApplication{
-    from DateTime @db.Date
-    days Int
+  applicationId   Int @unique // issue: larger id?
+  questionnaireId Int
+  prefRoomId      Int
 
-    applicationId Int @unique // issue: larger id?
-    questionnaireId Int
-    prefRoomId Int
-
-    applicaiton SeatApplication @relation(fields: [applicationId], references: [applicationId])
-    questionnaire TempQuestionnaire @relation(fields: [questionnaireId], references: [questionnaireId])
-    prefRoom Room @relation(fields: [prefRoomId], references: [roomId])
-
+  applicaiton   SeatApplication   @relation(fields: [applicationId], references: [applicationId])
+  questionnaire TempQuestionnaire @relation(fields: [questionnaireId], references: [questionnaireId])
+  prefRoom      Room              @relation(fields: [prefRoomId], references: [roomId])
 }
 
-model TempQuestionnaire{
-    questionnaireId Int @default(autoincrement()) @id
-    tempApplications TempApplication[] 
+model TempQuestionnaire {
+  questionnaireId  Int               @id @default(autoincrement())
+  tempApplications TempApplication[]
 }
 
-model Revision{
-    revisionId Int @id @default(autoincrement())
-    reason String // issue: better name?
-    createdAt DateTime @default(now())
+model Revision {
+  revisionId Int      @id @default(autoincrement())
+  reason     String // issue: better name?
+  createdAt  DateTime @default(now())
 
-    applicationId Int
+  applicationId Int
 
-    application SeatApplication @relation(fields: [applicationId], references: [applicationId])
-
+  application SeatApplication @relation(fields: [applicationId], references: [applicationId])
 }
 
-model ApplicationApproveHistory{
-    applicationId Int @unique
-    seatId Int
-    authorityId Int
+model ApplicationApproveHistory {
+  applicationId Int @unique
+  seatId        Int
+  authorityId   Int
 
-    application SeatApplication @relation(fields: [applicationId], references: [applicationId])
-    seat Seat @relation(fields: [seatId], references: [seatId])
-    authority Authority @relation(fields: [authorityId], references: [authorityId])
+  application SeatApplication @relation(fields: [applicationId], references: [applicationId])
+  seat        Seat            @relation(fields: [seatId], references: [seatId])
+  authority   Authority       @relation(fields: [authorityId], references: [authorityId])
+
+  time DateTime @default(now())
 }
 
-model Seat{
-    seatId Int @id @default(autoincrement())
-    roomId Int 
+model Seat {
+  seatId Int @id @default(autoincrement())
+  roomId Int
 
-    room Room @relation(fields: [roomId], references: [roomId])
-    residency Residency?
-    applicationsApproved ApplicationApproveHistory[]
+  room                 Room                        @relation(fields: [roomId], references: [roomId])
+  residency            Residency?
+  applicationsApproved ApplicationApproveHistory[]
+  tempResidency        TempResidency?
 }
 
-model Room{
-    roomId Int @id @default(autoincrement())
-    roomNo Int
-    floorId Int
-    
+model Room {
+  roomId  Int @id @default(autoincrement())
+  roomNo  Int
+  floorId Int
 
-    floor Floor @relation(fields: [floorId], references: [floorId])
-    tempApplications TempApplication[]
-    roomChangeApplications RoomChangeApplication[]
-    seats Seat[]
-    // issue : more fields?
+  floor                  Floor                   @relation(fields: [floorId], references: [floorId])
+  tempApplications       TempApplication[]
+  seatChangeApplications SeatChangeApplication[]
+  seats                  Seat[]
+  // issue : more fields?
 }
 
-model Floor{
-    floorId Int @id @default(autoincrement())
-    floorNo Int
-    roomLabelLen Int
-    rooms Room[]
+model Floor {
+  floorId      Int    @id @default(autoincrement())
+  floorNo      Int
+  roomLabelLen Int
+  rooms        Room[]
 }
 
-model RoomChangeApplication{
-    roomChangeApplicationId Int @id @default(autoincrement())
-    reason String
+model SeatChangeApplication {
+  seatChangeApplicationId Int    @id @default(autoincrement())
+  reason                  String
 
-    applicationId Int @unique // issue: larger id?
-    toRoomId Int
+  applicationId Int @unique // issue: larger id?
+  toRoomId      Int
 
-    application SeatApplication @relation(fields: [applicationId], references: [applicationId])    
-    toRoom Room @relation(fields: [toRoomId], references: [roomId])
+  application SeatApplication @relation(fields: [applicationId], references: [applicationId])
+  toRoom      Room            @relation(fields: [toRoomId], references: [roomId])
 
-    votes Vote[]
+  votes Vote[]
 }
 
-model NewSeatQuestionnaire{
-    questionnaireId Int @default(autoincrement()) @id
-    q1 Boolean 
-    q2 Boolean
-    newApplications NewApplication[] 
+model NewSeatQuestionnaire {
+  questionnaireId Int              @id @default(autoincrement())
+  q1              Boolean
+  q2              Boolean
+  newApplications NewApplication[]
 }
 
-enum ApplicationStatus{
-    PENDING
-    ACCEPTED
-    REJECTED
-    REVISE
+enum ApplicationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  REVISE
 }
 
-model Vote{
-    voteId Int @id @default(autoincrement())
-    reason String
-    lastUpdated DateTime
-    status VoteStatus
+model Vote {
+  voteId      Int        @id @default(autoincrement())
+  reason      String
+  lastUpdated DateTime
+  status      VoteStatus
 
-    roomChangeApplicationId Int
-    studentId Int
-    
-    roomChangeApplication RoomChangeApplication @relation(fields: [roomChangeApplicationId], references: [roomChangeApplicationId])
-    student Student @relation(fields: [studentId], references: [studentId])
+  seatChangeApplicationId Int
+  studentId               Int
 
-    @@unique([roomChangeApplicationId, studentId])
+  seatChangeApplication SeatChangeApplication @relation(fields: [seatChangeApplicationId], references: [seatChangeApplicationId])
+  student               Student               @relation(fields: [studentId], references: [studentId])
+
+  @@unique([seatChangeApplicationId, studentId])
 }
 
-enum VoteStatus{
-    YES
-    NO
-    NOT_VOTED
+enum VoteStatus {
+  YES
+  NO
+  NOT_VOTED
 }
 
-model Item{
-    itemId Int @id @default(autoincrement())
-    name String
-    type ItemType
-    
-    photoId Int?
-    photo Photo? @relation(fields: [photoId], references: [photoId])
+model Item {
+  itemId Int      @id @default(autoincrement())
+  name   String
+  type   ItemType
 
-    meals Meal[]
-    cupCounts CupCount[]
-    preferences Preference[]
-}
-model Photo{
-    photoId Int @id @default(autoincrement())
-    filePath String
-    item Item[]
+  photoId Int?
+  photo   Photo? @relation(fields: [photoId], references: [photoId])
+
+  meals       Meal[]
+  cupCounts   CupCount[]
+  preferences Preference[]
 }
 
-enum ItemType{
-    RICE
-    VEG 
-    NON_VEG
+model Photo {
+  photoId  Int    @id @default(autoincrement())
+  filePath String
+  item     Item[]
 }
 
-model Meal{
-    mealId Int @id @default(autoincrement())
-    createdAt DateTime @default(now())
-    items Item[] 
-
-    mealPlans MealPlan[]
+enum ItemType {
+  RICE
+  VEG
+  NON_VEG
 }
 
-model MealPlan{
-    mealPlanId Int @id @default(autoincrement())
-    day DateTime
-    mealTime MealTime
+model Meal {
+  mealId    Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  items     Item[]
 
-    mealId Int
-
-    meal Meal @relation(fields: [mealId], references: [mealId])
-    cupCount CupCount[]
-    preferences Preference[]
-    optedOut Student[]
+  mealPlans MealPlan[]
 }
 
-enum MealTime{
-    LUNCH
-    DINNER
+model MealPlan {
+  mealPlanId Int      @id @default(autoincrement())
+  day        DateTime
+  mealTime   MealTime
+
+  mealId Int
+
+  meal        Meal         @relation(fields: [mealId], references: [mealId])
+  cupCount    CupCount[]
+  preferences Preference[]
+  optedOut    Student[]
+}
+
+enum MealTime {
+  LUNCH
+  DINNER
 }
 
 // model MealTime{
@@ -292,108 +305,119 @@ enum MealTime{
 //     mealPlans MealPlan[]
 // }
 
-model CupCount{
-    cupcount Int
-    
-    mealPlanId Int
-    itemId Int
+model CupCount {
+  cupcount Int
 
-    @@id([mealPlanId, itemId])
+  mealPlanId Int
+  itemId     Int
 
-    mealPlan MealPlan @relation(fields: [mealPlanId], references: [mealPlanId])
-    item Item @relation(fields: [itemId], references: [itemId])
+  mealPlan MealPlan @relation(fields: [mealPlanId], references: [mealPlanId])
+  item     Item     @relation(fields: [itemId], references: [itemId])
+
+  @@id([mealPlanId, itemId])
 }
 
-model Preference{
-    order Int
-    
-    mealPlanId Int
-    itemId Int
-    studentId Int
+model Preference {
+  order Int
 
-    mealPlan MealPlan @relation(fields: [mealPlanId], references: [mealPlanId])
-    item Item @relation(fields: [itemId], references: [itemId])
-    student Student @relation(fields: [studentId], references: [studentId])
+  mealPlanId Int
+  itemId     Int
+  studentId  Int
 
-    @@id([mealPlanId, itemId, studentId])
+  mealPlan MealPlan @relation(fields: [mealPlanId], references: [mealPlanId])
+  item     Item     @relation(fields: [itemId], references: [itemId])
+  student  Student  @relation(fields: [studentId], references: [studentId])
+
+  @@id([mealPlanId, itemId, studentId])
 }
 
-model Feedback{
-    feedbackId Int @id @default(autoincrement())
-    week DateTime // issue : different data type?
+model Feedback {
+  feedbackId Int      @id @default(autoincrement())
+  week       DateTime // issue : different data type?
 
-    ratings Rating[]
+  ratings Rating[]
 }
 
-model Rating{
-    rating Float
-    type RatingType
+model Rating {
+  rating Float
+  type   RatingType
 
-    feedbackId Int
-    studentId Int
-    
-    feedback Feedback @relation(fields: [feedbackId], references: [feedbackId])
-    student Student @relation(fields: [studentId], references: [studentId])
+  feedbackId Int
+  studentId  Int
 
-    @@id([feedbackId, studentId, type])
+  feedback Feedback @relation(fields: [feedbackId], references: [feedbackId])
+  student  Student  @relation(fields: [studentId], references: [studentId])
+
+  @@id([feedbackId, studentId, type])
 }
 
-enum RatingType{
-    QUALITY
-    QUANTITY
-    MANAGEMENT
+enum RatingType {
+  QUALITY
+  QUANTITY
+  MANAGEMENT
 }
 
-model MessManager{
-    messManagerId Int @id @default(autoincrement())
-    from DateTime
-    to DateTime
-    assingedAt DateTime @default(now())
+model MessManager {
+  messManagerId Int      @id @default(autoincrement())
+  from          DateTime
+  to            DateTime
+  assingedAt    DateTime @default(now())
 
-    studentId Int
-    student Student @relation(fields: [studentId], references: [studentId])
+  studentId Int
+  student   Student @relation(fields: [studentId], references: [studentId])
 }
 
-model MessManagerApplication{
-    applicationId Int @id @default(autoincrement())
-    preferredTimeRange DateTime // issue : from to?
-    appliedAt DateTime @default(now())
+model MessManagerApplication {
+  applicationId      Int      @id @default(autoincrement())
+  preferredTimeRange DateTime // issue : from to?
+  appliedAt          DateTime @default(now())
 
-    studentId Int
-    student Student @relation(fields: [studentId], references: [studentId])
+  studentId Int
+  student   Student @relation(fields: [studentId], references: [studentId])
 }
 
-model Complaint{
-    complainId Int @id @default(autoincrement())
-    // issue : longer id?
-    title String
-    details String
-    createdAt DateTime @default(now())
-    type ComplaintType
+model Complaint {
+  complainId Int           @id @default(autoincrement())
+  // issue : longer id?
+  title      String
+  details    String
+  createdAt  DateTime      @default(now())
+  type       ComplaintType
 
-    studentId Int
-    student Student @relation(fields: [studentId], references: [studentId])
+  studentId Int
+  student   Student @relation(fields: [studentId], references: [studentId])
 }
 
-enum ComplaintType{
-    RESOURCE
-    STUDENT
-    STUFF
+enum ComplaintType {
+  RESOURCE
+  STUDENT
+  STUFF
 }
 
-model Authority{
-    authorityId Int @id @default(autoincrement())
-    name String
-    email String @unique
-    phone String?
-    role AuthorityRole
-    password String
+model Authority {
+  authorityId Int           @id @default(autoincrement())
+  name        String
+  email       String        @unique
+  phone       String?
+  role        AuthorityRole
+  password    String
 
-    applicationsHistory ApplicationApproveHistory[]
+  applicationsHistory ApplicationApproveHistory[]
+  RejectionHistory    RejectionHistory[]
 }
 
-enum AuthorityRole{
-    PROVOST
-    ASSISTANT_PROVOST
-    DINING_STUFF
+enum AuthorityRole {
+  PROVOST
+  ASSISTANT_PROVOST
+  DINING_STUFF
+}
+
+model RejectionHistory {
+  applicationId Int @unique
+  authorityId   Int
+
+  application SeatApplication @relation(fields: [applicationId], references: [applicationId])
+  authority   Authority       @relation(fields: [authorityId], references: [authorityId])
+
+  time DateTime @default(now())
 }
