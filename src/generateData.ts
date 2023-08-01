@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt'
 const prisma = new PrismaClient()
 
 async function generateDept(){
+    let promises = []
     let deptShorts = [
         'CSE',
         'EEE',
@@ -25,20 +26,22 @@ async function generateDept(){
     let n = deptShorts.length
 
     for(let i = 0; i < n; ++i){
-        await prisma.department.create({
+        promises.push(prisma.department.create({
             data : {
                 name : depts[i],
                 shortName : deptShorts[i],
                 deptCode : deptCodes[i]
             }
-        })
+        }))
     }
+    await Promise.all(promises)
     // prisma.batch.createMany({
     //     data : 
     // })
 }
 
 async function generateBatches(){
+    let promises = []
     let batches = [
         '2018',
         '2019',
@@ -48,14 +51,18 @@ async function generateBatches(){
 
     let n = batches.length
     batches.forEach(async (batch, index)=>{
-        await prisma.batch.create({
+        
+        promises.push(prisma.batch.create({
             data : {
                 year : batch
             }
-        })
+        }))
     })
+
+    await Promise.all(promises);
 }
 async function generateLT(){
+    let promises = []
     let levelTerm = [
         '4-1',
         '3-2',
@@ -65,12 +72,14 @@ async function generateLT(){
 
     let n = levelTerm.length
     levelTerm.forEach(async (lt, index)=>{
-        await prisma.levelTerm.create({
+        promises.push(prisma.levelTerm.create({
             data : {
                 label : lt
             }
-        })
+        }))
     })
+
+    await Promise.all(promises)
 }
 
 
@@ -139,55 +148,80 @@ async function generateRooms(){
         for(let i = 1; i <= roomCount; ++i){
             promises.push(prisma.room.create({
                 data : {
-                    roomCapacity : i % 2 ? 3 : 4,
                     roomNo : i,
                     floorId : f.floorId
                 }
             }))
         }
     })
-    await Promise.all(promises)
+    await Promise.all(promises);
+}
+
+async function generateSeat(){
+    let rooms = await prisma.room.findMany();
+    let promises = []
+    rooms.forEach(r =>{
+        let rc = Math.random() > .5 ? 3 : 4;
+        for(let i = 0; i < rc; ++i){
+            promises.push(
+                prisma.seat.create({
+                    data : {
+                        roomId : r.roomId
+                    }
+                })
+            )
+        }
+    })
+    await Promise.all(promises);
 }
 
 async function generateResidency(){
     let students = await prisma.student.findMany()
-    let rooms = await prisma.room.findMany()
-    let randIndex = () =>{
-        return Math.floor(Math.random() * rooms.length ) 
-    }
+    let seats = await prisma.seat.findMany()
+    let seatIndex = 0;
 
     let promises = []
     students.forEach( async st =>{
         
         if (st.residencyStatus == 'RESIDENT'){
             console.log('here');
-            let room = rooms[randIndex()]
-
-            while(true){
-                room = rooms[randIndex()]
-                let residents = await prisma.residency.findMany({
-                    where : {
-                        roomId : room.roomId
-                    }
-                })
-                if(residents.length < room.roomCapacity )
-                    break;
+            if(seatIndex >= seats.length - 10){
+                promises.push(
+                    prisma.student.update({
+                        where : {
+                            studentId : st.studentId
+                        },
+                        data : {
+                            residencyStatus : 'ATTACHED'
+                        }
+                    })
+                )
             }
-
-            // promises.push(
-                prisma.residency.create({
-                    data : {
-                        from : new Date(Date.now() - 1000 * 60 * 24 * 30),
-                        roomId : room.roomId,
-                        studentId : st.studentId
-                    }
-                }).then(r =>{
-                    console.log(r);
-                })
-                .catch(err =>{
-                    console.log(err)
-                })
-            // )
+            else{
+                
+                let seat = seats[seatIndex++]
+    
+                // while(true){
+                //     seat = seats[randIndex()]
+                //     let residents = await prisma.residency.findMany({
+                //         where : {
+                //             roomId : seat.roomId
+                //         }
+                //     })
+                //     if(residents.length < seat.roomCapacity )
+                //         break;
+                // }
+    
+                promises.push(
+                    prisma.residency.create({
+                        data : {
+                            from : new Date(Date.now() - 1000 * 60 * 24 * 30),
+                            seatId : seat.seatId,
+                            studentId : st.studentId
+                        }
+                    })
+                )
+            }
         }
     })
     try{
@@ -233,6 +267,7 @@ async function generateAuthority(){
 
 
 async function generateApplications(){
+    let promises = []
     let students = await prisma.student.findMany({
     })
     
@@ -241,7 +276,7 @@ async function generateApplications(){
 
             if(Math.random() > .5) return;
     
-            await prisma.newApplication.create({
+            promises.push(prisma.newApplication.create({
                 data : {
                     application : {
                         create : {
@@ -256,12 +291,14 @@ async function generateApplications(){
                         }
                     }
                 }
-            })
+            }))
         }
         // else if(s.residencyStatus == 'RESIDENT'){
 
         // }
     })
+
+    Promise.all(promises);
 
 }
 
@@ -283,6 +320,7 @@ async function generateAll(){
     await generateStudents()
     await generateFloors()
     await generateRooms()
+    await generateSeat()
     await generateResidency()
     await generateAuthority();
     await generateApplications();

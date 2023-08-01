@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken'
 import {CupCount, NewApplication, RoomChangeApplication, TempApplication, UserWithToken, Vote} from "../graphql-schema";
 import {roles} from "../utility";
 import {ItemType, MealTime} from "@prisma/client";
+import { contains } from "class-validator";
 
 export class mutationResolver{
     
@@ -182,7 +183,7 @@ export class mutationResolver{
     @Mutation(returns => RoomChangeApplication)
     async roomChangeApplication(
         @Ctx() ctx : Context,
-        @Arg('roomId') roomId : number,
+        @Arg('seatId') seatId : number,
         @Arg('reason') reason : string
     ){
         console.log("in room change application\n");
@@ -209,19 +210,19 @@ export class mutationResolver{
         //         roomId : roomId
         //     }
         // });
-        let roomMembers = await ctx.prisma.residency.findMany({
+        let seat = await ctx.prisma.seat.findUnique({
             where : {
-                roomId : roomId
+                seatId : seatId
             }
         })
-        // await ctx.prisma.vote.createMany({
-        //     data : roomMembers.map(r =>({
-        //         lastUpdated : new Date(),
-        //         reason : '',
-        //         roomChangeApplicationId : 
-        //     }))
-        // })
-
+        let roomMembers = await ctx.prisma.residency.findMany({
+            where : {
+                seat : {
+                    roomId : seat.roomId
+                }
+            }
+        })
+        
         let application = await ctx.prisma.roomChangeApplication.create({
             data : {
                 application : {
@@ -234,7 +235,7 @@ export class mutationResolver{
                 },
                 toRoom : {
                     connect : {
-                        roomId : roomId
+                        roomId : seatId
                     }
                 },
                 reason : reason,

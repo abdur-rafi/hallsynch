@@ -66,9 +66,10 @@ model Residency{
     from DateTime
     
     studentId Int @unique
-    roomId Int
+    
+    seatId Int @unique
 
-    room Room @relation(fields: [roomId], references: [roomId])
+    seat Seat @relation(fields: [seatId], references: [seatId])
     student Student @relation(fields: [studentId], references: [studentId])
     
 }
@@ -89,7 +90,7 @@ model SeatApplication{
     tempApplication TempApplication?
     roomChangeApplication RoomChangeApplication?
     revisions Revision[]
-
+    approveHisotry ApplicationApproveHistory?
 
 }
 
@@ -148,17 +149,35 @@ model Revision{
 
 }
 
+model ApplicationApproveHistory{
+    applicationId Int @unique
+    seatId Int
+    authorityId Int
+
+    application SeatApplication @relation(fields: [applicationId], references: [applicationId])
+    seat Seat @relation(fields: [seatId], references: [seatId])
+    authority Authority @relation(fields: [authorityId], references: [authorityId])
+}
+
+model Seat{
+    seatId Int @id @default(autoincrement())
+    roomId Int 
+
+    room Room @relation(fields: [roomId], references: [roomId])
+    residency Residency?
+    applicationsApproved ApplicationApproveHistory[]
+}
+
 model Room{
     roomId Int @id @default(autoincrement())
     roomNo Int
-    roomCapacity Int
     floorId Int
     
 
     floor Floor @relation(fields: [floorId], references: [floorId])
     tempApplications TempApplication[]
     roomChangeApplications RoomChangeApplication[]
-    residencies Residency[]
+    seats Seat[]
     // issue : more fields?
 }
 
@@ -369,6 +388,8 @@ model Authority{
     phone String?
     role AuthorityRole
     password String
+
+    applicationsHistory ApplicationApproveHistory[]
 }
 
 enum AuthorityRole{
