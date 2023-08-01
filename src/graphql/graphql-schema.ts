@@ -47,6 +47,20 @@ export class LevelTerm{
 
 
 @ObjectType()
+export class ApplicationApproveHistory{
+    @Field()
+    applicationId : number;
+
+    @Field()
+    seatId : number;
+
+    @Field()
+    authorityId : number;
+
+}
+
+
+@ObjectType()
 export class Floor{
     @Field()
     floorId : number;
@@ -63,7 +77,21 @@ export class Floor{
 }
 
 
+@ObjectType()
+export class Seat{
+    @Field()
+    seatId : number;
 
+    @Field()
+    roomId : number;
+
+    @Field(type => Room)
+    room : ()=> Room;
+
+    @Field(type => Residency, {nullable : true})
+    residency? : () => Residency;
+
+}
 
 @ObjectType()
 export class Room{
@@ -74,13 +102,15 @@ export class Room{
     roomNo : number;
 
     @Field()
-    roomCapacity : number;
-
-    @Field()
     floorId : number;
 
     @Field(type => Floor)
     floor : Floor;
+
+    @Field(type => [Seat])
+    seats : [Seat];
+
+    
 }
 
 @ObjectType()

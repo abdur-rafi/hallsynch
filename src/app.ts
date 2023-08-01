@@ -31,6 +31,9 @@ import cors from 'cors'
 import {json} from 'body-parser'
 import { VoteResolver } from "./graphql/resolvers/FieldResolvers/vote";
 import { AuthorityResolver } from "./graphql/resolvers/FieldResolvers/authority";
+import { SeatResolver } from "./graphql/resolvers/FieldResolvers/seat";
+import { FloorResolver } from "./graphql/resolvers/FieldResolvers/floor";
+import { RoomResolver } from "./graphql/resolvers/FieldResolvers/room";
 
 const client = new PrismaClient()
 
@@ -52,7 +55,10 @@ buildSchema({
         TempApplicationResolver,
         RoomChangeApplicationResolver,
         VoteResolver,
-        AuthorityResolver
+        AuthorityResolver,
+        SeatResolver,
+        RoomResolver,
+        FloorResolver
     ],
     authChecker : authChecker
 }).then(schema => {

@@ -1,5 +1,5 @@
 import {Arg, Authorized, Ctx, Query, Resolver} from 'type-graphql'
-import { Batch, Department, FilterInput, LevelTerm, Room, SearchInput, SeatApplication, SeatApplicationsWithCount, SortInput, StatusWithDefaultSelect, Student, Vote } from '../graphql-schema'
+import { Batch, Department, FilterInput, LevelTerm, Room, SearchInput, Seat, SeatApplication, SeatApplicationsWithCount, SortInput, StatusWithDefaultSelect, Student, Vote } from '../graphql-schema'
 import { Context } from '../interface'
 import { applicationTypes, params, roles, sortVals } from '../utility';
 import { ApplicationStatus, Prisma } from '@prisma/client';
@@ -261,14 +261,19 @@ export class queryResolver{
         return await ctx.prisma.levelTerm.findMany();
     }
     
-    @Query(returns => Room)
-    async freeRoom(
+
+    @Query(returns => Seat)
+    async freeSeat(
         @Ctx() ctx : Context
     ){
-        return await ctx.prisma.room.findFirst({
-            
+        return await ctx.prisma.seat.findFirst({
+            where : {
+                residency : null
+            }
         })
     }
+
+    
 
     // @Query
 }
