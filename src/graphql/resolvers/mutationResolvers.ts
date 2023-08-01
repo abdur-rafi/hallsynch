@@ -2,7 +2,7 @@ import {Arg, Authorized, Ctx, Mutation} from "type-graphql";
 import {Context} from "../interface";
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import {CupCount, NewApplication, Residency, RoomChangeApplication, SeatApplication, TempApplication, TempResidency, UserWithToken, Vote} from "../graphql-schema";
+import {CupCount, NewApplication, Residency, Revision, RoomChangeApplication, SeatApplication, TempApplication, TempResidency, UserWithToken, Vote} from "../graphql-schema";
 import {roles} from "../utility";
 import {ItemType, MealTime} from "@prisma/client";
 import { contains } from "class-validator";
@@ -620,5 +620,40 @@ export class mutationResolver{
     }
 
 
+    @Authorized(roles.PROVOST)
+    @Mutation(returns => Revision)
+    async reviseApplication(
+        @Ctx() ctx : Context,
+        @Arg('applicationId') applicationId : number,
+        @Arg('reason') reason : string
+    ){
+        let application = await ctx.prisma.seatApplication.findUnique({
+            where :  {
+                applicationId : applicationId
+            }
+        })
+        if(application.status != 'PENDING'){
+            throw new Error("Invalid state of application");
+        }
+
+        let result = await ctx.prisma.$transaction([
+            ctx.prisma.seatApplication.update({
+                where : {
+                    applicationId : application.applicationId
+                },
+                data : {
+                    status : 'REVISE'
+                }
+            }),
+            ctx.prisma.revision.create({
+                data : {
+                    applicationId : application.applicationId,
+                    reason : reason
+                }
+            })
+        ])
+
+        return result[1];        
+    }
     
 }

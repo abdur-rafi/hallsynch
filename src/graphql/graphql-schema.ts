@@ -401,6 +401,25 @@ export class RoomChangeApplication{
 }
 
 @ObjectType()
+export class Revision{
+    
+    @Field()
+    revisionId : number
+    
+    @Field()
+    reason : string;
+
+    @Field()
+    createdAt : Date;
+    
+    @Field()
+    applicationId : number;
+
+    @Field(type => SeatApplication)
+    application : SeatApplication
+}
+
+@ObjectType()
 export class Vote{
     @Field()
     voteId : number
