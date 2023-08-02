@@ -1,5 +1,5 @@
 import { Ctx, FieldResolver, Resolver, Root } from "type-graphql";
-import { AttachedFiles, Batch, Department, NewApplication, NewSeatQuestionnaire, ResidencyStatus, Room, RoomChangeApplication, SeatApplication, Student, TempApplication, TempQuestionnaire, Vote } from "../../graphql-schema";
+import { AttachedFiles, Batch, Department, NewApplication, NewSeatQuestionnaire, ResidencyStatus, Room, SeatChangeApplication, SeatApplication, Student, TempApplication, TempQuestionnaire, Vote } from "../../graphql-schema";
 import { Context } from "../../interface";
 import { VoteStatus } from "@prisma/client";
 
@@ -15,14 +15,14 @@ export class VoteResolver{
         return VoteStatus[vote.status];
     }
 
-    @FieldResolver(type => RoomChangeApplication)
+    @FieldResolver(type => SeatChangeApplication)
     async roomChangeApplication(
         @Ctx() ctx : Context,
         @Root() vote : Vote
     ){
-        return await ctx.prisma.roomChangeApplication.findUnique({
+        return await ctx.prisma.seatChangeApplication.findUnique({
             where : {
-                applicationId : vote.roomChangeApplicationId
+                applicationId : vote.seatChangeApplicationId
             }
         })
     }

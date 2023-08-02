@@ -2,7 +2,7 @@ import {Arg, Authorized, Ctx, Mutation} from "type-graphql";
 import {Context} from "../interface";
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import {CupCount, NewApplication, Residency, Revision, RoomChangeApplication, SeatApplication, TempApplication, TempResidency, UserWithToken, Vote} from "../graphql-schema";
+import {CupCount, NewApplication, Residency, Revision, SeatChangeApplication, SeatApplication, TempApplication, TempResidency, UserWithToken, Vote} from "../graphql-schema";
 import {roles} from "../utility";
 import {ItemType, MealTime} from "@prisma/client";
 import { contains } from "class-validator";
@@ -180,7 +180,7 @@ export class mutationResolver{
 
     
     // @Authorized(roles.STUDENT_RESIDENT) // adding this is causing the server to not respond to reqs. why????
-    @Mutation(returns => RoomChangeApplication)
+    @Mutation(returns => SeatChangeApplication)
     async seatChangeApplication(
         @Ctx() ctx : Context,
         @Arg('seatId') seatId : number,

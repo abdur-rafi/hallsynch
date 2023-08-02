@@ -199,10 +199,32 @@ export class Student{
 
     @Field(type =>[SeatApplication])
     applications : [SeatApplication]
+
+    @Field(type => [TempResidencyHistory])
+    tempResidencyHistory : [TempResidencyHistory]
+    // @Field(type =>)
     
 }
+@ObjectType()
+export class TempResidencyHistory{
+    @Field()
+    tempResidencyHistoryId : number
+    
+    @Field()
+    from : Date
+    
+    @Field()
+    to : Date 
+    
+    @Field()
+    studentId : number
+    
+    @Field()
+    seatId : number;
 
-
+    @Field(type => Seat)
+    seat : Seat;
+}
 
 export enum ResidencyStatus{
     ATTACHED,
@@ -297,8 +319,8 @@ export class SeatApplication{
     @Field(type => TempApplication, {nullable : true})
     tempApplication? : () => TempApplication
 
-    @Field(type => RoomChangeApplication, {nullable : true})
-    roomChangeApplication? : () => RoomChangeApplication
+    @Field(type => SeatChangeApplication, {nullable : true})
+    seatChangeApplication? : () => SeatChangeApplication
 
 }
 
@@ -376,10 +398,10 @@ export class TempApplication{
 
 
 @ObjectType()
-export class RoomChangeApplication{
+export class SeatChangeApplication{
     
     @Field()
-    roomChangeApplicationId : number
+    seatChangeApplicationId : number
     
     @Field()
     reason : string;
@@ -388,13 +410,13 @@ export class RoomChangeApplication{
     applicationId : number;
     
     @Field()
-    toRoomId : number;
+    toSeatId : number;
 
     @Field(type => SeatApplication)
     application : SeatApplication
 
-    @Field(type => Room)
-    toRoom : Room
+    @Field(type => Seat)
+    toSeat : Seat
 
     @Field(type => [Vote])
     votes : [Vote]
@@ -434,13 +456,13 @@ export class Vote{
     status : VoteStatus;
     
     @Field()
-    roomChangeApplicationId : number;
+    seatChangeApplicationId : number;
 
     @Field()
     studentId : number;
 
-    @Field(type => RoomChangeApplication)
-    roomChangeApplication : RoomChangeApplication
+    @Field(type => SeatChangeApplication)
+    seatChangeApplication : SeatChangeApplication
 
     @Field(type => Student)
     student : Student;

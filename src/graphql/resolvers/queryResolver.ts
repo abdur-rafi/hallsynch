@@ -274,7 +274,17 @@ export class queryResolver{
         })
     }
 
-    
+    @Query(returs => SeatApplication)
+    async applicationDetails(
+        @Ctx() ctx : Context,
+        @Arg('applicationId') applicationId : number
+    ){
+        return await ctx.prisma.seatApplication.findUnique({
+            where : {
+                applicationId : applicationId
+            }
+        })
+    }
 
     // @Query
 }

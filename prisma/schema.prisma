@@ -36,6 +36,7 @@ model Student {
   complaints              Complaint[]
   applications            SeatApplication[]
   tempResidency           TempResidency?
+  tempResidencyHistory    TempResidencyHistory[]
 }
 
 model Department {
@@ -84,6 +85,20 @@ model TempResidency {
   studentId Int @unique
 
   seatId Int @unique
+
+  seat    Seat    @relation(fields: [seatId], references: [seatId])
+  student Student @relation(fields: [studentId], references: [studentId])
+}
+
+model TempResidencyHistory {
+  //   tempResidencyId Int      @id @default(autoincrement())
+  tempResidencyHistoryId Int      @id @default(autoincrement())
+  from                   DateTime
+  to                     DateTime
+
+  studentId Int
+
+  seatId Int
 
   seat    Seat    @relation(fields: [seatId], references: [seatId])
   student Student @relation(fields: [studentId], references: [studentId])
@@ -179,6 +194,7 @@ model Seat {
   residency            Residency?
   applicationsApproved ApplicationApproveHistory[]
   tempResidency        TempResidency?
+  tempResidencyHistory TempResidencyHistory[]
 }
 
 model Room {

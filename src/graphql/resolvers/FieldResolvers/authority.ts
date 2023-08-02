@@ -1,5 +1,5 @@
 import { Ctx, FieldResolver, Resolver, Root } from "type-graphql";
-import { AuthorityRole, ApplicationStatus, Authority, NewApplication, RoomChangeApplication, SeatApplication, TempApplication } from "../../graphql-schema";
+import { AuthorityRole, ApplicationStatus, Authority, NewApplication, SeatChangeApplication, SeatApplication, TempApplication } from "../../graphql-schema";
 import { Context } from "../../interface";
 
 @Resolver(of => Authority)

@@ -25,7 +25,7 @@ import {ItemResolver} from "./graphql/resolvers/FieldResolvers/item";
 import {MealPlanResolver} from "./graphql/resolvers/FieldResolvers/mealPlan";
 import {MealResolver} from "./graphql/resolvers/FieldResolvers/meal";
 import { TempApplicationResolver } from "./graphql/resolvers/FieldResolvers/tempApplication";
-import { RoomChangeApplicationResolver } from "./graphql/resolvers/FieldResolvers/roomChangeApplication";
+import { SeatChangeApplicationResolver } from "./graphql/resolvers/FieldResolvers/seatChangeApplication";
 
 import cors from 'cors'
 import {json} from 'body-parser'
@@ -54,7 +54,7 @@ buildSchema({
         MealPlanResolver,
         MealResolver,
         TempApplicationResolver,
-        RoomChangeApplicationResolver,
+        SeatChangeApplicationResolver,
         VoteResolver,
         AuthorityResolver,
         SeatResolver,
