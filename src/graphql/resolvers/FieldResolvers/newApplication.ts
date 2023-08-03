@@ -29,16 +29,16 @@ export class NewApplicationResolver{
         })
     }
 
-    @FieldResolver(type => [AttachedFiles])
-    async attachedFiles(
-        @Ctx() ctx : Context,
-        @Root() newApp : NewApplication
-    ){
-        return await ctx.prisma.attachedFiles.findMany({
-            where : {
-                newApplicationId : newApp.newApplicationId
-            }
-        })
-    }
+    // @FieldResolver(type => [AttachedFiles])
+    // async attachedFiles(
+    //     @Ctx() ctx : Context,
+    //     @Root() newApp : NewApplication
+    // ){
+    //     return await ctx.prisma.attachedFiles.findMany({
+    //         where : {
+    //             newApplicationId : newApp.newApplicationId
+    //         }
+    //     })
+    // }
     
 }

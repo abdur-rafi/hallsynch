@@ -37,6 +37,7 @@ model Student {
   applications            SeatApplication[]
   tempResidency           TempResidency?
   tempResidencyHistory    TempResidencyHistory[]
+  UploadedFile            UploadedFile[]
 }
 
 model Department {
@@ -122,6 +123,7 @@ model SeatApplication {
   approveHisotry        ApplicationApproveHistory?
 
   rejectionHistory RejectionHistory?
+  AttachedFiles    AttachedFiles[]
 }
 
 model NewApplication {
@@ -137,13 +139,27 @@ model NewApplication {
 }
 
 model AttachedFiles {
-  fileId Int @id @default(autoincrement())
+  uploadedFileId Int
+  applicationId  Int
+
+  uploadedFile                   UploadedFile    @relation(fields: [uploadedFileId], references: [uploadedFileId])
+  application                    SeatApplication @relation(fields: [applicationId], references: [applicationId])
+  NewApplication                 NewApplication? @relation(fields: [newApplicationNewApplicationId], references: [newApplicationId])
+  newApplicationNewApplicationId Int?
+
+  @@unique([uploadedFileId, applicationId])
+}
+
+model UploadedFile {
+  uploadedFileId Int @id @default(autoincrement())
 
   fileName String
   filePath String
 
-  newApplicationId Int
-  application      NewApplication @relation(fields: [newApplicationId], references: [newApplicationId])
+  studentId Int
+  student   Student @relation(fields: [studentId], references: [studentId])
+
+  AttachedFiles AttachedFiles[]
 }
 
 model TempApplication {
