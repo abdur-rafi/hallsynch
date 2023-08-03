@@ -1,5 +1,5 @@
 import {Arg, Authorized, Ctx, Query, Resolver} from 'type-graphql'
-import { Batch, Department, FilterInput, LevelTerm, Room, SearchInput, Seat, SeatApplication, SeatApplicationsWithCount, SortInput, StatusWithDefaultSelect, Student, Vote } from '../graphql-schema'
+import { Batch, Department, FilterInput, LevelTerm, Room, SearchInput, Seat, SeatApplication, SeatApplicationsWithCount, SortInput, StatusWithDefaultSelect, Student, UserWithToken, Vote } from '../graphql-schema'
 import { Context } from '../interface'
 import { applicationTypes, params, roles, sortVals } from '../utility';
 import { ApplicationStatus, Prisma } from '@prisma/client';
@@ -8,6 +8,31 @@ export class queryResolver{
     @Query(returns => String)
     test(){
         return 'Hello world'
+    }
+
+    @Query(retunrs => UserWithToken)
+    async selfInfo(
+        @Ctx() ctx : Context
+    ){
+        if(!ctx.identity)
+            throw new Error("Not authenticated");
+        let student = undefined;
+        if(ctx.identity.studentId){
+            student = await ctx.prisma.student.findUnique({
+                where : {studentId : ctx.identity.studentId}
+            })
+        }
+        let authority = undefined;
+        if(ctx.identity.authorityId){
+            authority = await ctx.prisma.authority.findUnique({
+                where : {authorityId : ctx.identity.authorityId}
+            })
+        }
+        return {
+            authority : authority,
+            student : student,
+            token : ''
+        }
     }
 
     @Query(returns => [Department])
