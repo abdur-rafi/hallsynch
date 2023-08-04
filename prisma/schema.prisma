@@ -205,12 +205,13 @@ model Seat {
   seatLabel String @db.Char(1)
   roomId    Int
 
-  room                 Room                        @relation(fields: [roomId], references: [roomId])
-  residency            Residency?
-  applicationsApproved ApplicationApproveHistory[]
-  tempResidency        TempResidency?
-  tempResidencyHistory TempResidencyHistory[]
-  TempApplication      TempApplication[]
+  room                  Room                        @relation(fields: [roomId], references: [roomId])
+  residency             Residency?
+  applicationsApproved  ApplicationApproveHistory[]
+  tempResidency         TempResidency?
+  tempResidencyHistory  TempResidencyHistory[]
+  TempApplication       TempApplication[]
+  SeatChangeApplication SeatChangeApplication[]
 }
 
 model Room {
@@ -239,12 +240,14 @@ model SeatChangeApplication {
   reason                  String
 
   applicationId Int @unique // issue: larger id?
-  toRoomId      Int
+  toSeatId      Int
 
   application SeatApplication @relation(fields: [applicationId], references: [applicationId])
-  toRoom      Room            @relation(fields: [toRoomId], references: [roomId])
+  toSeat      Seat            @relation(fields: [toSeatId], references: [seatId])
 
-  votes Vote[]
+  votes      Vote[]
+  Room       Room?  @relation(fields: [roomRoomId], references: [roomId])
+  roomRoomId Int?
 }
 
 model NewSeatQuestionnaire {

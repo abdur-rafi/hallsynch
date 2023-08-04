@@ -227,6 +227,14 @@ export class mutationResolver{
                 seatId : seatId
             }
         })
+        let residency = await ctx.prisma.residency.findFirst({
+            where : {
+                seatId : seatId
+            }
+        })
+        if(residency){
+            throw new Error("Seat is not empty\n");
+        }
         let roomMembers = await ctx.prisma.residency.findMany({
             where : {
                 seat : {
@@ -245,9 +253,9 @@ export class mutationResolver{
                         studentId : ctx.identity.studentId
                     }
                 },
-                toRoom : {
+                toSeat : {
                     connect : {
-                        roomId : seatId
+                        seatId : seatId
                     }
                 },
                 reason : reason,
@@ -261,9 +269,6 @@ export class mutationResolver{
                         }))
                     }
                 }
-            },
-            include : {
-                application : true
             }
         })
 
