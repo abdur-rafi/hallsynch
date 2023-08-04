@@ -135,7 +135,7 @@ export class mutationResolver{
         @Ctx() ctx : Context,
         @Arg('q1') q1 : boolean,
         @Arg('q2') q2 : boolean,
-        @Arg('roomPref') roomPref : number,
+        @Arg('prefSeatId') prefSeatId : number,
         @Arg('days') days : number,
         @Arg('from') from : string
     ){
@@ -177,17 +177,13 @@ export class mutationResolver{
 
                     }
                 },
-                prefRoom : {
+                prefSeat : {
                     connect : {
-                        roomId : roomPref
+                        seatId : prefSeatId
                     }
                 },
                 days : days,
                 from : new Date(from)
-            },
-            include : {
-                applicaiton : true,
-                questionnaire : true
             }
         })
 

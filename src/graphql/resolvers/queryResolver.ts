@@ -338,7 +338,7 @@ export class queryResolver{
     @Query(returns => [Room])
     async freeRoomInFloor(
         @Ctx() ctx : Context,
-        @Arg('floorId') floorId : number
+        @Arg('floorNo') floorNo : number
     ){
         return await ctx.prisma.room.findMany({
             where : {
@@ -348,7 +348,12 @@ export class queryResolver{
                         residency : null
                     }
                 },
-                floorId : floorId
+                floor : {
+                    floorNo : floorNo
+                }
+            },
+            orderBy : {
+                roomNo : 'asc'
             }
         })
     }
@@ -357,13 +362,22 @@ export class queryResolver{
     @Query(returns => [Seat])
     async freeSeatInRoom(
         @Ctx() ctx : Context,
-        @Arg('roomId') roomId : number
+        @Arg('floorNo') floorNo : number,
+        @Arg('roomNo') roomNo : number
     ){
         return await ctx.prisma.seat.findMany({
             where : {
-                roomId : roomId,
+                room : {
+                    roomNo : roomNo,
+                    floor : {
+                        floorNo : floorNo
+                    }
+                },
                 residency : null,
                 tempResidency : null
+            },
+            orderBy : {
+                seatLabel : 'asc'
             }
         })
     }

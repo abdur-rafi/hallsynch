@@ -134,15 +134,14 @@ model NewApplication {
   questionnaireId Int                  @unique
   application     SeatApplication      @relation(fields: [applicationId], references: [applicationId])
   questionnaire   NewSeatQuestionnaire @relation(fields: [questionnaireId], references: [questionnaireId])
-
 }
 
 model AttachedFiles {
   uploadedFileId Int
   applicationId  Int
 
-  uploadedFile                   UploadedFile    @relation(fields: [uploadedFileId], references: [uploadedFileId])
-  application                    SeatApplication @relation(fields: [applicationId], references: [applicationId])
+  uploadedFile UploadedFile    @relation(fields: [uploadedFileId], references: [uploadedFileId])
+  application  SeatApplication @relation(fields: [applicationId], references: [applicationId])
 
   @@unique([uploadedFileId, applicationId])
 }
@@ -165,11 +164,13 @@ model TempApplication {
 
   applicationId   Int @unique // issue: larger id?
   questionnaireId Int
-  prefRoomId      Int
+  prefSeatId      Int
 
   applicaiton   SeatApplication   @relation(fields: [applicationId], references: [applicationId])
   questionnaire TempQuestionnaire @relation(fields: [questionnaireId], references: [questionnaireId])
-  prefRoom      Room              @relation(fields: [prefRoomId], references: [roomId])
+  prefSeat      Seat              @relation(fields: [prefSeatId], references: [seatId])
+  Room          Room?             @relation(fields: [roomRoomId], references: [roomId])
+  roomRoomId    Int?
 }
 
 model TempQuestionnaire {
@@ -200,15 +201,16 @@ model ApplicationApproveHistory {
 }
 
 model Seat {
-  seatId Int @id @default(autoincrement())
+  seatId    Int    @id @default(autoincrement())
   seatLabel String @db.Char(1)
-  roomId Int
+  roomId    Int
 
   room                 Room                        @relation(fields: [roomId], references: [roomId])
   residency            Residency?
   applicationsApproved ApplicationApproveHistory[]
   tempResidency        TempResidency?
   tempResidencyHistory TempResidencyHistory[]
+  TempApplication      TempApplication[]
 }
 
 model Room {
@@ -221,11 +223,13 @@ model Room {
   seatChangeApplications SeatChangeApplication[]
   seats                  Seat[]
   // issue : more fields?
+
+  @@unique([floorId, roomNo])
 }
 
 model Floor {
   floorId      Int    @id @default(autoincrement())
-  floorNo      Int
+  floorNo      Int    @unique
   roomLabelLen Int
   rooms        Room[]
 }
