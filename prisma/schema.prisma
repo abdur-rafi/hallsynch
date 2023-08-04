@@ -201,6 +201,7 @@ model ApplicationApproveHistory {
 
 model Seat {
   seatId Int @id @default(autoincrement())
+  seatLabel String @db.Char(1)
   roomId Int
 
   room                 Room                        @relation(fields: [roomId], references: [roomId])

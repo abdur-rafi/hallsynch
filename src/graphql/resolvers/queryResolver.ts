@@ -1,5 +1,5 @@
 import {Arg, Authorized, Ctx, Query, Resolver} from 'type-graphql'
-import { Batch, Department, FilterInput, LevelTerm, Room, SearchInput, Seat, SeatApplication, SeatApplicationsWithCount, SortInput, StatusWithDefaultSelect, Student, UserWithToken, Vote } from '../graphql-schema'
+import { Batch, Department, FilterInput, Floor, LevelTerm, Room, SearchInput, Seat, SeatApplication, SeatApplicationsWithCount, SortInput, StatusWithDefaultSelect, Student, UserWithToken, Vote } from '../graphql-schema'
 import { Context } from '../interface'
 import { applicationTypes, params, roles, sortVals } from '../utility';
 import { ApplicationStatus, Prisma } from '@prisma/client';
@@ -299,7 +299,7 @@ export class queryResolver{
         })
     }
 
-    @Query(returs => SeatApplication)
+    @Query(returns => SeatApplication)
     async applicationDetails(
         @Ctx() ctx : Context,
         @Arg('applicationId') applicationId : number
@@ -310,6 +310,64 @@ export class queryResolver{
             }
         })
     }
+
+    @Query(returs => [Floor])
+    async freeFloors(
+        @Ctx() ctx : Context,
+    ){
+        return await ctx.prisma.floor.findMany({
+            where : {
+                rooms : {
+                    some : {
+                        seats : {
+                            some : {
+                                residency : null,
+                                tempResidency : null
+                            }
+                        }
+                    }
+                }
+            },
+            orderBy : {
+                floorNo : 'asc'
+            }
+        })
+    }
+
+    
+    @Query(returns => [Room])
+    async freeRoomInFloor(
+        @Ctx() ctx : Context,
+        @Arg('floorId') floorId : number
+    ){
+        return await ctx.prisma.room.findMany({
+            where : {
+                seats : {
+                    some : {
+                        tempResidency : null,
+                        residency : null
+                    }
+                },
+                floorId : floorId
+            }
+        })
+    }
+
+    
+    @Query(returns => [Seat])
+    async freeSeatInRoom(
+        @Ctx() ctx : Context,
+        @Arg('roomId') roomId : number
+    ){
+        return await ctx.prisma.seat.findMany({
+            where : {
+                roomId : roomId,
+                residency : null,
+                tempResidency : null
+            }
+        })
+    }
+
 
     // @Query
 }

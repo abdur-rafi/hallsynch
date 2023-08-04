@@ -160,13 +160,15 @@ async function generateRooms(){
 async function generateSeat(){
     let rooms = await prisma.room.findMany();
     let promises = []
+    let roomLabels = ['A', 'B', 'C', 'D']
     rooms.forEach(r =>{
         let rc = Math.random() > .5 ? 3 : 4;
         for(let i = 0; i < rc; ++i){
             promises.push(
                 prisma.seat.create({
                     data : {
-                        roomId : r.roomId
+                        roomId : r.roomId,
+                        seatLabel : roomLabels[i]
                     }
                 })
             )

@@ -82,6 +82,11 @@ export class Seat{
     @Field()
     seatId : number;
 
+
+    @Field()
+    seatLabel : string;
+    
+
     @Field()
     roomId : number;
 
