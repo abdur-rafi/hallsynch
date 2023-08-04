@@ -338,6 +338,12 @@ export class NewSeatQuestionnaire{
     @Field()
     questionnaireId : number;
 
+    @Field()
+    q1: boolean;
+
+    @Field()
+    q2: boolean;
+
     @Field(type => NewApplication)
     application : ()=> NewApplication
 }
