@@ -1,5 +1,5 @@
 import { Ctx, FieldResolver, Resolver, Root } from "type-graphql";
-import { AttachedFiles, Batch, Department, NewApplication, NewSeatQuestionnaire, ResidencyStatus, SeatApplication, Student } from "../../graphql-schema";
+import { AttachedFile, Batch, Department, NewApplication, NewSeatQuestionnaire, ResidencyStatus, SeatApplication, Student } from "../../graphql-schema";
 import { Context } from "../../interface";
 
 @Resolver(of => NewApplication)

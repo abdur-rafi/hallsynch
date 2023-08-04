@@ -2,7 +2,7 @@ import {Arg, Authorized, Ctx, Mutation} from "type-graphql";
 import {Context} from "../interface";
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import {CupCount, NewApplication, Residency, Revision, SeatChangeApplication, SeatApplication, TempApplication, TempResidency, UserWithToken, Vote} from "../graphql-schema";
+import {CupCount, NewApplication, Residency, Revision, SeatChangeApplication, SeatApplication, TempApplication, TempResidency, UserWithToken, Vote, IntArray} from "../graphql-schema";
 import {roles} from "../utility";
 import {ItemType, MealTime} from "@prisma/client";
 import { contains } from "class-validator";
@@ -60,7 +60,7 @@ export class mutationResolver{
         @Ctx() ctx : Context,
         @Arg('q1') q1 : boolean,
         @Arg('q2') q2 : boolean,
-        @Arg('attachedFileIds') attachedFileIds : string
+        @Arg('attachedFileIds') attachedFileIds : IntArray
     ){
 
         let pendingApplication = await ctx.prisma.newApplication.findFirst({
@@ -74,9 +74,24 @@ export class mutationResolver{
                 }
             }
         })
+        // if(attachedFileIds.array.length > 5){
+            
+        // }
 
         if( pendingApplication ){
             throw new Error("One application still pending");
+        }
+
+        let verifyFile = await ctx.prisma.uploadedFile.findMany({
+            where : {
+                studentId : ctx.identity.studentId,
+                uploadedFileId : {
+                    in : attachedFileIds.array
+                }
+            }
+        })
+        if(verifyFile.length != attachedFileIds.array.length){
+            throw new Error("Not authorized");
         }
 
         let application = await ctx.prisma.newApplication.create({
@@ -86,7 +101,14 @@ export class mutationResolver{
                         createdAt : new Date(),
                         lastUpdate : new Date(),
                         status : 'PENDING',
-                        studentId : ctx.identity.studentId
+                        studentId : ctx.identity.studentId,
+                        attachedFiles : {
+                            createMany : {
+                                data : attachedFileIds.array.map(v => ({
+                                    uploadedFileId : v
+                                }))
+                            }
+                        }
                     }
                 },
                 questionnaire : {
@@ -94,14 +116,8 @@ export class mutationResolver{
                         q1 : q1,
                         q2 : q2
                     }
-                },
-                // attachedFiles : {
-                //     connect : 
-                //         attachedFileIds.split(" ").map(v => ({
-                //             fileId : parseInt(v)
-                //         }))
-                    
-                // }
+                }
+                
             },
             include : {
                 application : true,

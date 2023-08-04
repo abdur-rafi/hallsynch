@@ -3,3 +3,5 @@ in add new meal item, photolocation is location in our server, not user device l
 new seat application : check if room has empty seat
 temp seat : same
 room change : same + is it the curr room
+
+seat application : check file id array length

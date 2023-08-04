@@ -322,6 +322,10 @@ export class SeatApplication{
     @Field(type => SeatChangeApplication, {nullable : true})
     seatChangeApplication? : () => SeatChangeApplication
 
+    @Field(type => [AttachedFile], {nullable : true})
+    attachedFiles : [AttachedFile]
+
+
 }
 
 @ObjectType()
@@ -360,8 +364,6 @@ export class NewApplication{
     @Field(type => NewSeatQuestionnaire)
     questionnaire : NewSeatQuestionnaire
 
-    @Field(type => [AttachedFiles])
-    attachedFiles : [AttachedFiles]
 
     
 }
@@ -420,6 +422,7 @@ export class SeatChangeApplication{
 
     @Field(type => [Vote])
     votes : [Vote]
+
 }
 
 @ObjectType()
@@ -466,13 +469,33 @@ export class Vote{
 
     @Field(type => Student)
     student : Student;
+    
  
 }
 
 @ObjectType()
-export class AttachedFiles{
+export class AttachedFile{
     @Field()
-    fileId : number;
+    applicationId : number;
+
+    @Field()
+    uploadedFileId : number;
+
+    @Field(type => UploadedFile)
+    uploadedFile : ()=> UploadedFile
+
+    @Field(type => SeatApplication)
+    application : SeatApplication
+
+
+
+}
+
+@ObjectType()
+export class UploadedFile{
+
+    @Field()
+    uploadedFileId : number;
 
     @Field()
     fileName : string;
@@ -481,11 +504,10 @@ export class AttachedFiles{
     filePath : string;
 
     @Field()
-    newApplicationId : number;
+    studentId : number;
 
-
-    @Field(type => NewApplication)
-    application : NewApplication
+    @Field(type => Student)
+    student : Student;
 
 }
 
@@ -696,3 +718,10 @@ export class StatusWithDefaultSelect{
     @Field()
     select : Boolean;
 };
+
+@InputType()
+
+export class IntArray{
+    @Field(type => [Number])
+    array : [number]
+}

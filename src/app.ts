@@ -39,6 +39,8 @@ import fs from 'fs'
 import path from 'path'
 
 import formidable from 'formidable'
+import { AttachedFileResolver } from "./graphql/resolvers/FieldResolvers/attachedFile";
+import { UploadedFileResolver } from "./graphql/resolvers/FieldResolvers/uploadedFile";
 
 const client = new PrismaClient()
 
@@ -64,7 +66,9 @@ buildSchema({
         SeatResolver,
         RoomResolver,
         FloorResolver,
-        TempResidency
+        TempResidency,
+        AttachedFileResolver,
+        UploadedFileResolver
     ],
     authChecker: authChecker
 }).then(schema => {

@@ -1,5 +1,5 @@
 import { Ctx, FieldResolver, Resolver, Root } from "type-graphql";
-import { AttachedFiles, Batch, Department, NewApplication, NewSeatQuestionnaire, ResidencyStatus, Room, SeatChangeApplication, SeatApplication, Student, TempApplication, TempQuestionnaire, Vote, Seat } from "../../graphql-schema";
+import { AttachedFile, Batch, Department, NewApplication, NewSeatQuestionnaire, ResidencyStatus, Room, SeatChangeApplication, SeatApplication, Student, TempApplication, TempQuestionnaire, Vote, Seat } from "../../graphql-schema";
 import { Context } from "../../interface";
 
 @Resolver(of => SeatChangeApplication)
@@ -42,6 +42,8 @@ export class SeatChangeApplicationResolver{
             }
         })
     }
+
+    
     
     
 }

@@ -1,5 +1,5 @@
 import { Ctx, FieldResolver, Resolver, Root } from "type-graphql";
-import { ApplicationStatus, NewApplication, SeatChangeApplication, SeatApplication, Student, TempApplication } from "../../graphql-schema";
+import { ApplicationStatus, NewApplication, SeatChangeApplication, SeatApplication, Student, TempApplication, AttachedFile } from "../../graphql-schema";
 import { Context } from "../../interface";
 
 @Resolver(of => SeatApplication)
@@ -60,6 +60,24 @@ export class SeatApplicationResolver{
                 studentId : app.studentId
             }
         })
+    }
+
+    @FieldResolver(type => [AttachedFile])
+    async attachedFiles(
+        @Ctx() ctx : Context,
+        @Root() app : SeatApplication
+
+    ){
+        console.log("here", app.applicationId);
+        let r = await ctx.prisma.attachedFiles.findMany({
+            where : {
+                applicationId : app.applicationId
+            }
+        })
+
+        console.log(r);
+
+        return r;
     }
     
     

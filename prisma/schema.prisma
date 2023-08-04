@@ -123,7 +123,7 @@ model SeatApplication {
   approveHisotry        ApplicationApproveHistory?
 
   rejectionHistory RejectionHistory?
-  AttachedFiles    AttachedFiles[]
+  attachedFiles    AttachedFiles[]
 }
 
 model NewApplication {
@@ -135,7 +135,6 @@ model NewApplication {
   application     SeatApplication      @relation(fields: [applicationId], references: [applicationId])
   questionnaire   NewSeatQuestionnaire @relation(fields: [questionnaireId], references: [questionnaireId])
 
-  attachedFiles AttachedFiles[]
 }
 
 model AttachedFiles {
@@ -144,8 +143,6 @@ model AttachedFiles {
 
   uploadedFile                   UploadedFile    @relation(fields: [uploadedFileId], references: [uploadedFileId])
   application                    SeatApplication @relation(fields: [applicationId], references: [applicationId])
-  NewApplication                 NewApplication? @relation(fields: [newApplicationNewApplicationId], references: [newApplicationId])
-  newApplicationNewApplicationId Int?
 
   @@unique([uploadedFileId, applicationId])
 }
