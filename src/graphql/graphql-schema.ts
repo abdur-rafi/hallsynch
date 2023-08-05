@@ -227,7 +227,7 @@ export class TempResidencyHistory{
     @Field()
     seatId : number;
 
-    @Field(type => Seat, {nullable : true})
+    @Field(type => Seat)
     seat : Seat;
 }
 
