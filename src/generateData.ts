@@ -236,6 +236,45 @@ async function generateResidency(){
 
 }
 
+
+async function generateTempResidencyHistory(){
+    let students = await prisma.student.findMany();
+
+    let seats = await prisma.seat.findMany()
+    let seatIndex = 0;
+    let counter = 0;
+
+    let promises = []
+    for (const st of students) {
+        console.log(st.studentId);
+        if(st.residencyStatus == 'RESIDENT') continue;
+        if(seatIndex >= seats.length - 10){
+            console.log('here');
+        } else {
+            counter++;
+            if(counter > 10) break;
+            const seat = seats[seatIndex++];
+            const date = parseInt(Math.random().toString());
+            promises.push(
+                prisma.tempResidencyHistory.create({
+                    data : {
+                        from : new Date(Date.now() - date * 60 * 24 * 30),
+                        studentId : st.studentId,
+                        seatId : seat.seatId,
+                        to : new Date(Date.now() - (date + 7) * 60 * 24 * 30)
+                    }
+                })
+            )
+        }
+    }
+    try{
+        await Promise.all(promises)
+    }
+    catch(err){
+        console.log(err)
+    }
+}
+
 async function generateAuthority(){
     let pass = 'password'
     let salt = await bcrypt.genSalt()
@@ -316,16 +355,18 @@ async function generateApplications(){
 // generateResidency()
  
 async function generateAll(){
-    await generateBatches()
-    await generateDept()
-    await generateLT()
-    await generateStudents()
-    await generateFloors()
-    await generateRooms()
-    await generateSeat()
-    await generateResidency()
-    await generateAuthority();
-    await generateApplications();
+    // await generateBatches()
+    // await generateDept()
+    // await generateLT()
+    // await generateStudents()
+    // await generateFloors()
+    // await generateRooms()
+    // await generateSeat()
+    // await generateResidency()
+    // await generateAuthority();
+    // await generateApplications();
+
+    await generateTempResidencyHistory();
 }
 
 generateAll();

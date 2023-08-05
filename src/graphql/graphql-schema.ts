@@ -206,7 +206,7 @@ export class Student{
     applications : [SeatApplication]
 
     @Field(type => [TempResidencyHistory])
-    tempResidencyHistory : [TempResidencyHistory]
+    tempResidencyHistory? : [TempResidencyHistory]
     // @Field(type =>)
     
 }
@@ -227,7 +227,7 @@ export class TempResidencyHistory{
     @Field()
     seatId : number;
 
-    @Field(type => Seat)
+    @Field(type => Seat, {nullable : true})
     seat : Seat;
 }
 
