@@ -383,7 +383,7 @@ export class NewApplication{
 export class TempApplication{
     
     @Field()
-    fromTime : Date
+    from : Date
 
     @Field()
     days : number
@@ -395,7 +395,7 @@ export class TempApplication{
     questionnaireId : number;
     
     @Field()
-    prefRoomId : number;
+    prefSeatId : number;
 
 
     @Field(type => SeatApplication)
@@ -404,8 +404,8 @@ export class TempApplication{
     @Field(type => TempQuestionnaire)
     questionnaire : TempQuestionnaire
 
-    @Field(type => Room)
-    prefRoom : Room
+    @Field(type => Seat)
+    prefSeat : Seat
 
 }
 

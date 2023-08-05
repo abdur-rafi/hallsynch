@@ -1,5 +1,5 @@
 import { Ctx, FieldResolver, Resolver, Root } from "type-graphql";
-import { AttachedFile, Batch, Department, NewApplication, NewSeatQuestionnaire, ResidencyStatus, Room, SeatApplication, Student, TempApplication, TempQuestionnaire } from "../../graphql-schema";
+import { AttachedFile, Batch, Department, NewApplication, NewSeatQuestionnaire, ResidencyStatus, Room, Seat, SeatApplication, Student, TempApplication, TempQuestionnaire } from "../../graphql-schema";
 import { Context } from "../../interface";
 
 @Resolver(of => TempApplication)
@@ -30,15 +30,15 @@ export class TempApplicationResolver{
         })
     }
 
-    @FieldResolver(type => Room)
-    async prefRoom(
+    @FieldResolver(type => Seat)
+    async prefSeat(
         @Ctx() ctx : Context,
         @Root() tempApp : TempApplication
 
     ){
-        return await ctx.prisma.room.findUnique({
+        return await ctx.prisma.seat.findUnique({
             where : {
-                roomId : tempApp.prefRoomId
+                seatId : tempApp.prefSeatId
             }
         })
     }
