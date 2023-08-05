@@ -38,6 +38,7 @@ model Student {
   tempResidency           TempResidency?
   tempResidencyHistory    TempResidencyHistory[]
   UploadedFile            UploadedFile[]
+  notifications            Notification[]
 }
 
 model Department {
@@ -124,6 +125,7 @@ model SeatApplication {
 
   rejectionHistory RejectionHistory?
   attachedFiles    AttachedFiles[]
+  notifications    Notification[]
 }
 
 model NewApplication {
@@ -275,6 +277,7 @@ model Vote {
 
   seatChangeApplication SeatChangeApplication @relation(fields: [seatChangeApplicationId], references: [seatChangeApplicationId])
   student               Student               @relation(fields: [studentId], references: [studentId])
+  notifications         Notification[]
 
   @@unique([seatChangeApplicationId, studentId])
 }
@@ -457,4 +460,19 @@ model RejectionHistory {
   authority   Authority       @relation(fields: [authorityId], references: [authorityId])
 
   time DateTime @default(now())
+}
+
+model Notification {
+  notificationId Int    @id @default(autoincrement())
+  text           String
+  applicationId  Int?
+  voteId         Int?
+  studentId      Int
+
+  time DateTime @default(now())
+  seen Boolean  @default(false)
+
+  application SeatApplication? @relation(fields: [applicationId], references: [applicationId])
+  vote        Vote?            @relation(fields: [voteId], references: [voteId])
+  student     Student          @relation(fields: [studentId], references: [studentId])
 }
