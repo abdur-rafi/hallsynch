@@ -1,7 +1,6 @@
 import { Ctx, FieldResolver, Resolver, Root } from "type-graphql";
-import { AttachedFile, Batch, Department, NewApplication, NewSeatQuestionnaire, ResidencyStatus, Room, SeatChangeApplication, SeatApplication, Student, TempApplication, TempQuestionnaire, Vote } from "../../graphql-schema";
+import { AttachedFile, Batch, Department, NewApplication, NewSeatQuestionnaire, ResidencyStatus, Room, SeatChangeApplication, SeatApplication, Student, TempApplication, TempQuestionnaire, Vote, VoteStatus } from "../../graphql-schema";
 import { Context } from "../../interface";
-import { VoteStatus } from "@prisma/client";
 
 @Resolver(of => Vote)
 export class VoteResolver{
