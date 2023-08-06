@@ -384,7 +384,7 @@ export class queryResolver{
 
     
     @Authorized([roles.STUDENT])
-    @Query(returns => [NotificationWithCount])
+    @Query(returns => NotificationWithCount)
     async notifications(
         @Ctx() ctx : Context
     ){  
