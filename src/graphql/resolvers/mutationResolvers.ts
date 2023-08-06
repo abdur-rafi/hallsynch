@@ -243,6 +243,7 @@ export class mutationResolver{
             }
         })
 
+
         let application = await ctx.prisma.seatChangeApplication.create({
             data : {
                 application : {
@@ -258,19 +259,39 @@ export class mutationResolver{
                         seatId : seatId
                     }
                 },
-                reason : reason,
-                votes : {
-                    createMany : {
-                        data : roomMembers.map(r =>({
-                            lastUpdated : new Date(),
-                            reason : '',
-                            status : 'NOT_VOTED',
-                            studentId : r.studentId
-                        }))
-                    }
-                }
+                reason : reason
             }
         })
+
+        console.log(roomMembers);
+
+        await ctx.prisma.$transaction(
+            roomMembers.map(m =>(
+                ctx.prisma.vote.create({
+                    data : {
+                        status : "NOT_VOTED",
+                        student : {
+                            connect : {
+                                studentId : m.studentId
+                            }
+                        },
+                        reason : '',
+                        lastUpdated : new Date(),
+                        notification : {
+                            create : {
+                                text : "Request to move to a seat in your room",
+                                studentId : m.studentId
+                            }
+                        },
+                        seatChangeApplication : {
+                            connect : {
+                                seatChangeApplicationId : application.seatChangeApplicationId
+                            }
+                        }
+                    }
+                })
+            ))
+        )
 
         return application
     }
@@ -484,6 +505,13 @@ export class mutationResolver{
                 data : {
                     residencyStatus : 'RESIDENT'
                 }
+            }),
+            ctx.prisma.notification.create({
+                data : {
+                    text : "Your application has been accepted",
+                    applicationId : newApplication.application.applicationId,
+                    studentId : newApplication.application.studentId
+                }
             })
         ])
 
@@ -520,6 +548,13 @@ export class mutationResolver{
                 data : {
                     applicationId : application.applicationId,
                     authorityId : ctx.identity.authorityId
+                }
+            }),
+            ctx.prisma.notification.create({
+                data : {
+                    text : "Your application has been rejected",
+                    studentId : application.studentId,
+                    applicationId : application.applicationId
                 }
             })
         ])

@@ -277,7 +277,7 @@ model Vote {
 
   seatChangeApplication SeatChangeApplication @relation(fields: [seatChangeApplicationId], references: [seatChangeApplicationId])
   student               Student               @relation(fields: [studentId], references: [studentId])
-  notifications         Notification[]
+  notification         Notification?
 
   @@unique([seatChangeApplicationId, studentId])
 }
@@ -466,7 +466,7 @@ model Notification {
   notificationId Int    @id @default(autoincrement())
   text           String
   applicationId  Int?
-  voteId         Int?
+  voteId         Int? @unique
   studentId      Int
 
   time DateTime @default(now())

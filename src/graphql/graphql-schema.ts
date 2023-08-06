@@ -736,3 +736,46 @@ export class IntArray{
     @Field(type => [Number])
     array : [number]
 }
+
+
+@ObjectType()
+export class Notification {
+    @Field()
+    notificationId : number;
+
+    @Field({nullable : true})
+    applicationId? : number;
+
+    @Field({nullable : true})
+    voteId? : number;
+
+    @Field()
+    studentId : number;
+
+    @Field()
+    text : string;
+
+    @Field()
+    time : Date
+
+    @Field()
+    seen : Boolean
+
+    @Field(returns => SeatApplication, {nullable : true})
+    application? : SeatApplication;
+
+    @Field(returns => Vote, {nullable : true})
+    vote? : Vote;
+
+    @Field(returns => Student)
+    student : Student;
+}
+
+@ObjectType()
+export class NotificationWithCount{
+    @Field(type => [Notification])
+    notifications : [Notification];
+
+    @Field()
+    unseenCount : number
+}

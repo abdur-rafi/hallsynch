@@ -1,5 +1,5 @@
 import {Arg, Authorized, Ctx, Query, Resolver} from 'type-graphql'
-import { Batch, Department, FilterInput, Floor, LevelTerm, Room, SearchInput, Seat, SeatApplication, SeatApplicationsWithCount, SortInput, StatusWithDefaultSelect, Student, UserWithToken, Vote } from '../graphql-schema'
+import { Batch, Department, FilterInput, Floor, LevelTerm, Notification, NotificationWithCount, Room, SearchInput, Seat, SeatApplication, SeatApplicationsWithCount, SortInput, StatusWithDefaultSelect, Student, UserWithToken, Vote } from '../graphql-schema'
 import { Context } from '../interface'
 import { applicationTypes, params, roles, sortVals } from '../utility';
 import { ApplicationStatus, Prisma } from '@prisma/client';
@@ -381,6 +381,35 @@ export class queryResolver{
             }
         })
     }
+
+    
+    @Authorized([roles.STUDENT])
+    @Query(returns => [NotificationWithCount])
+    async notifications(
+        @Ctx() ctx : Context
+    ){  
+        let t = await ctx.prisma.$transaction([
+            ctx.prisma.notification.count({
+                where : {
+                    studentId : ctx.identity.studentId,
+                    seen : false
+                }
+            }),
+            ctx.prisma.notification.findMany({
+                where : {
+                    studentId : ctx.identity.studentId
+                },
+                
+            })
+        ])
+
+        return {
+            unseenCount : t[0],
+            notifications : t[1]
+        }
+    }
+
+
 
 
     // @Query
