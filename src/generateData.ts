@@ -339,7 +339,188 @@ async function generateApplications(){
         // }
     })
 
-    Promise.all(promises);
+    await  Promise.all(promises);
+
+}
+
+
+async function generateItem(){
+    let promises = []
+
+    promises.push(
+        prisma.item.create({
+            data : {
+                name : "Rice",
+                type : "RICE",
+                photo : {
+                    create : {
+                        uploadedFileId : 1
+                    }
+                }
+            }
+        })
+    )
+
+    promises.push(
+        prisma.item.create({
+            data : {
+                name : "Alu Bhaji",
+                type : "VEG",
+                photo : {
+                    create : {
+                        uploadedFileId : 1
+                    }
+                }
+            }
+        })
+    )
+
+    promises.push(
+        prisma.item.create({
+            data : {
+                name : "Chicken curry",
+                type : "NON_VEG",
+                photo : {
+                    create : {
+                        uploadedFileId : 1
+                    }
+                }
+            }
+        })
+    )
+
+    promises.push(
+        prisma.item.create({
+            data : {
+                name : "Egg curry",
+                type : "NON_VEG",
+                photo : {
+                    create : {
+                        uploadedFileId : 1
+                    }
+                }
+            }
+        })
+    )
+
+    promises.push(
+        prisma.item.create({
+            data : {
+                name : "Rui Fish",
+                type : "NON_VEG",
+                photo : {
+                    create : {
+                        uploadedFileId : 1
+                    }
+                }
+            }
+        })
+    )
+
+
+    promises.push(
+        prisma.item.create({
+            data : {
+                name : "Polao",
+                type : "RICE",
+                photo : {
+                    create : {
+                        uploadedFileId : 1
+                    }
+                }
+            }
+        })
+    )
+
+
+
+    await Promise.all(promises);
+    
+}
+
+
+async function generateMeal(){
+    let promises = []
+
+    let items = await prisma.item.findMany();
+    let veg = items.filter(i => i.type == "VEG")
+    let nonVeg = items.filter(i => i.type == "NON_VEG")
+    let rice = items.filter(i => i.type == "RICE")
+
+    promises.push(
+        prisma.meal.create({
+            data : {
+                items : {
+                    connect : [
+                        {
+                            itemId : veg[0].itemId
+                        },
+                        {
+                            itemId : rice[0].itemId
+                        },
+                        {
+                            itemId : nonVeg[0].itemId
+                        },
+                        {
+                            itemId : nonVeg[1].itemId
+                        }
+                    ]
+                }
+            }
+        })
+    )
+    promises.push(
+        prisma.meal.create({
+            data : {
+                items : {
+                    connect : [
+                        {
+                            itemId : veg[0].itemId
+                        },
+                        {
+                            itemId : rice[0].itemId
+                        },
+                        {
+                            itemId : nonVeg[1].itemId
+                        },
+                        {
+                            itemId : nonVeg[2].itemId
+                        },
+                        {
+                            itemId : nonVeg[0].itemId
+                        },
+                        
+                    ]
+                }
+            }
+        })
+    )
+
+    promises.push(
+        prisma.meal.create({
+            data : {
+                items : {
+                    connect : [
+                        {
+                            itemId : veg[0].itemId
+                        },
+                        {
+                            itemId : rice[1].itemId
+                        },
+                        {
+                            itemId : nonVeg[1].itemId
+                        },
+                        {
+                            itemId : nonVeg[2].itemId
+                        }
+                        
+                    ]
+                }
+            }
+        })
+    )
+
+    await Promise.all(promises);
 
 }
 
@@ -353,7 +534,153 @@ async function generateApplications(){
 // generateFloors()
 // generateRooms()
 // generateResidency()
- 
+
+async function generateMealPlan(){
+    let meals = await prisma.meal.findMany();
+    let month = 6;
+    let year = 2023;
+    let promises = []
+
+
+    for(let j = 1; j < 32; ++j){
+        promises.push(
+            prisma.mealPlan.create({
+                data : {
+                    day : new Date(year, month, j),
+                    mealTime : "LUNCH",
+                    mealId : meals[Math.floor(Math.random() * meals.length)].mealId
+                }
+            })
+        )
+        promises.push(
+            prisma.mealPlan.create({
+                data : {
+                    day : new Date(year, month, j),
+                    mealTime : "DINNER",
+                    mealId : meals[Math.floor(Math.random() * meals.length)].mealId
+                }
+            })
+        )
+    }
+    await Promise.all(promises);
+
+}
+
+async function generateCupCount(){
+    let promises = []
+    let res = await prisma.mealPlan.findMany({
+        include : {
+            meal : {
+                include : {
+                    items : true
+                }
+            }
+        }
+    })
+    res.forEach(mp =>{
+        mp.meal.items.forEach(item =>{
+            promises.push(
+                prisma.cupCount.create({
+                    data : {
+                        cupcount : 50,
+                        itemId : item.itemId,
+                        mealPlanId : mp.mealPlanId 
+                    }
+                })
+            )
+        })
+    })
+    await Promise.all(promises);
+}
+
+
+async function generateParticipation(){
+    let promises = []
+
+    let residents = await prisma.residency.findMany()
+    let mealPlans = await prisma.mealPlan.findMany()
+
+    residents.forEach(r =>{
+        mealPlans.forEach(mp =>{
+            if(Math.random() < .4){
+                promises.push(
+                    prisma.participation.create({
+                        data : {
+                            mealPlanId : mp.mealPlanId,
+                            residencyId : r.residencyId
+                        }
+                    })
+                )
+            }
+        })
+    })
+    await Promise.all(promises);
+   
+}
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+async function generatePreference(){
+    let promises = []
+
+    let residents = await prisma.residency.findMany()
+    let mealPlans = await prisma.mealPlan.findMany({
+        include : {
+            meal : {
+                include : {
+                    items : true
+                }
+            }
+        }
+    })
+
+    residents.forEach(r =>{
+        mealPlans.forEach(mp =>{
+            if(Math.random() < .7){
+                let vegs = mp.meal.items.filter(f => f.type == "VEG")
+                let rice = mp.meal.items.filter(f => f.type == "RICE")
+                let nonVeg = mp.meal.items.filter(f => f.type == "NON_VEG")
+                shuffleArray(vegs)
+                shuffleArray(rice)
+                shuffleArray(nonVeg)
+                let arr = [vegs, rice, nonVeg]
+                arr.forEach(a =>{
+                    promises.push(
+                        prisma.preference.createMany({
+                            data : a.map((it, index) =>({
+                                itemId : it.itemId,
+                                mealPlanId : mp.mealPlanId,
+                                order : index,
+                                residencyId : r.residencyId
+                            }))
+                        })
+                    )
+                })
+                // arr.forEach(a =>{
+                //     a.forEach((it, index)=>{
+                //         promises.push(
+                //             prisma.preference.create({
+                //                 data : {
+                //                     order : index,
+                //                     itemId : it.itemId,
+                //                     mealPlanId : mp.mealPlanId,
+                //                     residencyId : r.residencyId
+                //                 }
+                //             })
+                //         )
+                //     })
+                // }) 
+            }
+        })
+    })
+    await Promise.all(promises);
+}
+
 async function generateAll(){
     // await generateBatches()
     // await generateDept()
@@ -366,7 +693,13 @@ async function generateAll(){
     // await generateAuthority();
     // await generateApplications();
 
-    await generateTempResidencyHistory();
+    // await generateTempResidencyHistory();
+    // await generateItem();
+    // await generateMeal();
+    // await generateMealPlan();
+    // await generateCupCount();
+    await generateParticipation();
+    await generatePreference();
 }
 
 generateAll();

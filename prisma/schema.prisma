@@ -28,7 +28,6 @@ model Student {
 
   // residency Residency @relation(fields: [residencyId], references: [residencyId])
   votes                   Vote[]
-  preferences             Preference[]
   optedOutOf              MealPlan[]
   ratings                 Rating[]
   messManagerRoles        MessManager[]
@@ -38,7 +37,7 @@ model Student {
   tempResidency           TempResidency?
   tempResidencyHistory    TempResidencyHistory[]
   UploadedFile            UploadedFile[]
-  notifications            Notification[]
+  notifications           Notification[]
 }
 
 model Department {
@@ -75,8 +74,10 @@ model Residency {
 
   seatId Int @unique
 
-  seat    Seat    @relation(fields: [seatId], references: [seatId])
-  student Student @relation(fields: [studentId], references: [studentId])
+  seat          Seat            @relation(fields: [seatId], references: [seatId])
+  student       Student         @relation(fields: [studentId], references: [studentId])
+  Participation Participation[]
+  Preference    Preference[]
 }
 
 model TempResidency {
@@ -158,6 +159,7 @@ model UploadedFile {
   student   Student @relation(fields: [studentId], references: [studentId])
 
   AttachedFiles AttachedFiles[]
+  Photo         Photo[]
 }
 
 model TempApplication {
@@ -277,7 +279,7 @@ model Vote {
 
   seatChangeApplication SeatChangeApplication @relation(fields: [seatChangeApplicationId], references: [seatChangeApplicationId])
   student               Student               @relation(fields: [studentId], references: [studentId])
-  notification         Notification?
+  notification          Notification?
 
   @@unique([seatChangeApplicationId, studentId])
 }
@@ -286,6 +288,49 @@ enum VoteStatus {
   YES
   NO
   NOT_VOTED
+}
+
+model Authority {
+  authorityId Int           @id @default(autoincrement())
+  name        String
+  email       String        @unique
+  phone       String?
+  role        AuthorityRole
+  password    String
+
+  applicationsHistory ApplicationApproveHistory[]
+  RejectionHistory    RejectionHistory[]
+}
+
+enum AuthorityRole {
+  PROVOST
+  ASSISTANT_PROVOST
+  DINING_STUFF
+}
+
+model RejectionHistory {
+  applicationId Int @unique
+  authorityId   Int
+
+  application SeatApplication @relation(fields: [applicationId], references: [applicationId])
+  authority   Authority       @relation(fields: [authorityId], references: [authorityId])
+
+  time DateTime @default(now())
+}
+
+model Notification {
+  notificationId Int    @id @default(autoincrement())
+  text           String
+  applicationId  Int?
+  voteId         Int?   @unique
+  studentId      Int
+
+  time DateTime @default(now())
+  seen Boolean  @default(false)
+
+  application SeatApplication? @relation(fields: [applicationId], references: [applicationId])
+  vote        Vote?            @relation(fields: [voteId], references: [voteId])
+  student     Student          @relation(fields: [studentId], references: [studentId])
 }
 
 model Item {
@@ -302,9 +347,11 @@ model Item {
 }
 
 model Photo {
-  photoId  Int    @id @default(autoincrement())
-  filePath String
-  item     Item[]
+  photoId        Int @id @default(autoincrement())
+  uploadedFileId Int
+
+  file UploadedFile @relation(fields: [uploadedFileId], references: [uploadedFileId])
+  item Item[]
 }
 
 enum ItemType {
@@ -328,10 +375,11 @@ model MealPlan {
 
   mealId Int
 
-  meal        Meal         @relation(fields: [mealId], references: [mealId])
-  cupCount    CupCount[]
-  preferences Preference[]
-  optedOut    Student[]
+  meal          Meal            @relation(fields: [mealId], references: [mealId])
+  cupCount      CupCount[]
+  preferences   Preference[]
+  optedOut      Student[]
+  Participation Participation[]
 }
 
 enum MealTime {
@@ -357,18 +405,30 @@ model CupCount {
   @@id([mealPlanId, itemId])
 }
 
+model Participation {
+  mealPlanId  Int
+  residencyId Int
+
+  mealPlan  MealPlan  @relation(fields: [mealPlanId], references: [mealPlanId])
+  residency Residency @relation(fields: [residencyId], references: [residencyId])
+
+  time DateTime @default(now())
+
+  @@unique([mealPlanId, residencyId])
+}
+
 model Preference {
   order Int
 
-  mealPlanId Int
-  itemId     Int
-  studentId  Int
+  mealPlanId  Int
+  itemId      Int
+  residencyId Int
 
-  mealPlan MealPlan @relation(fields: [mealPlanId], references: [mealPlanId])
-  item     Item     @relation(fields: [itemId], references: [itemId])
-  student  Student  @relation(fields: [studentId], references: [studentId])
+  mealPlan         MealPlan  @relation(fields: [mealPlanId], references: [mealPlanId])
+  item             Item      @relation(fields: [itemId], references: [itemId])
+  residency        Residency @relation(fields: [residencyId], references: [residencyId])
 
-  @@id([mealPlanId, itemId, studentId])
+  @@id([mealPlanId, itemId, residencyId])
 }
 
 model Feedback {
@@ -432,47 +492,4 @@ enum ComplaintType {
   RESOURCE
   STUDENT
   STUFF
-}
-
-model Authority {
-  authorityId Int           @id @default(autoincrement())
-  name        String
-  email       String        @unique
-  phone       String?
-  role        AuthorityRole
-  password    String
-
-  applicationsHistory ApplicationApproveHistory[]
-  RejectionHistory    RejectionHistory[]
-}
-
-enum AuthorityRole {
-  PROVOST
-  ASSISTANT_PROVOST
-  DINING_STUFF
-}
-
-model RejectionHistory {
-  applicationId Int @unique
-  authorityId   Int
-
-  application SeatApplication @relation(fields: [applicationId], references: [applicationId])
-  authority   Authority       @relation(fields: [authorityId], references: [authorityId])
-
-  time DateTime @default(now())
-}
-
-model Notification {
-  notificationId Int    @id @default(autoincrement())
-  text           String
-  applicationId  Int?
-  voteId         Int? @unique
-  studentId      Int
-
-  time DateTime @default(now())
-  seen Boolean  @default(false)
-
-  application SeatApplication? @relation(fields: [applicationId], references: [applicationId])
-  vote        Vote?            @relation(fields: [voteId], references: [voteId])
-  student     Student          @relation(fields: [studentId], references: [studentId])
 }
