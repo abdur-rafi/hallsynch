@@ -365,12 +365,7 @@ async function generateItem(){
         prisma.item.create({
             data : {
                 name : "Alu Bhaji",
-                type : "VEG",
-                photo : {
-                    create : {
-                        uploadedFileId : 1
-                    }
-                }
+                type : "VEG"
             }
         })
     )
@@ -379,12 +374,7 @@ async function generateItem(){
         prisma.item.create({
             data : {
                 name : "Chicken curry",
-                type : "NON_VEG",
-                photo : {
-                    create : {
-                        uploadedFileId : 1
-                    }
-                }
+                type : "NON_VEG"
             }
         })
     )
@@ -393,12 +383,7 @@ async function generateItem(){
         prisma.item.create({
             data : {
                 name : "Egg curry",
-                type : "NON_VEG",
-                photo : {
-                    create : {
-                        uploadedFileId : 1
-                    }
-                }
+                type : "NON_VEG"
             }
         })
     )
@@ -407,12 +392,7 @@ async function generateItem(){
         prisma.item.create({
             data : {
                 name : "Rui Fish",
-                type : "NON_VEG",
-                photo : {
-                    create : {
-                        uploadedFileId : 1
-                    }
-                }
+                type : "NON_VEG"
             }
         })
     )
@@ -422,12 +402,7 @@ async function generateItem(){
         prisma.item.create({
             data : {
                 name : "Polao",
-                type : "RICE",
-                photo : {
-                    create : {
-                        uploadedFileId : 1
-                    }
-                }
+                type : "RICE"
             }
         })
     )
@@ -681,6 +656,27 @@ async function generatePreference(){
     await Promise.all(promises);
 }
 
+async function generateMessManager(){
+    let residents = await prisma.residency.findMany();
+    let promises = [];
+    let month_id = 1;
+    residents.forEach(r =>{
+        if(Math.random() < .2){
+            promises.push(
+                prisma.messManager.create({
+                    data : {
+                        studentId : r.studentId,
+                        from: new Date(2021, month_id % 12, 1),
+                        to : new Date(2021, month_id % 12, 31)
+                    }
+                })
+            )
+            month_id++;
+        }
+    })
+    await Promise.all(promises);
+}
+
 async function generateAll(){
     // await generateBatches()
     // await generateDept()
@@ -698,8 +694,10 @@ async function generateAll(){
     // await generateMeal();
     // await generateMealPlan();
     // await generateCupCount();
-    await generateParticipation();
-    await generatePreference();
+    // await generateParticipation();
+    // await generatePreference();
+
+    await generateMessManager();
 }
 
 generateAll();
