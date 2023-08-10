@@ -433,6 +433,9 @@ export class queryResolver{
                         Participation : true
                     }
                 }
+            },
+            orderBy : {
+                day : 'asc'
             }
         })
         return res.map(r => ({
@@ -448,7 +451,6 @@ export class queryResolver{
     async absentees(
         @Ctx() ctx : Context,
         @Arg('from') from : string,
-        @Arg('mealTime') mealTime : string,
         @Arg('take') take : number
     ){  
 
@@ -461,8 +463,7 @@ export class queryResolver{
                                 mealPlan : {
                                     day : {
                                         gte : new Date(from)
-                                    },
-                                    mealTime : mealTime == 'DINNER' ? MealTime['DINNER'] : MealTime['LUNCH']
+                                    }
                                 }
                             }
                         }
@@ -475,8 +476,7 @@ export class queryResolver{
             where : {
                 day : {
                     gte : new Date(from)
-                },
-                mealTime : mealTime == 'DINNER' ? MealTime['DINNER'] : MealTime['LUNCH']
+                }
             }
         })
 
