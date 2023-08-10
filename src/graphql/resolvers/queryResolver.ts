@@ -1,8 +1,8 @@
 import {Arg, Authorized, Ctx, Query, Resolver} from 'type-graphql'
-import { Batch, Department, FilterInput, Floor, LevelTerm, Notification, NotificationWithCount, Room, SearchInput, Seat, SeatApplication, SeatApplicationsWithCount, SortInput, StatusWithDefaultSelect, Student, UserWithToken, Vote } from '../graphql-schema'
+import { Batch, Department, FilterInput, Floor, LevelTerm, MealPlanWithCount, Notification, NotificationWithCount, ResidencyWithParticipationCount, Room, SearchInput, Seat, SeatApplication, SeatApplicationsWithCount, SortInput, StatusWithDefaultSelect, Student, UserWithToken, Vote } from '../graphql-schema'
 import { Context } from '../interface'
 import { applicationTypes, params, roles, sortVals } from '../utility';
-import { ApplicationStatus, Prisma } from '@prisma/client';
+import { ApplicationStatus, MealTime, Prisma } from '@prisma/client';
 @Resolver()
 export class queryResolver{
     @Query(returns => String)
@@ -407,6 +407,88 @@ export class queryResolver{
             unseenCount : t[0],
             notifications : t[1]
         }
+    }
+
+
+    
+    
+    @Authorized([roles.PROVOST])
+    @Query(returns => [MealPlanWithCount])
+    async participants(
+        @Ctx() ctx : Context,
+        @Arg('from') from : string,
+        @Arg('mealTime') mealTime : string
+    ){  
+
+        let res = await ctx.prisma.mealPlan.findMany({
+            where : {
+                day : {
+                    gte : new Date(from)
+                },
+                mealTime : mealTime == 'DINNER' ? MealTime['DINNER'] : MealTime['LUNCH']
+            },
+            include : {
+                _count : {
+                    select : {
+                        Participation : true
+                    }
+                }
+            }
+        })
+        return res.map(r => ({
+            mealPlan : r,
+            _count : r._count.Participation
+        }));
+
+    }
+
+
+    @Authorized([roles.PROVOST])
+    @Query(returns => [ResidencyWithParticipationCount])
+    async absentees(
+        @Ctx() ctx : Context,
+        @Arg('from') from : string,
+        @Arg('mealTime') mealTime : string,
+        @Arg('take') take : number
+    ){  
+
+        let res = await ctx.prisma.residency.findMany({
+            include : {
+                _count : {
+                    select : {
+                        Participation : {
+                            where : {
+                                mealPlan : {
+                                    day : {
+                                        gte : new Date(from)
+                                    },
+                                    mealTime : mealTime == 'DINNER' ? MealTime['DINNER'] : MealTime['LUNCH']
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        })
+
+        let mealCount = await ctx.prisma.mealPlan.count({
+            where : {
+                day : {
+                    gte : new Date(from)
+                },
+                mealTime : mealTime == 'DINNER' ? MealTime['DINNER'] : MealTime['LUNCH']
+            }
+        })
+
+        
+        let s = res.map(r =>({
+            residency : r,
+            _count : mealCount - r._count.Participation
+        }))
+        s.sort((a, b)=> b._count - a._count)
+        // console.log(res);
+
+        return s.slice(0, take);
     }
 
 

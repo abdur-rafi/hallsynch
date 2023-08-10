@@ -327,9 +327,9 @@ export class mutationResolver{
         @Arg('name') name : string,
         @Arg('type') type : string,
         @Arg('cupCount') cupCount : number,
-        @Arg('photoLocation') photoLocation : string = "",
         @Arg('date') date : string,
-        @Arg('mealTime') mealtime : string
+        @Arg('mealTime') mealtime : string,
+        @Arg('fileId') fileId : number
     ){
 
         let itemType : ItemType;
@@ -348,7 +348,7 @@ export class mutationResolver{
                 type : itemType,
                 photo : {
                     create : {
-                        filePath : photoLocation
+                        uploadedFileId : fileId
                     }
                 }
             },

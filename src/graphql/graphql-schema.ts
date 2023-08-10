@@ -779,3 +779,24 @@ export class NotificationWithCount{
     @Field()
     unseenCount : number
 }
+
+@ObjectType()
+export class MealPlanWithCount{
+    @Field(type => MealPlan)
+    mealPlan : MealPlan;
+
+    @Field()
+    _count : number;
+
+}
+
+@ObjectType()
+export class ResidencyWithParticipationCount{
+    @Field(type => Residency)
+    residency : Residency;
+
+    @Field()
+    _count : number;
+
+}
+
