@@ -20,7 +20,17 @@ export const authChecker : AuthChecker<Context> = async ({context}, currRoles)=>
         }
         if(currRoles.includes(roles.STUDENT_MESS_MANAGER)){
             console.log('here2');
-            return std.residencyStatus == 'RESIDENT';     // here additional checking may be required
+            if(std.residencyStatus != 'RESIDENT'){
+                return false;
+            }
+
+            const std2 = await context.prisma.messManager.findFirst({
+                where : {
+                    studentId : context.identity.studentId
+                }
+            })
+
+            return std2 != null;
         }
         
         if(currRoles.includes(roles.STUDENT_RESIDENT)){

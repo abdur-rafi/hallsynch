@@ -1,8 +1,27 @@
 import {Arg, Authorized, Ctx, Query, Resolver} from 'type-graphql'
-import { Batch, Department, FilterInput, Floor, LevelTerm, Notification, NotificationWithCount, Room, SearchInput, Seat, SeatApplication, SeatApplicationsWithCount, SortInput, StatusWithDefaultSelect, Student, UserWithToken, Vote } from '../graphql-schema'
+import {
+    Batch,
+    Department,
+    FilterInput,
+    Floor, Item,
+    LevelTerm,
+    MealPlan,
+    Notification,
+    NotificationWithCount,
+    Room,
+    SearchInput,
+    Seat,
+    SeatApplication,
+    SeatApplicationsWithCount,
+    SortInput,
+    StatusWithDefaultSelect,
+    Student,
+    UserWithToken,
+    Vote
+} from '../graphql-schema'
 import { Context } from '../interface'
 import { applicationTypes, params, roles, sortVals } from '../utility';
-import { ApplicationStatus, Prisma } from '@prisma/client';
+import {ApplicationStatus, MealTime, Prisma} from '@prisma/client';
 @Resolver()
 export class queryResolver{
     @Query(returns => String)
@@ -409,8 +428,33 @@ export class queryResolver{
         }
     }
 
+    @Authorized([roles.STUDENT])
+    @Query(returns => MealPlan)
+    async getMealPlan(
+        @Ctx() ctx: Context,
+        @Arg('date') date : string,
+        @Arg('mealTime') mealtime : string
+    ) {
+
+        let mealTime : MealTime;
+        if(mealtime.toLowerCase() == 'lunch') mealTime = MealTime.LUNCH;
+        else mealTime = MealTime.DINNER;
+
+        return await ctx.prisma.mealPlan.findFirst({
+            where: {
+                day: new Date(date),
+                mealTime: mealTime
+            }
+        });
+    }
+
+    @Authorized([roles.STUDENT])
+    @Query(returns => [Item])
+    async getOldItems(
+        @Ctx() ctx: Context,
+    ) {
+        return await ctx.prisma.item.findMany();
+    }
 
 
-
-    // @Query
 }

@@ -18,7 +18,8 @@ export class ItemResolver{
         @Ctx() ctx : Context,
         @Root() itemCls : Item
     ){
-        return await ctx.prisma.photo.findUnique({
+        if(itemCls.photoId == null) return null;
+        return await ctx.prisma.photo.findFirst({
             where: {
                 photoId: itemCls.photoId
             }

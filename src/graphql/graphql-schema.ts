@@ -520,6 +520,12 @@ export class UploadedFile{
     @Field(type => Student)
     student : Student;
 
+    // @Field(type => [AttachedFile])
+    // attachedFiles : [AttachedFile]
+    //
+    // @Field(type => [Photo])
+    // photos : [Photo]
+
 }
 
 export enum MealTime{
@@ -558,10 +564,13 @@ export class Photo {
     photoId : number;
 
     @Field()
-    filePath : string;
+    uploadedFileId : number;
 
-    // @Field(returns => Item)
-    // item: Item;
+    @Field(returns => UploadedFile)
+    file : UploadedFile;
+
+    // @Field(returns => [Item])
+    // item: [Item];
 }
 
 @ObjectType()
@@ -575,10 +584,10 @@ export class Item{
     @Field(returns => ItemType)
     type : ItemType;
 
-    @Field()
+    @Field({nullable : true})
     photoId? : number;
 
-    @Field(returns => Photo)
+    @Field(returns => Photo, {nullable : true})
     photo? : Photo;
 
     @Field(returns => [Meal])

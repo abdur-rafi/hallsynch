@@ -317,7 +317,7 @@ export class mutationResolver{
         })
     }
 
-    
+
 
 
     @Authorized(roles.STUDENT_MESS_MANAGER)
@@ -327,10 +327,20 @@ export class mutationResolver{
         @Arg('name') name : string,
         @Arg('type') type : string,
         @Arg('cupCount') cupCount : number,
-        @Arg('photoLocation') photoLocation : string = "",
+        @Arg('photoId') photoId : number,
         @Arg('date') date : string,
         @Arg('mealTime') mealtime : string
     ){
+
+        const existingItem = await ctx.prisma.item.findFirst({
+            where : {
+                name : name.toLowerCase()
+            }
+        });
+
+        if(existingItem){
+            throw new Error("This Item already exists\n");
+        }
 
         let itemType : ItemType;
         if(type.toLowerCase() == 'rice') itemType = ItemType.RICE;
@@ -341,23 +351,24 @@ export class mutationResolver{
         if(mealtime.toLowerCase() == 'lunch') mealTime = MealTime.LUNCH;
         else mealTime = MealTime.DINNER;
 
+        let photoFile = await ctx.prisma.photo.findFirst({
+            where : {
+                photoId : photoId
+            }
+        })
 
         let newItem = await ctx.prisma.item.create({
             data : {
                 name : name,
                 type : itemType,
-                photo : {
-                    create : {
-                        filePath : photoLocation
-                    }
-                }
+                photoId : photoFile?.photoId
             },
             include : {
                 photo : true
             }
         });
 
-        let newMealPan = await ctx.prisma.mealPlan.create({
+        let newMealPlan = await ctx.prisma.mealPlan.create({
             data : {
                 day: new Date(date),
                 mealTime : mealTime,
@@ -382,7 +393,7 @@ export class mutationResolver{
                 },
                 mealPlan : {
                     connect : {
-                        mealPlanId : newMealPan.mealPlanId
+                        mealPlanId : newMealPlan.mealPlanId
                     }
                 }
             },
@@ -399,17 +410,11 @@ export class mutationResolver{
     @Mutation(returns => CupCount)
     async addOldMealItem(
         @Ctx() ctx : Context,
-        @Arg('name') name : string,
-        @Arg('type') type : string,
+        @Arg('itemId') itemId : number,
         @Arg('cupCount') cupCount : number,
         @Arg('date') date : string,
         @Arg('mealTime') mealtime : string
     ){
-
-        let itemType : ItemType;
-        if(type.toLowerCase() == 'rice') itemType = ItemType.RICE;
-        else if(type.toLowerCase() == 'veg') itemType = ItemType.VEG;
-        else itemType = ItemType.NON_VEG;
 
         let mealTime : MealTime;
         if(mealtime.toLowerCase() == 'lunch') mealTime = MealTime.LUNCH;
@@ -417,13 +422,28 @@ export class mutationResolver{
 
         let item = await ctx.prisma.item.findFirst({
             where : {
-                name : name,
-                type : itemType
+                itemId : itemId
             }
         });
 
         if(!item){
             throw new Error("No such item found");
+        }
+
+        let cupCountExists = await ctx.prisma.cupCount.findFirst({
+            where : {
+                mealPlan : {
+                    day : new Date(date),
+                    mealTime : mealTime
+                },
+                item : {
+                    itemId : itemId
+                }
+            }
+        });
+
+        if(cupCountExists){
+            throw new Error("This item already exists for this meal");
         }
 
         let newCupCount = await ctx.prisma.cupCount.create({
