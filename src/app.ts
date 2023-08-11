@@ -43,6 +43,7 @@ import { UploadedFileResolver } from "./graphql/resolvers/FieldResolvers/uploade
 import { TempResidencyHistoryResolver } from "./graphql/resolvers/FieldResolvers/tempResidencyHistory";
 import { TempResidencyResolver } from "./graphql/resolvers/FieldResolvers/tempResidency";
 import {PhotoResolver} from "./graphql/resolvers/FieldResolvers/photo";
+import {PreferenceResolver} from "./graphql/resolvers/FieldResolvers/preference";
 
 
 const client = new PrismaClient()
@@ -73,7 +74,8 @@ buildSchema({
         UploadedFileResolver,
         TempResidencyHistoryResolver,
         TempResidencyResolver,
-        PhotoResolver
+        PhotoResolver,
+        PreferenceResolver
     ],
     authChecker: authChecker
 }).then(schema => {
