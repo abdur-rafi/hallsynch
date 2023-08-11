@@ -677,6 +677,28 @@ async function generateMessManager(){
     await Promise.all(promises);
 }
 
+
+async function generateOptedOut(){
+    let promises = [];
+
+    let residents = await prisma.residency.findMany();
+    let mealPlans = await prisma.mealPlan.findMany();
+
+    residents.forEach(f =>{
+        promises.push(
+            prisma.optedOut.createMany({
+                data : mealPlans.filter(m => Math.random() > .8 ).map(d =>({
+                    mealPlanId : d.mealPlanId,
+                    residencyId : f.residencyId
+                }))
+            })
+        )
+    })
+
+
+    await Promise.all(promises);
+}
+
 async function generateAll(){
     // await generateBatches()
     // await generateDept()
@@ -698,6 +720,7 @@ async function generateAll(){
     // await generatePreference();
 
     await generateMessManager();
+    await generateOptedOut();
 }
 
 generateAll();

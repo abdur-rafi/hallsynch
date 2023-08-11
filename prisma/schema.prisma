@@ -28,7 +28,6 @@ model Student {
 
   // residency Residency @relation(fields: [residencyId], references: [residencyId])
   votes                   Vote[]
-  optedOutOf              MealPlan[]
   ratings                 Rating[]
   messManagerRoles        MessManager[]
   messManagerApplications MessManagerApplication[]
@@ -78,6 +77,7 @@ model Residency {
   student       Student         @relation(fields: [studentId], references: [studentId])
   Participation Participation[]
   Preference    Preference[]
+  OptedOut      OptedOut[]
 }
 
 model TempResidency {
@@ -378,8 +378,8 @@ model MealPlan {
   meal          Meal            @relation(fields: [mealId], references: [mealId])
   cupCount      CupCount[]
   preferences   Preference[]
-  optedOut      Student[]
   Participation Participation[]
+  OptedOut      OptedOut[]
 }
 
 enum MealTime {
@@ -424,11 +424,22 @@ model Preference {
   itemId      Int
   residencyId Int
 
-  mealPlan         MealPlan  @relation(fields: [mealPlanId], references: [mealPlanId])
-  item             Item      @relation(fields: [itemId], references: [itemId])
-  residency        Residency @relation(fields: [residencyId], references: [residencyId])
+  mealPlan  MealPlan  @relation(fields: [mealPlanId], references: [mealPlanId])
+  item      Item      @relation(fields: [itemId], references: [itemId])
+  residency Residency @relation(fields: [residencyId], references: [residencyId])
 
   @@id([mealPlanId, itemId, residencyId])
+}
+
+model OptedOut {
+  residencyId Int
+  mealPlanId  Int
+  time DateTime @default(now())
+
+  residency Residency @relation(fields: [residencyId], references: [residencyId])
+  mealPlan  MealPlan  @relation(fields: [mealPlanId], references: [mealPlanId])
+
+  @@unique([mealPlanId, residencyId])
 }
 
 model Feedback {
