@@ -2,10 +2,22 @@ import {Arg, Authorized, Ctx, Mutation} from "type-graphql";
 import {Context} from "../interface";
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import {CupCount, NewApplication, Residency, Revision, SeatChangeApplication, SeatApplication, TempApplication, TempResidency, UserWithToken, Vote, IntArray} from "../graphql-schema";
+import {
+    CupCount,
+    NewApplication,
+    Residency,
+    Revision,
+    SeatChangeApplication,
+    SeatApplication,
+    TempApplication,
+    TempResidency,
+    UserWithToken,
+    Vote,
+    IntArray,
+    PreferenceInput, Preference
+} from "../graphql-schema";
 import {roles} from "../utility";
 import {ItemType, MealTime} from "@prisma/client";
-import { contains } from "class-validator";
 
 export class mutationResolver{
     
@@ -318,7 +330,63 @@ export class mutationResolver{
     }
 
 
+    /* Mess Management Module starts */
 
+    @Authorized(roles.STUDENT_RESIDENT)
+    @Mutation(returns => [Preference])
+    async addPreferences(
+        @Ctx() ctx : Context,
+        @Arg('mealPlanId') mealPlanId : number,
+        @Arg('preferences') preferences : PreferenceInput
+    ) {
+        let mealPlan = await ctx.prisma.mealPlan.findUnique({
+            where : {
+                mealPlanId : mealPlanId
+            }
+        });
+
+        if(!mealPlan){
+            throw new Error("Meal Plan not found\n");
+        }
+
+        let resident = await ctx.prisma.residency.findFirst({
+            where : {
+                studentId : ctx.identity.studentId
+            }
+        })
+
+        if(!resident){
+            throw new Error("Resident not found\n");
+        }
+
+        let preference = await ctx.prisma.preference.findFirst({
+            where : {
+                mealPlanId : mealPlanId,
+                residencyId: resident.residencyId
+            }
+        });
+
+        if(preference){
+            throw new Error("Preference already exists for this student\n");
+        }
+
+        preferences.preferences.map(async p => {
+            await ctx.prisma.preference.create({
+                data : {
+                    mealPlanId : mealPlanId,
+                    residencyId : resident.residencyId,
+                    ...p
+                }
+            })
+        })
+
+        return await ctx.prisma.preference.findMany({
+            where : {
+                mealPlanId : mealPlanId,
+                residencyId: resident.residencyId
+            }
+        });
+    }
 
     @Authorized(roles.STUDENT_MESS_MANAGER)
     @Mutation(returns => CupCount)
@@ -334,7 +402,10 @@ export class mutationResolver{
 
         const existingItem = await ctx.prisma.item.findFirst({
             where : {
-                name : name.toLowerCase()
+                name : {
+                    equals : name,
+                    mode : 'insensitive'
+                }
             }
         });
 
@@ -474,6 +545,8 @@ export class mutationResolver{
 
         return newCupCount;
     }
+
+    /* Mess Management Ends */
 
     
     @Authorized(roles.PROVOST)

@@ -427,7 +427,7 @@ export class queryResolver{
         }
     }
 
-    @Authorized([roles.STUDENT])
+    @Authorized([roles.STUDENT_RESIDENT])
     @Query(returns => MealPlan)
     async getMealPlan(
         @Ctx() ctx: Context,
@@ -447,7 +447,25 @@ export class queryResolver{
         });
     }
 
-    @Authorized([roles.STUDENT])
+    // get multiple meal plans for student view
+    @Authorized([roles.STUDENT_RESIDENT])
+    @Query(returns => [MealPlan])
+    async getMealPlans(
+        @Ctx() ctx: Context,
+        @Arg('from') from : string,
+        @Arg('to') to : string
+    ) {
+        return await ctx.prisma.mealPlan.findMany({
+            where: {
+                day: {
+                    gte: new Date(from),
+                    lte: new Date(to)
+                }
+            }
+        });
+    }
+
+    @Authorized([roles.STUDENT_RESIDENT])
     @Query(returns => [Item])
     async getOldItems(
         @Ctx() ctx: Context,

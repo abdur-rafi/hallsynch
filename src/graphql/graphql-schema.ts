@@ -660,6 +660,21 @@ export class CupCount {
     item : Item;
 }
 
+@InputType()
+export class SinglePreferenceInput {
+    @Field()
+    order : number;
+
+    @Field()
+    itemId : number;
+}
+
+@InputType()
+export class PreferenceInput {
+    @Field(type => [SinglePreferenceInput])
+    preferences : [SinglePreferenceInput];
+}
+
 @ObjectType()
 export class Preference {
     @Field()

@@ -18,6 +18,10 @@ export const authChecker : AuthChecker<Context> = async ({context}, currRoles)=>
             return std.residencyStatus == 'ATTACHED';
     
         }
+        if(currRoles.includes(roles.STUDENT_RESIDENT)){
+            console.log('here3');
+            return std.residencyStatus == 'RESIDENT' ;
+        }
         if(currRoles.includes(roles.STUDENT_MESS_MANAGER)){
             console.log('here2');
             if(std.residencyStatus != 'RESIDENT'){
@@ -31,12 +35,6 @@ export const authChecker : AuthChecker<Context> = async ({context}, currRoles)=>
             })
 
             return std2 != null;
-        }
-        
-        if(currRoles.includes(roles.STUDENT_RESIDENT)){
-            console.log(context);
-            console.log('here3');
-            return std.residencyStatus == 'RESIDENT' ;        
         }
         // else{
         //     console.log('no roles match');
