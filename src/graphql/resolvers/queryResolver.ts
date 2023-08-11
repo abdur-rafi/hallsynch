@@ -6,7 +6,8 @@ import {
     Floor, Item,
     LevelTerm,
     MealPlan, MealPlanWithCount,
-    NotificationWithCount, ResidencyWithParticipationCount,
+    MealPreferenceStats,
+    NotificationWithCount, OptedOutCount, ResidencyWithParticipationCount,
     Room,
     SearchInput,
     Seat,
@@ -18,7 +19,7 @@ import {
     Vote
 } from '../graphql-schema'
 import { Context } from '../interface'
-import { applicationTypes, params, roles, sortVals } from '../utility';
+import { applicationTypes, getMealTime, params, roles, sortVals } from '../utility';
 import {ApplicationStatus, MealTime, Prisma} from '@prisma/client';
 
 @Resolver()
@@ -470,7 +471,7 @@ export class queryResolver{
                 day : {
                     gte : new Date(from)
                 },
-                mealTime : mealTime == 'DINNER' ? MealTime['DINNER'] : MealTime['LUNCH']
+                mealTime : getMealTime(mealTime)
             },
             include : {
                 _count : {
@@ -535,6 +536,74 @@ export class queryResolver{
 
         return s.slice(0, take);
     }
+
+
+    
+    @Authorized([roles.STUDENT_MESS_MANAGER])
+    @Query(returns => OptedOutCount)
+    async optedOutStats(
+        @Ctx() ctx : Context,
+        @Arg('date') date : string,
+        @Arg('mealTime') mealTime : string
+    ){  
+
+        let optedOutCount = await ctx.prisma.optedOut.count({
+            where : {
+                mealPlan : {
+                    day : new Date(date),
+                    mealTime : getMealTime(mealTime)
+                }
+            }
+        })
+        let totalResidents = await ctx.prisma.residency.count();
+
+        return {
+            optedOut : optedOutCount,
+            total : totalResidents
+        }
+    }
+
+    @Authorized([roles.STUDENT_MESS_MANAGER])
+    @Query(returns => [MealPreferenceStats])
+    async mealPreferenceStats(
+        @Ctx() ctx : Context,
+        @Arg('date') date : string,
+        @Arg('mealTime') mealTime : string
+    ){  
+
+        let preferences = await ctx.prisma.preference.groupBy({
+            where : {
+                mealPlan : {
+                    day : new Date(date),
+                    mealTime : getMealTime(mealTime)
+                }
+            },
+            by : ['order', 'itemId'],
+            _count : {
+                residencyId : true
+            }
+        })
+
+        let items = await ctx.prisma.item.findMany({
+            where : {
+                itemId : {
+                    in : preferences.map(p => p.itemId)
+                }
+            }
+        })
+
+        // console.log(items);
+        // console.log(preferences);
+
+        return preferences.map(p =>({
+            count : p._count.residencyId,
+            order : p.order,
+            item : items.filter(i => i.itemId == p.itemId)[0]
+        }))
+
+        console.log(preferences)
+    }
+
 
 
 

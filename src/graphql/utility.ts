@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { Identity } from './interface';
 import { IncomingHttpHeaders } from 'http';
+import { MealTime } from '@prisma/client';
 
 function getTokenPayLoad(token : string){
     let t : null | Identity = null;
@@ -55,4 +56,10 @@ export const applicationTypes = {
 export const sortVals = {
     newest : 'Newest',
     oldest : 'Oldest'
+}
+
+export function getMealTime(v : string){
+    if(v.toUpperCase() === 'DINNER')
+        return MealTime.DINNER
+    return MealTime.LUNCH
 }

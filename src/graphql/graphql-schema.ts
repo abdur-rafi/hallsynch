@@ -809,3 +809,26 @@ export class ResidencyWithParticipationCount{
 
 }
 
+
+@ObjectType()
+export class OptedOutCount{
+    @Field()
+    optedOut : number;
+
+    @Field()
+    total : number;
+
+}
+
+@ObjectType()
+export class MealPreferenceStats{
+    @Field()
+    count : number;
+
+    @Field()
+    order : number;
+
+    @Field()
+    item : Item;
+
+}
