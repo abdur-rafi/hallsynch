@@ -1,5 +1,5 @@
 import {Ctx, FieldResolver, Resolver, Root} from "type-graphql";
-import {CupCount, Meal, MealPlan, MealTime} from "../../graphql-schema";
+import {CupCount, Meal, MealPlan, MealTime, Preference, Student} from "../../graphql-schema";
 import {Context} from "../../interface";
 
 @Resolver(of => MealPlan)
@@ -31,6 +31,30 @@ export class MealPlanResolver{
         @Root() mealPlanCls : MealPlan
     ){
         return await ctx.prisma.cupCount.findMany({
+            where: {
+                mealPlanId: mealPlanCls.mealPlanId
+            }
+        });
+    }
+
+    @FieldResolver(type => [Preference])
+    async preferences(
+        @Ctx() ctx : Context,
+        @Root() mealPlanCls : MealPlan
+    ){
+        return await ctx.prisma.preference.findMany({
+            where: {
+                mealPlanId: mealPlanCls.mealPlanId
+            }
+        });
+    }
+
+    @FieldResolver(type => [Student])
+    async optedOut(
+        @Ctx() ctx : Context,
+        @Root() mealPlanCls : MealPlan
+    ){
+        return await ctx.prisma.optedOut.findMany({
             where: {
                 mealPlanId: mealPlanCls.mealPlanId
             }

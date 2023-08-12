@@ -1,5 +1,9 @@
 import { Ctx, FieldResolver, Resolver, Root } from "type-graphql";
-import { AuthorityRole, ApplicationStatus, Authority, NewApplication, SeatChangeApplication, SeatApplication, TempApplication } from "../../graphql-schema";
+import {
+    AuthorityRole,
+    Authority,
+    Announcement
+} from "../../graphql-schema";
 import { Context } from "../../interface";
 
 @Resolver(of => Authority)
@@ -13,5 +17,15 @@ export class AuthorityResolver{
         return AuthorityRole[authority.role];
     }
 
-    
+    @FieldResolver(type => [Announcement])
+    async announcements(
+        @Ctx() ctx : Context,
+        @Root() authority : Authority
+    ){
+        return ctx.prisma.announcement.findMany({
+            where : {
+                authorityId: authority.authorityId
+            }
+        });
+    }
 }

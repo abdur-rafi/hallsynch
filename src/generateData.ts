@@ -699,6 +699,42 @@ async function generateOptedOut(){
     await Promise.all(promises);
 }
 
+async function generateAnnouncements(){
+    let promises = []
+    let authorities = await prisma.authority.findMany();
+    let messManagers = await prisma.messManager.findMany();
+
+    authorities.forEach(a =>{
+        const title = 'title_' + a.role.toLowerCase() + a.authorityId.toString();
+        promises.push(
+            prisma.announcement.create({
+                data : {
+                    authorityId : a.authorityId,
+                    title : title,
+                    details : 'lorem ipsum dolor sit amet by provost',
+                    createdAt : new Date(Date.now() - 1000 * 60 * 60 * 24 * 30),
+                }
+            })
+        )
+    })
+
+    messManagers.forEach(m =>{
+        const title = 'title_mess_manager_' + m.messManagerId.toString();
+        promises.push(
+            prisma.announcement.create({
+                data : {
+                    messManagerId : m.messManagerId,
+                    title : title,
+                    details : 'lorem ipsum dolor sit amet by mess manager',
+                    createdAt : new Date(Date.now() - 1000 * 60 * 60 * 24 * 30),
+                }
+            })
+        )
+    })
+
+    await Promise.all(promises);
+}
+
 async function generateAll(){
     // await generateBatches()
     // await generateDept()
@@ -720,7 +756,9 @@ async function generateAll(){
     // await generatePreference();
 
     // await generateMessManager();
-    await generateOptedOut();
+    // await generateOptedOut();
+
+    await generateAnnouncements();
 }
 
 generateAll();

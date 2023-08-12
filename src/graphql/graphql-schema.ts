@@ -269,6 +269,9 @@ export class Authority{
     @Field(type => AuthorityRole)
     role :  AuthorityRole
 
+    @Field(type => [Announcement], {nullable : true})
+    announcements? : [Announcement]
+
 }
 
 export enum AuthorityRole{
@@ -715,6 +718,54 @@ export class OptedOut {
 
     @Field(returns => Residency)
     residency : Residency;
+}
+
+@ObjectType()
+export class MessManager {
+    @Field()
+    messManagerId : number;
+
+    @Field()
+    from : Date;
+
+    @Field()
+    to : Date;
+
+    @Field()
+    studentId : number;
+
+    @Field(returns => Student)
+    student : Student;
+
+    @Field(returns => [Announcement], {nullable : true})
+    announcements? : [Announcement];
+}
+
+@ObjectType()
+export class Announcement {
+    @Field()
+    announcementId : number;
+
+    @Field()
+    title : string;
+
+    @Field()
+    details : string;
+
+    @Field()
+    createdAt : Date;
+
+    @Field({nullable : true})
+    authorityId? : number;
+
+    @Field({nullable : true})
+    messManagerId? : number;
+
+    @Field(returns => Authority, {nullable : true})
+    authority? : Authority;
+
+    @Field(returns => MessManager, {nullable : true})
+    messManager? : MessManager;
 }
 
 

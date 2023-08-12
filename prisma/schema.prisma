@@ -227,8 +227,8 @@ model Room {
   tempApplications       TempApplication[]
   seatChangeApplications SeatChangeApplication[]
   seats                  Seat[]
-  // issue : more fields?
 
+  // issue : more fields?
   @@unique([floorId, roomNo])
 }
 
@@ -300,6 +300,7 @@ model Authority {
 
   applicationsHistory ApplicationApproveHistory[]
   RejectionHistory    RejectionHistory[]
+  announcements       Announcement[]
 }
 
 enum AuthorityRole {
@@ -434,12 +435,24 @@ model Preference {
 model OptedOut {
   residencyId Int
   mealPlanId  Int
-  time DateTime @default(now())
+  time        DateTime @default(now())
 
   residency Residency @relation(fields: [residencyId], references: [residencyId])
   mealPlan  MealPlan  @relation(fields: [mealPlanId], references: [mealPlanId])
 
   @@unique([mealPlanId, residencyId])
+}
+
+model Announcement {
+  announcementId Int      @id @default(autoincrement())
+  title          String
+  details        String
+  createdAt      DateTime @default(now())
+  authorityId    Int?
+  messManagerId  Int?
+
+  authority   Authority?   @relation(fields: [authorityId], references: [authorityId])
+  messManager MessManager? @relation(fields: [messManagerId], references: [messManagerId])
 }
 
 model Feedback {
@@ -476,6 +489,8 @@ model MessManager {
 
   studentId Int
   student   Student @relation(fields: [studentId], references: [studentId])
+
+  announcements Announcement[]
 }
 
 model MessManagerApplication {

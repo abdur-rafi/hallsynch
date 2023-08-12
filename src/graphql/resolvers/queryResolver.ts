@@ -1,5 +1,6 @@
 import {Arg, Authorized, Ctx, Query, Resolver} from 'type-graphql'
 import {
+    Announcement,
     Batch,
     Department,
     FilterInput,
@@ -474,7 +475,30 @@ export class queryResolver{
         return await ctx.prisma.item.findMany();
     }
 
-    
+    @Authorized([roles.STUDENT_RESIDENT])
+    @Query(returns => [Announcement])
+    async getAnnouncements(
+        @Ctx() ctx: Context,
+    ) {
+        return await ctx.prisma.announcement.findMany({
+            orderBy: {
+                createdAt: 'desc'
+            }
+        });
+    }
+
+    @Authorized([roles.STUDENT_RESIDENT])
+    @Query(returns => Announcement)
+    async getAnnouncement(
+        @Ctx() ctx: Context,
+        @Arg('announcementId') announcementId: number
+    ) {
+        return await ctx.prisma.announcement.findFirst({
+            where: {
+                announcementId: announcementId
+            }
+        });
+    }
     
     @Authorized([roles.PROVOST])
     @Query(returns => [MealPlanWithCount])
