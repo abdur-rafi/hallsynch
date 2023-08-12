@@ -719,7 +719,7 @@ async function generateAll(){
     // await generateParticipation();
     // await generatePreference();
 
-    await generateMessManager();
+    // await generateMessManager();
     await generateOptedOut();
 }
 

@@ -44,6 +44,7 @@ import { TempResidencyHistoryResolver } from "./graphql/resolvers/FieldResolvers
 import { TempResidencyResolver } from "./graphql/resolvers/FieldResolvers/tempResidency";
 import {PhotoResolver} from "./graphql/resolvers/FieldResolvers/photo";
 import {PreferenceResolver} from "./graphql/resolvers/FieldResolvers/preference";
+import {OptedOutResolver} from "./graphql/resolvers/FieldResolvers/optedOut";
 
 
 const client = new PrismaClient()
@@ -75,7 +76,8 @@ buildSchema({
         TempResidencyHistoryResolver,
         TempResidencyResolver,
         PhotoResolver,
-        PreferenceResolver
+        PreferenceResolver,
+        OptedOutResolver
     ],
     authChecker: authChecker
 }).then(schema => {

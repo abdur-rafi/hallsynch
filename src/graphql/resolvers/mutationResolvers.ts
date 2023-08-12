@@ -14,7 +14,7 @@ import {
     UserWithToken,
     Vote,
     IntArray,
-    PreferenceInput, Preference
+    PreferenceInput, Preference, OptedOut
 } from "../graphql-schema";
 import {roles} from "../utility";
 import {ItemType, MealTime} from "@prisma/client";
@@ -386,6 +386,61 @@ export class mutationResolver{
                 residencyId: resident.residencyId
             }
         });
+    }
+
+    @Authorized(roles.STUDENT_RESIDENT)
+    @Mutation(returns => OptedOut)
+    async optOut(
+        @Ctx() ctx : Context,
+        @Arg('mealPlanId') mealPlanId : number
+    ){
+        let mealPlan = await ctx.prisma.mealPlan.findUnique({
+            where : {
+                mealPlanId : mealPlanId
+            }
+        });
+
+        if(!mealPlan){
+            throw new Error("Meal Plan not found\n");
+        }
+
+        let resident = await ctx.prisma.residency.findFirst({
+            where : {
+                studentId : ctx.identity.studentId
+            }
+        })
+
+        if(!resident){
+            throw new Error("Resident not found\n");
+        }
+
+        let optedOut = await ctx.prisma.optedOut.findFirst({
+            where : {
+                mealPlanId : mealPlanId,
+                residencyId: resident.residencyId
+            }
+        });
+
+        if(optedOut){
+            throw new Error("Already opted out\n");
+        }
+
+        let newOptedOut = await ctx.prisma.optedOut.create({
+            data : {
+                mealPlanId : mealPlanId,
+                residencyId : resident.residencyId
+            }
+        })
+
+        // clear preferences for this student for this meal plan
+        await ctx.prisma.preference.deleteMany({
+            where : {
+                mealPlanId : mealPlanId,
+                residencyId: resident.residencyId
+            }
+        })
+
+        return newOptedOut;
     }
 
     @Authorized(roles.STUDENT_MESS_MANAGER)

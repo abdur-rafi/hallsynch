@@ -635,8 +635,8 @@ export class MealPlan {
     @Field(returns => [CupCount])
     cupCount : [CupCount];
 
-    @Field(returns => [Preference])
-    preferences : [Preference];
+    @Field(returns => [Preference], {nullable : true})
+    preferences? : [Preference];
 
     @Field(returns => [Student])
     optedOut : [Student];
@@ -697,6 +697,24 @@ export class Preference {
 
     @Field(returns => Student)
     student : Student;
+}
+
+@ObjectType()
+export class OptedOut {
+    @Field()
+    mealPlanId : number;
+
+    @Field()
+    residencyId : number;
+
+    @Field()
+    time : Date;
+
+    @Field(returns => MealPlan)
+    mealPlan : MealPlan;
+
+    @Field(returns => Residency)
+    residency : Residency;
 }
 
 
