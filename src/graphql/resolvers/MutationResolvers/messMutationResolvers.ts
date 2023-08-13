@@ -333,4 +333,30 @@ export class messMutationResolver {
 
         return newAnnouncement;
     }
+
+    @Authorized(roles.STUDENT_MESS_MANAGER || roles.PROVOST)
+    @Mutation(returns => Announcement)
+    async removeAnnouncement(
+        @Ctx() ctx : Context,
+        @Arg('announcementId') announcementId : number
+    ) {
+        let announcement = await ctx.prisma.announcement.findFirst({
+            where: {
+                announcementId: announcementId
+            }
+        });
+
+        if(!announcement){
+            throw new Error("No such announcement found");
+        }
+
+        let deleted = await ctx.prisma.announcement.delete({
+            where: {
+                announcementId: announcementId
+            }
+        });
+
+        return deleted;
+    }
+
 }
