@@ -3,14 +3,21 @@ import "reflect-metadata";
 
 import express from "express";
 import { buildSchema } from "type-graphql";
-import { queryResolver } from "./graphql/resolvers/queryResolver";
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from '@apollo/server/express4';
 import { ApolloServerPluginLandingPageLocalDefault } from "@apollo/server/plugin/landingPage/default";
 import { createServer } from 'http'
 import { Context } from "./graphql/interface";
 import { PrismaClient } from "@prisma/client";
-import { mutationResolver } from "./graphql/resolvers/mutationResolvers";
+
+import { loginMutationResolver} from "./graphql/resolvers/MutationResolvers/loginMutationResolver";
+import { studentSeatMutationResolver } from "./graphql/resolvers/MutationResolvers/studentSeatMutationResolvers";
+import { provostSeatMutationResolver} from "./graphql/resolvers/MutationResolvers/provostSeatMutationResolvers";
+import { messMutationResolver} from "./graphql/resolvers/MutationResolvers/messMutationResolvers";
+import { basicResolver} from "./graphql/resolvers/QueryResolvers/basicResolvers";
+import { seatQueryResolver } from "./graphql/resolvers/QueryResolvers/seatQueryResolvers";
+import { messQueryResolver } from "./graphql/resolvers/QueryResolvers/messQueryResolvers";
+
 import { StudentResolver } from "./graphql/resolvers/FieldResolvers/student";
 import { DepartmentResolver } from "./graphql/resolvers/FieldResolvers/department";
 import { BatchResolver } from "./graphql/resolvers/FieldResolvers/batch";
@@ -55,8 +62,13 @@ const client = new PrismaClient()
 
 buildSchema({
     resolvers: [
-        queryResolver,
-        mutationResolver,
+        basicResolver,
+        seatQueryResolver,
+        messQueryResolver,
+        loginMutationResolver,
+        studentSeatMutationResolver,
+        provostSeatMutationResolver,
+        messMutationResolver,
         StudentResolver,
         DepartmentResolver,
         BatchResolver,
