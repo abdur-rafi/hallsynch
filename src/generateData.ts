@@ -669,7 +669,8 @@ async function generateMessManager(){
                     data : {
                         residencyId : r.residencyId,
                         from: new Date(2021, month_id % 12, 1),
-                        to : new Date(2021, month_id % 12, 31)
+                        to : new Date(2021, month_id % 12, 31),
+                        studentStudentId : r.studentId
                     }
                 })
             )
@@ -853,7 +854,7 @@ async function generateAll(){
     // await generateResidency()
     // await generateAuthority();
     // await generateApplications();
-
+    //
     // await generateTempResidencyHistory();
     // await generateItem();
     // await generateMeal();
@@ -863,9 +864,9 @@ async function generateAll(){
     // await generateParticipation();
     // await generatePreference();
 
-    // await generateOptedOut();
+    await generateOptedOut();
 
-    // await generateAnnouncements();
+    await generateAnnouncements();
     await generateFeedback();
     await generateRatings();
 }

@@ -442,12 +442,15 @@ export class queryResolver{
         if(mealtime.toLowerCase() == 'lunch') mealTime = MealTime.LUNCH;
         else mealTime = MealTime.DINNER;
 
-        return await ctx.prisma.mealPlan.findFirst({
+        let res = await ctx.prisma.mealPlan.findFirst({
             where: {
                 day: new Date(date),
                 mealTime: mealTime
             }
         });
+
+        if(!res) throw new Error("Meal plan not found");
+        return res;
     }
 
     // get multiple meal plans for student view

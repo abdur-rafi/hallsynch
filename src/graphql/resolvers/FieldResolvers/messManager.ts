@@ -10,9 +10,10 @@ export class MessManagerResolver{
         @Ctx() ctx : Context,
         @Root() messManager : MessManager
     ){
-        return ctx.prisma.student.findUnique({
+        if(!messManager) return null;
+        return ctx.prisma.student.findFirst({
             where : {
-                studentId : messManager.studentId
+                studentId : messManager.studentStudentId
             }
         });
     }

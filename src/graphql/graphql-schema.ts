@@ -252,6 +252,9 @@ export class UserWithToken{
     
     @Field(type => Authority, {nullable : true})
     authority? : ()=> Authority
+
+    @Field(type => MessManager, {nullable : true})
+    messManager? : ()=> MessManager
 }
 
 @ObjectType()
@@ -732,7 +735,7 @@ export class MessManager {
     to : Date;
 
     @Field()
-    studentId : number;
+    studentStudentId : number;
 
     @Field(returns => Student)
     student : Student;

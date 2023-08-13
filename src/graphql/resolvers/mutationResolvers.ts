@@ -47,22 +47,28 @@ export class mutationResolver{
         }
 
         let payload = {};
+        let messManager;
         if(student){
-            let messManager = await ctx.prisma.messManager.findFirst({
+             messManager = await ctx.prisma.messManager.findFirst({
                 where : {
                     residency : {
                         student : {
                             studentId : student.studentId
                         }
                     },
-                    from : {
-                        lte : new Date()
-                    },
-                    to : {
-                        gt : new Date()
+                    assingedAt : {
+                        lte : new Date(),
+                        gt : new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7)
                     }
+                    // from : {
+                    //     lte : new Date()
+                    // },
+                    // to : {
+                    //     gt : new Date()
+                    // }
                 }
             })
+
             payload = {
                 studentId : student.studentId,
                 messManagerId : messManager?.messManagerId
@@ -74,11 +80,15 @@ export class mutationResolver{
             }
         }
 
+        // console.log("hello ", messManager?.messManagerId)
+        // console.log(payload)
+
         let token = jwt.sign(payload, process.env.JWTSECRET!)
         // console.log(token)
         return {
             student : student,
             authority : authority,
+            messManager: messManager,
             token : token
         }
 
@@ -375,6 +385,17 @@ export class mutationResolver{
 
         if(!resident){
             throw new Error("Resident not found\n");
+        }
+
+        let optedOut = await ctx.prisma.optedOut.findFirst({
+            where : {
+                mealPlanId : mealPlanId,
+                residencyId: resident.residencyId
+            }
+        });
+
+        if(optedOut){
+            throw new Error("Already opted out. No preference can be given\n");
         }
 
         let preference = await ctx.prisma.preference.findFirst({
