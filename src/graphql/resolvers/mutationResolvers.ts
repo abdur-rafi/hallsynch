@@ -14,7 +14,7 @@ import {
     UserWithToken,
     Vote,
     IntArray,
-    PreferenceInput, Preference, OptedOut
+    PreferenceInput, Preference, OptedOut, Announcement
 } from "../graphql-schema";
 import {roles} from "../utility";
 import {ItemType, MealTime} from "@prisma/client";
@@ -600,6 +600,42 @@ export class mutationResolver{
         });
 
         return newCupCount;
+    }
+
+    @Authorized(roles.STUDENT_MESS_MANAGER || roles.PROVOST)
+    @Mutation(returns => Announcement)
+    async addAnnouncement(
+        @Ctx() ctx : Context,
+        @Arg('title') title : string,
+        @Arg('details') details : string
+    ) {
+        let authority = await ctx.prisma.authority.findFirst({
+            where : {
+                authorityId : ctx.identity.authorityId
+            }
+        });
+
+        let messManager = await ctx.prisma.messManager.findFirst({
+            where : {
+                studentId : ctx.identity.studentId
+            }
+        });
+
+        if(!authority && !messManager){
+            throw new Error("Not authorized to make announcements");
+        }
+
+        let newAnnouncement = await ctx.prisma.announcement.create({
+            data : {
+                title : title,
+                details : details,
+                createdAt : new Date(),
+                authorityId : authority?.authorityId ?? null,
+                messManagerId : messManager?.messManagerId ?? null
+            }
+        });
+
+        return newAnnouncement;
     }
 
     /* Mess Management Ends */
