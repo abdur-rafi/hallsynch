@@ -79,6 +79,7 @@ model Residency {
   OptedOut      OptedOut[]
   Rating        Rating[]
   FeedBackGiven FeedBackGiven[]
+  MessManager   MessManager[]
 }
 
 model TempResidency {
@@ -494,7 +495,7 @@ model Rating {
   feedback    Feedback  @relation(fields: [feedbackId], references: [feedbackId])
   residency   Residency @relation(fields: [residencyId], references: [residencyId])
 
-  givenAt          DateTime @default(now())
+  givenAt DateTime @default(now())
 
   @@id([feedbackId, residencyId, type])
 }
@@ -511,12 +512,14 @@ model MessManager {
   to            DateTime
   assingedAt    DateTime @default(now())
 
-  studentId Int
-  student   Student @relation(fields: [studentId], references: [studentId])
+  residencyId Int
+  residency   Residency @relation(fields: [residencyId], references: [residencyId])
 
-  announcements Announcement[]
-  MealPlan      MealPlan[]
-  Feedback      Feedback[]
+  announcements    Announcement[]
+  MealPlan         MealPlan[]
+  Feedback         Feedback[]
+  Student          Student?       @relation(fields: [studentStudentId], references: [studentId])
+  studentStudentId Int?
 }
 
 model MessManagerApplication {

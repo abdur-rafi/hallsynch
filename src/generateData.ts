@@ -351,12 +351,7 @@ async function generateItem(){
         prisma.item.create({
             data : {
                 name : "Rice",
-                type : "RICE",
-                photo : {
-                    create : {
-                        uploadedFileId : 1
-                    }
-                }
+                type : "RICE"
             }
         })
     )
@@ -672,7 +667,7 @@ async function generateMessManager(){
             promises.push(
                 prisma.messManager.create({
                     data : {
-                        studentId : r.studentId,
+                        residencyId : r.residencyId,
                         from: new Date(2021, month_id % 12, 1),
                         to : new Date(2021, month_id % 12, 31)
                     }
@@ -862,16 +857,16 @@ async function generateAll(){
     // await generateTempResidencyHistory();
     // await generateItem();
     // await generateMeal();
+    // await generateMessManager();
     // await generateMealPlan();
     // await generateCupCount();
     // await generateParticipation();
     // await generatePreference();
 
-    // await generateMessManager();
     // await generateOptedOut();
 
     // await generateAnnouncements();
-    // await generateFeedback();
+    await generateFeedback();
     await generateRatings();
 }
 

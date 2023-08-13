@@ -28,7 +28,9 @@ export class mutationResolver{
         @Arg('password') password : string
     ){
         // console.log(id);
-        let student = await ctx.prisma.student.findUnique({where : {student9DigitId : id}})
+        let student = await ctx.prisma.student.findUnique({
+            where : {student9DigitId : id}
+        })
         // console.log(student)
         let authority;
         if(!student){
@@ -46,8 +48,24 @@ export class mutationResolver{
 
         let payload = {};
         if(student){
+            let messManager = await ctx.prisma.messManager.findFirst({
+                where : {
+                    residency : {
+                        student : {
+                            studentId : student.studentId
+                        }
+                    },
+                    from : {
+                        lte : new Date()
+                    },
+                    to : {
+                        gt : new Date()
+                    }
+                }
+            })
             payload = {
-                studentId : student.studentId
+                studentId : student.studentId,
+                messManagerId : messManager?.messManagerId
             }
         }
         else{
@@ -502,6 +520,11 @@ export class mutationResolver{
                     create : {
                         createdAt : new Date(date),
                     }
+                },
+                messManager : {
+                    connect : {
+                        messManagerId : ctx.identity.messManagerId
+                    }
                 }
             },
             include : {
@@ -584,6 +607,11 @@ export class mutationResolver{
                             create : {
                                 createdAt : new Date(date),
                             }
+                        },
+                        messManager : {
+                            connect : {
+                                messManagerId : ctx.identity.messManagerId
+                            }
                         }
                     }
                 },
@@ -617,7 +645,7 @@ export class mutationResolver{
 
         let messManager = await ctx.prisma.messManager.findFirst({
             where : {
-                studentId : ctx.identity.studentId
+                messManagerId : ctx.identity.messManagerId
             }
         });
 

@@ -7,5 +7,6 @@ export interface Context{
 
 export interface Identity{
     studentId : number,
-    authorityId : number
+    authorityId : number,
+    messManagerId : number
 }

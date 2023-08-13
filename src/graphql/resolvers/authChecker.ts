@@ -28,13 +28,17 @@ export const authChecker : AuthChecker<Context> = async ({context}, currRoles)=>
                 return false;
             }
 
-            const std2 = await context.prisma.messManager.findFirst({
-                where : {
-                    studentId : context.identity.studentId
-                }
-            })
-
-            return std2 != null;
+            // const std2 = await context.prisma.messManager.findFirst({
+            //     where : {
+            //         residency : {
+            //             student : {
+            //                 stude 
+            //             }
+            //         }
+            //     }
+            // })
+            return context.identity.messManagerId != null;
+            // return std2 != null;
         }
         // else{
         //     console.log('no roles match');
