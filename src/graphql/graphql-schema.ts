@@ -916,3 +916,73 @@ export class MealPreferenceStats{
     item : Item;
 
 }
+
+@ObjectType()
+export class Feedback {
+    @Field()
+    feedbackId: number;
+    @Field()
+    startDate: Date
+    @Field()
+    messManagerId: number
+    @Field()
+    startMealPlanId: number
+    @Field()
+    endMealPlanId: number
+
+
+    @Field(type => MessManager)
+    messManager: MessManager
+    @Field(type => MealPlan)
+    startMealPlan: MealPlan
+    @Field(type => MealPlan)
+    endMealPlan: MealPlan
+}
+
+@ObjectType()
+export class Rating{
+    @Field()
+    rating : number;
+
+    @Field(type => RatingType)
+    type : RatingType;
+
+    @Field()
+    feedbackId : number;
+
+    @Field()
+    residencyId : number;
+
+    @Field(type => Feedback)
+    feedback : Feedback;
+
+    @Field(type => Residency)
+    residency : Residency;
+
+    @Field()
+    giventAt : Date
+
+}
+
+
+@ObjectType()
+export class FeedbackWithRating{
+    @Field()
+    avg : number;
+
+    @Field()
+    feedback : Feedback;
+
+    @Field(type => RatingType)
+    type : RatingType;
+
+}
+
+export enum RatingType{
+    QUALITY,
+    QUANTITY,
+    MANAGEMENT
+}
+registerEnumType(RatingType , {
+    name : 'RatingType'
+})

@@ -3,6 +3,7 @@ import {
     Announcement,
     Batch,
     Department,
+    FeedbackWithRating,
     FilterInput,
     Floor, Item,
     LevelTerm,
@@ -646,6 +647,50 @@ export class queryResolver{
         console.log(preferences)
     }
 
+
+    
+    @Authorized([roles.STUDENT_MESS_MANAGER])
+    @Query(returns => [FeedbackWithRating])
+    async ratings(
+        @Ctx() ctx : Context,
+        @Arg('date') date : string
+    ){  
+        let res = await ctx.prisma.rating.groupBy({
+            by : ['type', 'feedbackId'],
+            where : {
+                feedback : {
+                    startMealPlan : {
+                        day : {
+                            gte : new Date(date)
+                        }
+                    }
+                }
+            },
+            _avg : {
+                rating : true
+            },
+            orderBy : {
+                feedbackId : 'asc'
+            }
+        })
+
+        let feedbacks = await ctx.prisma.feedback.findMany({
+            where : {
+                feedbackId : {
+                    in : res.map(r => r.feedbackId)
+                }
+            }
+        })
+
+        return res.map(r => ({
+            avg : r._avg.rating,
+            type : r.type,
+            feedback : feedbacks.filter(f => f.feedbackId == r.feedbackId)[0]
+        }))
+
+        
+    }
+    
 
 
 

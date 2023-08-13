@@ -28,7 +28,6 @@ model Student {
 
   // residency Residency @relation(fields: [residencyId], references: [residencyId])
   votes                   Vote[]
-  ratings                 Rating[]
   messManagerRoles        MessManager[]
   messManagerApplications MessManagerApplication[]
   complaints              Complaint[]
@@ -78,6 +77,8 @@ model Residency {
   Participation Participation[]
   Preference    Preference[]
   OptedOut      OptedOut[]
+  Rating        Rating[]
+  FeedBackGiven FeedBackGiven[]
 }
 
 model TempResidency {
@@ -374,13 +375,17 @@ model MealPlan {
   day        DateTime
   mealTime   MealTime
 
-  mealId Int
+  mealId        Int
+  messManagerId Int
 
   meal          Meal            @relation(fields: [mealId], references: [mealId])
   cupCount      CupCount[]
   preferences   Preference[]
   Participation Participation[]
   OptedOut      OptedOut[]
+  messManager   MessManager     @relation(fields: [messManagerId], references: [messManagerId])
+  startFeedBack Feedback?       @relation("StartMeal")
+  endFeedBack   Feedback?       @relation("EndMeal")
 }
 
 enum MealTime {
@@ -456,23 +461,42 @@ model Announcement {
 }
 
 model Feedback {
-  feedbackId Int      @id @default(autoincrement())
-  week       DateTime // issue : different data type?
+  feedbackId    Int      @id @default(autoincrement())
+  startDate     DateTime // issue : different data type?
+  messManagerId Int
 
-  ratings Rating[]
+  startMealPlanId Int @unique
+  endMealPlanId   Int @unique
+
+  ratings       Rating[]
+  messManager   MessManager     @relation(fields: [messManagerId], references: [messManagerId])
+  startMealPlan MealPlan        @relation(name: "StartMeal", fields: [startMealPlanId], references: [mealPlanId])
+  endMealPlan   MealPlan        @relation(name: "EndMeal", fields: [endMealPlanId], references: [mealPlanId])
+  FeedBackGiven FeedBackGiven[]
+}
+
+model FeedBackGiven {
+  feedBackId  Int
+  residencyId Int
+
+  feedBack  Feedback  @relation(fields: [feedBackId], references: [feedbackId])
+  residency Residency @relation(fields: [residencyId], references: [residencyId])
+
+  @@id([residencyId, feedBackId])
 }
 
 model Rating {
   rating Float
   type   RatingType
 
-  feedbackId Int
-  studentId  Int
+  feedbackId  Int
+  residencyId Int
+  feedback    Feedback  @relation(fields: [feedbackId], references: [feedbackId])
+  residency   Residency @relation(fields: [residencyId], references: [residencyId])
 
-  feedback Feedback @relation(fields: [feedbackId], references: [feedbackId])
-  student  Student  @relation(fields: [studentId], references: [studentId])
+  givenAt          DateTime @default(now())
 
-  @@id([feedbackId, studentId, type])
+  @@id([feedbackId, residencyId, type])
 }
 
 enum RatingType {
@@ -491,6 +515,8 @@ model MessManager {
   student   Student @relation(fields: [studentId], references: [studentId])
 
   announcements Announcement[]
+  MealPlan      MealPlan[]
+  Feedback      Feedback[]
 }
 
 model MessManagerApplication {

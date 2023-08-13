@@ -531,6 +531,7 @@ export class mutationResolver{
 
         return newCupCount;
     }
+    
 
     @Authorized(roles.STUDENT_MESS_MANAGER)
     @Mutation(returns => CupCount)

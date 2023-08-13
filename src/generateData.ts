@@ -1,4 +1,4 @@
-import {PrismaClient} from '@prisma/client'
+import {PrismaClient, RatingType} from '@prisma/client'
 import bcrypt from 'bcrypt'
 const prisma = new PrismaClient()
 
@@ -516,6 +516,11 @@ async function generateMealPlan(){
     let year = 2023;
     let promises = []
 
+    let messManagers = await prisma.messManager.findMany();
+    let randMessManagerId = ()=>{
+        return messManagers[0].messManagerId;
+        // return messManagers[Math.floor(Math.random() * messManagers.length)].messManagerId;
+    }
 
     for(let j = 1; j < 32; ++j){
         promises.push(
@@ -523,7 +528,8 @@ async function generateMealPlan(){
                 data : {
                     day : new Date(year, month, j),
                     mealTime : "LUNCH",
-                    mealId : meals[Math.floor(Math.random() * meals.length)].mealId
+                    mealId : meals[Math.floor(Math.random() * meals.length)].mealId,
+                    messManagerId : randMessManagerId()
                 }
             })
         )
@@ -532,7 +538,8 @@ async function generateMealPlan(){
                 data : {
                     day : new Date(year, month, j),
                     mealTime : "DINNER",
-                    mealId : meals[Math.floor(Math.random() * meals.length)].mealId
+                    mealId : meals[Math.floor(Math.random() * meals.length)].mealId,
+                    messManagerId : randMessManagerId()
                 }
             })
         )
@@ -735,6 +742,111 @@ async function generateAnnouncements(){
     await Promise.all(promises);
 }
 
+async function generateFeedback(){
+    let promises = []
+    
+    let messManager = await prisma.messManager.findMany();
+    messManager.forEach(async m =>{
+
+        promises.push(prisma.mealPlan.findMany({
+            where : {
+                messManagerId : m.messManagerId
+            },
+            orderBy : {
+                mealPlanId : 'asc'
+            }
+        }).then(mealPlans =>{
+            let starts = [];
+            let ends = []
+            for(let i = 0; i + 14 < mealPlans.length; i+= 14){
+                starts.push(mealPlans[i].mealPlanId)
+                ends.push(mealPlans[i + 13].mealPlanId);
+            }
+            console.log(starts, ends)
+            promises.push(
+                prisma.feedback.createMany({
+                    data : starts.map((s, i)=>({
+                        startMealPlanId : s,
+                        endMealPlanId : mealPlans[ends[i]].mealPlanId,
+                        messManagerId : m.messManagerId,
+                        startDate : new Date(new Date().setDate(new Date(mealPlans[ends[i]].day).getDate() + 1))
+                    }))
+                }).catch(err=>{
+                    console.log(err)
+                })
+            )
+            console.log(mealPlans.length);
+
+        }))
+
+        // let mealPlans = await prisma.mealPlan.findMany({
+        //     where : {
+        //         messManagerId : m.messManagerId
+        //     },
+        //     orderBy : {
+        //         mealPlanId : 'asc'
+        //     }
+        // })
+        
+        
+    })
+    await Promise.all(promises);
+}
+
+async function generateRatings(){
+    let promises = []
+    let residents = await prisma.residency.findMany();
+    let feedbacks = await prisma.feedback.findMany();
+    feedbacks.pop();
+    let types = [RatingType.MANAGEMENT, RatingType.QUALITY, RatingType.QUANTITY]
+    residents.forEach(r =>{
+        feedbacks.forEach( async f =>{
+            console.log(f);
+            let mealsCount = await prisma.participation.count({
+                where : {
+                    mealPlan : {
+                        messManagerId : f.messManagerId,
+                        mealPlanId : {
+                            gte : f.startMealPlanId,
+                            lte : f.endMealPlanId
+                        }
+                    },
+                    residencyId : r.residencyId
+                }
+            })
+            if(mealsCount > 6){
+                console.log("here\n");
+                // console.log(promises)
+                promises.push(
+                    prisma.rating.createMany({
+                        data : types.map(t =>({
+                            rating : Math.random() > .5 ? 4 : 5,
+                            residencyId : r.residencyId,
+                            type : t,
+                            feedbackId : f.feedbackId
+                        }))
+                    }).catch(err=>{
+                        console.log(err)
+                    })
+                )
+                promises.push(
+                    prisma.feedBackGiven.create({
+                        data : {
+                            feedBackId : f.feedbackId,
+                            residencyId : r.residencyId
+                        }
+                    }).catch(err=>{
+                        console.log(err)
+                    })
+                )
+            }
+            promises.push(mealsCount);
+
+        })
+    })
+    await Promise.all(promises);
+}
+
 async function generateAll(){
     // await generateBatches()
     // await generateDept()
@@ -758,7 +870,9 @@ async function generateAll(){
     // await generateMessManager();
     // await generateOptedOut();
 
-    await generateAnnouncements();
+    // await generateAnnouncements();
+    // await generateFeedback();
+    await generateRatings();
 }
 
 generateAll();

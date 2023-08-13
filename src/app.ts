@@ -47,6 +47,8 @@ import {PreferenceResolver} from "./graphql/resolvers/FieldResolvers/preference"
 import {OptedOutResolver} from "./graphql/resolvers/FieldResolvers/optedOut";
 import {MessManagerResolver} from "./graphql/resolvers/FieldResolvers/messManager";
 import {AnnouncementResolver} from "./graphql/resolvers/FieldResolvers/announcement";
+import { FeedbackWithRatingResolver } from "./graphql/resolvers/FieldResolvers/feedbackWithRating";
+import { FeedbackResolver } from "./graphql/resolvers/FieldResolvers/feedback";
 
 
 const client = new PrismaClient()
@@ -81,7 +83,9 @@ buildSchema({
         PreferenceResolver,
         OptedOutResolver,
         MessManagerResolver,
-        AnnouncementResolver
+        AnnouncementResolver,
+        FeedbackWithRatingResolver,
+        FeedbackResolver
     ],
     authChecker: authChecker
 }).then(schema => {
