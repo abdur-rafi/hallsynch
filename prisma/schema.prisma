@@ -72,14 +72,15 @@ model Residency {
 
   seatId Int @unique
 
-  seat          Seat            @relation(fields: [seatId], references: [seatId])
-  student       Student         @relation(fields: [studentId], references: [studentId])
-  Participation Participation[]
-  Preference    Preference[]
-  OptedOut      OptedOut[]
-  Rating        Rating[]
-  FeedBackGiven FeedBackGiven[]
-  MessManager   MessManager[]
+  seat                   Seat                     @relation(fields: [seatId], references: [seatId])
+  student                Student                  @relation(fields: [studentId], references: [studentId])
+  Participation          Participation[]
+  Preference             Preference[]
+  OptedOut               OptedOut[]
+  Rating                 Rating[]
+  FeedBackGiven          FeedBackGiven[]
+  MessManager            MessManager[]
+  MessManagerApplication MessManagerApplication[]
 }
 
 model TempResidency {
@@ -523,12 +524,17 @@ model MessManager {
 }
 
 model MessManagerApplication {
-  applicationId      Int      @id @default(autoincrement())
-  preferredTimeRange DateTime // issue : from to?
-  appliedAt          DateTime @default(now())
+  applicationId Int               @id @default(autoincrement())
+  preferredFrom DateTime          @db.Date
+  preferredTo   DateTime          @db.Date
+  appliedAt     DateTime          @default(now())
+  status        ApplicationStatus @default(PENDING)
 
-  studentId Int
-  student   Student @relation(fields: [studentId], references: [studentId])
+  studentId   Int
+  residencyId Int
+
+  student   Student   @relation(fields: [studentId], references: [studentId])
+  residency Residency @relation(fields: [residencyId], references: [residencyId])
 }
 
 model Complaint {

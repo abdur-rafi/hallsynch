@@ -745,6 +745,36 @@ export class MessManager {
 }
 
 @ObjectType()
+export class MessManagerApplication {
+    @Field()
+    applicationId : number;
+
+    @Field()
+    preferredFrom : Date;
+
+    @Field()
+    preferredTo : Date;
+
+    @Field()
+    appliedAt : Date;
+
+    @Field()
+    status : ApplicationStatus
+
+    @Field()
+    studentId : number;
+
+    @Field()
+    residencyId : number;
+
+    @Field(returns => Student)
+    student : Student;
+
+    @Field(returns => Residency)
+    residency : Residency;
+}
+
+@ObjectType()
 export class Announcement {
     @Field()
     announcementId : number;

@@ -1,6 +1,13 @@
 import {Arg, Authorized, Ctx, Mutation} from "type-graphql";
 import {roles} from "../../utility";
-import {Announcement, CupCount, OptedOut, Preference, PreferenceInput} from "../../graphql-schema";
+import {
+    Announcement,
+    CupCount, MessManager,
+    MessManagerApplication,
+    OptedOut,
+    Preference,
+    PreferenceInput
+} from "../../graphql-schema";
 import {Context} from "../../interface";
 import {ItemType, MealTime} from "@prisma/client";
 
@@ -357,6 +364,160 @@ export class messMutationResolver {
         });
 
         return deleted;
+    }
+
+    @Authorized(roles.STUDENT_RESIDENT)
+    @Mutation(returns => MessManagerApplication)
+    async applyMessManager(
+        @Ctx() ctx : Context,
+        @Arg('preferredFrom') preferredFrom : string,
+        @Arg('preferredTo') preferredTo : string
+    ){
+        if(new Date(preferredFrom) > new Date(preferredTo)){
+            throw new Error("Invalid date range");
+        }
+
+        let application = await ctx.prisma.messManagerApplication.findFirst({
+            where : {
+                studentId : ctx.identity.studentId,
+                status : 'PENDING'
+            }
+        });
+
+        if(application) {
+            throw new Error("Already applied for Mess Manager for this time period");
+        }
+
+        let existingMessManager = await ctx.prisma.messManager.findMany({
+            where : {
+                OR : [
+                    {
+                        from : {
+                            gte : new Date(preferredFrom),
+                            lte : new Date(preferredTo)
+                        }
+                    },
+                    {
+                        to : {
+                            gte : new Date(preferredFrom),
+                            lte : new Date(preferredTo)
+                        }
+                    }
+                ]
+            }
+        });
+
+        if(existingMessManager.length > 3){
+            throw new Error("More than 3 Mess Managers already exist for this time period");
+        }
+
+        if(existingMessManager.filter(mm => mm.studentStudentId == ctx.identity.studentId).length > 0){
+            throw new Error("Already a Mess Manager for this time period");
+        }
+
+        let resident = await ctx.prisma.residency.findFirst({
+            where : {
+                studentId : ctx.identity.studentId
+            }
+        });
+
+        let newApplication = await ctx.prisma.messManagerApplication.create({
+            data : {
+                preferredFrom : new Date(preferredFrom),
+                preferredTo : new Date(preferredTo),
+                studentId : ctx.identity.studentId,
+                residencyId: resident.residencyId,
+                appliedAt : new Date()
+            }
+        });
+
+        return newApplication;
+    }
+
+    @Authorized(roles.PROVOST)
+    @Mutation(returns => MessManager)
+    async approveMessManagerApplication(
+        @Ctx() ctx : Context,
+        @Arg('messManagerApplicationId') messManagerApplicationId : number,
+        @Arg('from') from : string,
+        @Arg('to') to : string
+    ){
+        let application = await ctx.prisma.messManagerApplication.findFirst({
+            where : {
+                applicationId : messManagerApplicationId
+            }
+        });
+
+        if(!application){
+            throw new Error("No such application found");
+        }
+
+        if(application.status != 'PENDING'){
+            throw new Error("Invalid state of application");
+        }
+
+        if(new Date(from) > new Date(to)){
+            throw new Error("Invalid date range");
+        }
+
+        if(new Date(from).getMonth() != new Date(application.preferredFrom).getMonth() ||
+           new Date(to).getMonth() != new Date(application.preferredTo).getMonth()) {
+            throw new Error("Application preferred month and approved month do not match");
+        }
+
+        let result = await ctx.prisma.$transaction([
+            ctx.prisma.messManager.create({
+                data : {
+                    from : new Date(from),
+                    to : new Date(to),
+                    studentStudentId : application.studentId,
+                    residencyId : application.residencyId,
+                    assingedAt : new Date()
+                }
+            }),
+            ctx.prisma.messManagerApplication.update({
+                where : {
+                    applicationId : messManagerApplicationId
+                },
+                data : {
+                    status : 'ACCEPTED'
+                }
+            })
+        ])
+
+        return result[0];
+    }
+
+    @Authorized(roles.PROVOST)
+    @Mutation(returns => MessManagerApplication)
+    async rejectMessManagerApplication(
+        @Ctx() ctx : Context,
+        @Arg('messManagerApplicationId') messManagerApplicationId : number
+    ){
+        let application = await ctx.prisma.messManagerApplication.findFirst({
+            where : {
+                applicationId : messManagerApplicationId
+            }
+        });
+
+        if(!application){
+            throw new Error("No such application found");
+        }
+
+        if(application.status != 'PENDING'){
+            throw new Error("Invalid state of application");
+        }
+
+        let result = await ctx.prisma.messManagerApplication.update({
+            where : {
+                applicationId : messManagerApplicationId
+            },
+            data : {
+                status : 'REJECTED'
+            }
+        })
+
+        return result;
     }
 
 }

@@ -53,6 +53,7 @@ import {PhotoResolver} from "./graphql/resolvers/FieldResolvers/photo";
 import {PreferenceResolver} from "./graphql/resolvers/FieldResolvers/preference";
 import {OptedOutResolver} from "./graphql/resolvers/FieldResolvers/optedOut";
 import {MessManagerResolver} from "./graphql/resolvers/FieldResolvers/messManager";
+import {MessManagerApplicationResolver} from "./graphql/resolvers/FieldResolvers/messManagerApplication";
 import {AnnouncementResolver} from "./graphql/resolvers/FieldResolvers/announcement";
 import { FeedbackWithRatingResolver } from "./graphql/resolvers/FieldResolvers/feedbackWithRating";
 import { FeedbackResolver } from "./graphql/resolvers/FieldResolvers/feedback";
@@ -95,6 +96,7 @@ buildSchema({
         PreferenceResolver,
         OptedOutResolver,
         MessManagerResolver,
+        MessManagerApplicationResolver,
         AnnouncementResolver,
         FeedbackWithRatingResolver,
         FeedbackResolver
