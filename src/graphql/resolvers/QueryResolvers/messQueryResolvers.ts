@@ -1,15 +1,15 @@
 import {Arg, Authorized, Ctx, Query} from "type-graphql";
-import {getMealTime, roles} from "../../utility";
+import {getMealTime, params, roles, sortVals} from "../../utility";
 import {
     Announcement, FeedbackWithRating,
     Item,
     MealPlan,
-    MealPlanWithCount, MealPreferenceStats,
+    MealPlanWithCount, MealPreferenceStats, MessApplicationsWithCount, MessManager, MessManagerApplication,
     OptedOutCount,
-    ResidencyWithParticipationCount
+    ResidencyWithParticipationCount, SearchInput, SortInput
 } from "../../graphql-schema";
 import {Context} from "../../interface";
-import {MealTime} from "@prisma/client";
+import {MealTime, Prisma} from "@prisma/client";
 
 
 export class messQueryResolver {
@@ -84,6 +84,104 @@ export class messQueryResolver {
         return await ctx.prisma.announcement.findFirst({
             where: {
                 announcementId: announcementId
+            }
+        });
+    }
+
+    @Authorized([roles.PROVOST])
+    @Query(returns => MessApplicationsWithCount)
+    async messManagerApplications(
+        @Ctx() ctx: Context,
+        @Arg('page') page : number,
+        @Arg('sort', {nullable : true}) sort? : SortInput,
+        @Arg('search', {nullable : true}) search? : SearchInput
+    ) {
+        let ands = [];
+        if (search && search.searchBy && search.searchBy.trim().length > 0) {
+            ands.push({
+                OR: [
+                    {
+                        student: {
+                            name: {
+                                contains: search.searchBy as string
+                            }
+                        }
+                    },
+                    {
+                        student: {
+                            student9DigitId: {
+                                contains: search.searchBy as string
+                            }
+                        }
+                    }
+                ]
+            })
+        }
+
+        let order: Prisma.MessManagerApplicationOrderByWithRelationInput = {};
+        if (sort.orderBy && sort.order) {
+            if (sort.orderBy == 'Batch') {
+                order = {
+                    student: {
+                        batch: {
+                            year: (sort.order == sortVals.oldest) ? 'asc' : 'desc'
+                        }
+                    }
+                }
+            } else {
+                order = {
+                    appliedAt: sort.order == sortVals.oldest ? 'asc' : 'desc'
+                }
+            }
+        }
+
+        let res = await ctx.prisma.$transaction([
+            ctx.prisma.messManagerApplication.count({
+                where: {
+                    AND: ands
+                }
+            }),
+            ctx.prisma.messManagerApplication.findMany({
+                take: params.messApplicationPerPageCount,
+                skip: (page - 1) * params.messApplicationPerPageCount,
+                where: {
+                    AND: ands
+                },
+                orderBy: order,
+            })
+        ])
+
+        return {
+            count : res[0],
+            applications : res[1]
+        }
+    }
+
+    @Authorized([roles.PROVOST])
+    @Query(returns => MessManagerApplication)
+    async messManagerApplicationDetails(
+        @Ctx() ctx: Context,
+        @Arg('applicationId') applicationId: number
+    ) {
+        return await ctx.prisma.messManagerApplication.findFirst({
+            where: {
+                applicationId: applicationId
+            }
+        });
+    }
+
+    @Authorized([roles.PROVOST] || [roles.STUDENT_MESS_MANAGER])
+    @Query(returns => [MessManager])
+    async messManagingExperiences(
+        @Ctx() ctx: Context,
+        @Arg('studentId') studentId: number
+    ) {
+        return await ctx.prisma.messManager.findMany({
+            where: {
+                studentStudentId: studentId
+            },
+            orderBy: {
+                assingedAt: 'desc'
             }
         });
     }

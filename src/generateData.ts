@@ -843,6 +843,30 @@ async function generateRatings(){
     await Promise.all(promises);
 }
 
+async function generateMessManagerApplications(){
+    let promises = []
+    let residents = await prisma.residency.findMany();
+
+    residents.forEach(r =>{
+        if(Math.random() < .2){
+            promises.push(
+                prisma.messManagerApplication.create({
+                    data : {
+                        residencyId : r.residencyId,
+                        status : 'PENDING',
+                        studentId : r.studentId,
+                        appliedAt : new Date(Date.now() - 2000 * 60 * 60 * 24 * 30),
+                        preferredFrom : new Date(Date.now() - 1000 * 60 * 60 * 24 * 30),
+                        preferredTo : new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+                    }
+                })
+            )
+        }
+    });
+
+    await Promise.all(promises);
+}
+
 async function generateAll(){
     // await generateBatches()
     // await generateDept()
@@ -864,11 +888,13 @@ async function generateAll(){
     // await generateParticipation();
     // await generatePreference();
 
-    await generateOptedOut();
+    // await generateOptedOut();
+    //
+    // await generateAnnouncements();
+    // await generateFeedback();
+    // await generateRatings();
 
-    await generateAnnouncements();
-    await generateFeedback();
-    await generateRatings();
+    await generateMessManagerApplications();
 }
 
 generateAll();

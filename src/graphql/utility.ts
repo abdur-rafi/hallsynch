@@ -44,7 +44,8 @@ export const roles = {
 }
 
 export const params = {
-    provostApplicationPerPageCount : 10
+    provostApplicationPerPageCount : 10,
+    messApplicationPerPageCount : 5,
 }
 
 export const applicationTypes = {

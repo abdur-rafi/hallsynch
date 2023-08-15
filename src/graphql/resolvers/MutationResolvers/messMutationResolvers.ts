@@ -385,7 +385,7 @@ export class messMutationResolver {
         });
 
         if(application) {
-            throw new Error("Already applied for Mess Manager for this time period");
+            throw new Error("Already applied for Mess Manager which is pending");
         }
 
         let existingMessManager = await ctx.prisma.messManager.findMany({
@@ -412,7 +412,7 @@ export class messMutationResolver {
         }
 
         if(existingMessManager.filter(mm => mm.studentStudentId == ctx.identity.studentId).length > 0){
-            throw new Error("Already a Mess Manager for this time period");
+            throw new Error("You are already a Mess Manager for this time period");
         }
 
         let resident = await ctx.prisma.residency.findFirst({

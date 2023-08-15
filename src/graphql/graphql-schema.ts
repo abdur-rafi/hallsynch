@@ -775,6 +775,15 @@ export class MessManagerApplication {
 }
 
 @ObjectType()
+export class MessApplicationsWithCount{
+    @Field(returns => [MessManagerApplication])
+    applications : MessManagerApplication[];
+
+    @Field()
+    count : number;
+}
+
+@ObjectType()
 export class Announcement {
     @Field()
     announcementId : number;
