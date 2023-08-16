@@ -11,11 +11,15 @@ export class MessManagerResolver{
         @Root() messManager : MessManager
     ){
         if(!messManager) return null;
-        return ctx.prisma.student.findFirst({
+        let res = await ctx.prisma.residency.findFirst({
             where : {
-                studentId : messManager.studentStudentId
+                residencyId : messManager.residencyId
+            },
+            include : {
+                student : true
             }
         });
+        return res.student;
     }
 
     @FieldResolver(type => [Announcement])

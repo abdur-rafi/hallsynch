@@ -1,7 +1,7 @@
 import {Arg, Authorized, Ctx, Query} from "type-graphql";
 import {getMealTime, params, roles, sortVals} from "../../utility";
 import {
-    Announcement, FeedbackWithRating,
+    Announcement, Feedback, FeedbackWithRating,
     Item,
     MealPlan,
     MealPlanWithCount, MealPreferenceStats, MessApplicationsWithCount, MessManager, MessManagerApplication,
@@ -186,7 +186,7 @@ export class messQueryResolver {
         });
     }
 
-    @Authorized([roles.PROVOST])
+    // @Authorized([roles.PROVOST])
     @Query(returns => [MealPlanWithCount])
     async participants(
         @Ctx() ctx : Context,
@@ -220,7 +220,7 @@ export class messQueryResolver {
     }
 
 
-    @Authorized([roles.PROVOST])
+    // @Authorized([roles.PROVOST])
     @Query(returns => [ResidencyWithParticipationCount])
     async absentees(
         @Ctx() ctx : Context,
@@ -267,7 +267,7 @@ export class messQueryResolver {
 
 
 
-    @Authorized([roles.STUDENT_MESS_MANAGER])
+    // @Authorized([roles.STUDENT_MESS_MANAGER])
     @Query(returns => OptedOutCount)
     async optedOutStats(
         @Ctx() ctx : Context,
@@ -291,7 +291,7 @@ export class messQueryResolver {
         }
     }
 
-    @Authorized([roles.STUDENT_MESS_MANAGER])
+    // @Authorized([roles.STUDENT_MESS_MANAGER])
     @Query(returns => [MealPreferenceStats])
     async mealPreferenceStats(
         @Ctx() ctx : Context,
@@ -334,7 +334,7 @@ export class messQueryResolver {
 
 
 
-    @Authorized([roles.STUDENT_MESS_MANAGER])
+    // @Authorized([roles.STUDENT_MESS_MANAGER])
     @Query(returns => [FeedbackWithRating])
     async ratings(
         @Ctx() ctx : Context,
@@ -372,7 +372,39 @@ export class messQueryResolver {
             type : r.type,
             feedback : feedbacks.filter(f => f.feedbackId == r.feedbackId)[0]
         }))
-
+        
+        
 
     }
+    @Authorized(roles.STUDENT_RESIDENT)
+    @Query(returns => [Feedback])
+    async pendingFeedbacks(
+        @Ctx() ctx : Context
+    ){
+        console.log( "identity in fb", ctx.identity);
+        let lastFeedBack = await ctx.prisma.feedBackGiven.findFirst({
+            where : {
+                residency : {
+                    studentId : ctx.identity.studentId
+                }
+            },
+            orderBy : {
+                feedBack : {
+                    startDate : 'desc'
+                }
+            }
+        })
+        let res = await ctx.prisma.feedback.findMany({
+            where : {
+                feedbackId : {
+                    gt : lastFeedBack.feedBackId
+                },
+                startDate : {
+                    lte : new Date()
+                }
+            }
+        })   
+        return res;
+    }
+
 }

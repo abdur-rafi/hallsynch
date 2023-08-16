@@ -64,3 +64,5 @@ export function getMealTime(v : string){
         return MealTime.DINNER
     return MealTime.LUNCH
 }
+
+export let ratingTypes = ['QUALITY', 'QUANTITY', 'MANAGEMENT']

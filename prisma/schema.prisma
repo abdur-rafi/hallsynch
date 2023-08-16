@@ -484,6 +484,9 @@ model FeedBackGiven {
   feedBack  Feedback  @relation(fields: [feedBackId], references: [feedbackId])
   residency Residency @relation(fields: [residencyId], references: [residencyId])
 
+  comment String?
+  
+
   @@id([residencyId, feedBackId])
 }
 

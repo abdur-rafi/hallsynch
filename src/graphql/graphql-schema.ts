@@ -737,6 +737,12 @@ export class MessManager {
     @Field()
     studentStudentId : number;
 
+    @Field()
+    residencyId : number;
+
+    @Field(type => Residency)
+    residency : Residency;
+
     @Field(returns => Student)
     student : Student;
 
@@ -866,7 +872,6 @@ export class StatusWithDefaultSelect{
 };
 
 @InputType()
-
 export class IntArray{
     @Field(type => [Number])
     array : [number]
