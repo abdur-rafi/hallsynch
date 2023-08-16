@@ -137,6 +137,9 @@ export class Residency{
 
     @Field(type => Seat)
     seat : Seat
+
+    @Field()
+    isCurrentMessManager : boolean;
     
 }
 

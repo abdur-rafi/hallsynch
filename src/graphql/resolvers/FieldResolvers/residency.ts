@@ -28,4 +28,17 @@ export class ResidencyResolver{
             }
         })
     }
+
+    @FieldResolver(type => Boolean)
+    async isCurrentMessManager(
+        @Ctx() ctx : Context,
+        @Root() residency : Residency
+    ){
+        let manager = await ctx.prisma.messManager.findFirst({
+            where : {
+                residencyId : residency.residencyId
+            }
+        })
+        return manager != null;
+    }
 }
