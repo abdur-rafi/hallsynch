@@ -669,8 +669,8 @@ async function generateMessManager(){
                 prisma.messManager.create({
                     data : {
                         residencyId : r.residencyId,
-                        from: new Date(2021, month_id % 12, 1),
-                        to : new Date(2021, month_id % 12, 31),
+                        from: new Date(2023, month_id % 12, 1),
+                        to : new Date(2023, month_id % 12, 31),
                         studentStudentId : r.studentId
                     }
                 })
@@ -900,16 +900,16 @@ async function generateAll(){
     // await generateMessManager();
     // await generateMealPlan();
     // await generateCupCount();
+    // await generateMessManagerApplications();
+
     // await generateParticipation();
     // await generatePreference();
 
-    // await generateOptedOut();
-    //
-    // await generateAnnouncements();
-    // await generateFeedback();
-    await generateRatings();
+    await generateOptedOut();
 
-    // await generateMessManagerApplications();
+    await generateAnnouncements();
+    await generateFeedback();
+    await generateRatings();
 }
 
 generateAll();
