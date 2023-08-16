@@ -539,7 +539,7 @@ export class messMutationResolver {
             ctx.prisma.rating.createMany({
                 data : ratingTypes.map((r, i)=>({
                     feedbackId : feedbackId,
-                    rating : ratings[i],
+                    rating : ratings.array[i],
                     residencyId : residency.residencyId,
                     type : RatingType[r]
                 }))

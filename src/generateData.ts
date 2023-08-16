@@ -1,5 +1,6 @@
 import {PrismaClient, RatingType} from '@prisma/client'
 import bcrypt from 'bcrypt'
+import { addDay } from './graphql/utility'
 const prisma = new PrismaClient()
 
 async function generateDept(){
@@ -748,10 +749,13 @@ async function generateFeedback(){
             where : {
                 messManagerId : m.messManagerId
             },
-            orderBy : {
-                mealPlanId : 'asc'
-            }
+            orderBy : [{
+                day : 'asc',
+            },{
+                mealTime : 'desc'
+            }]
         }).then(mealPlans =>{
+            console.log(mealPlans.length);
             let starts = [];
             let ends = []
             for(let i = 0; i + 14 < mealPlans.length; i+= 14){
@@ -765,7 +769,7 @@ async function generateFeedback(){
                         startMealPlanId : s,
                         endMealPlanId : mealPlans[ends[i]].mealPlanId,
                         messManagerId : m.messManagerId,
-                        startDate : new Date(new Date().setDate(new Date(mealPlans[ends[i]].day).getDate() + 1))
+                        startDate : addDay(mealPlans[ends[i]].day.toString())
                     }))
                 }).catch(err=>{
                     console.log(err)
@@ -794,10 +798,12 @@ async function generateRatings(){
     let residents = await prisma.residency.findMany();
     let feedbacks = await prisma.feedback.findMany();
     feedbacks.pop();
+    feedbacks.pop();
+
     let types = [RatingType.MANAGEMENT, RatingType.QUALITY, RatingType.QUANTITY]
     residents.forEach(r =>{
         feedbacks.forEach( async f =>{
-            console.log(f);
+            // console.log(f);
             let mealsCount = await prisma.participation.count({
                 where : {
                     mealPlan : {
@@ -810,6 +816,7 @@ async function generateRatings(){
                     residencyId : r.residencyId
                 }
             })
+            console.log(mealsCount)
             if(mealsCount > 6){
                 console.log("here\n");
                 // console.log(promises)
@@ -829,7 +836,8 @@ async function generateRatings(){
                     prisma.feedBackGiven.create({
                         data : {
                             feedBackId : f.feedbackId,
-                            residencyId : r.residencyId
+                            residencyId : r.residencyId,
+                            comment : Math.random() > .5 ? null : "This is a comment"
                         }
                     }).catch(err=>{
                         console.log(err)
@@ -840,7 +848,7 @@ async function generateRatings(){
 
         })
     })
-    await Promise.all(promises);
+    await Promise.allSettled(promises);
 }
 
 async function generateMessManagerApplications(){
@@ -863,8 +871,15 @@ async function generateMessManagerApplications(){
             )
         }
     });
-
+    
     await Promise.all(promises);
+}
+
+function busy(){
+    for(let i = 0; i < 100000000; ++i){
+        let j = 0;
+        j += i;
+    }
 }
 
 async function generateAll(){
@@ -892,12 +907,16 @@ async function generateAll(){
     //
     // await generateAnnouncements();
     // await generateFeedback();
-    // await generateRatings();
+    await generateRatings();
 
-    await generateMessManagerApplications();
+    // await generateMessManagerApplications();
 }
 
 generateAll();
+// busy();
+setTimeout(()=>{
+    console.log("Timeout");
+}, 5000);
 
 // async function generateRooms(){
 //     let floor

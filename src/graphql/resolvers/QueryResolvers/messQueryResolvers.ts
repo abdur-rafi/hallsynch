@@ -392,18 +392,30 @@ export class messQueryResolver {
                 feedBack : {
                     startDate : 'desc'
                 }
+            },
+            include : {
+                feedBack : true
             }
         })
-        let res = await ctx.prisma.feedback.findMany({
-            where : {
+        // console.log(lastFeedBack)
+        let where : Prisma.FeedbackWhereInput = {};
+        if(lastFeedBack){
+            where = {
                 feedbackId : {
                     gt : lastFeedBack.feedBackId
-                },
-                startDate : {
-                    lte : new Date()
                 }
             }
+        }
+        where = {
+            ... where,
+            startDate : {
+                lte : new Date()
+            }
+        }
+        let res = await ctx.prisma.feedback.findMany({
+            where : where
         })   
+        console.log("res",res);
         return res;
     }
 

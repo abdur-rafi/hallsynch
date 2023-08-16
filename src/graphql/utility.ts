@@ -65,4 +65,10 @@ export function getMealTime(v : string){
     return MealTime.LUNCH
 }
 
+export function addDay(date : string){
+    let dt = new Date(date)
+    dt.setDate(dt.getDate() + 1)
+    return dt;
+}
+
 export let ratingTypes = ['QUALITY', 'QUANTITY', 'MANAGEMENT']
