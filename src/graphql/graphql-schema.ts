@@ -647,8 +647,8 @@ export class MealPlan {
     @Field(returns => [Preference], {nullable : true})
     preferences? : [Preference];
 
-    @Field(returns => [Student])
-    optedOut : [Student];
+    @Field(returns => Student, {nullable : true})
+    optedOut? : Student;
 }
 
 @ObjectType()

@@ -508,7 +508,7 @@ async function generateMeal(){
 
 async function generateMealPlan(){
     let meals = await prisma.meal.findMany();
-    let month = 6;
+    let month = 7;
     let year = 2023;
     let promises = []
 
@@ -905,11 +905,11 @@ async function generateAll(){
     // await generateParticipation();
     // await generatePreference();
 
-    await generateOptedOut();
-
-    await generateAnnouncements();
-    await generateFeedback();
-    await generateRatings();
+    // await generateOptedOut();
+    //
+    // await generateAnnouncements();
+    // await generateFeedback();
+    // await generateRatings();
 }
 
 generateAll();

@@ -42,22 +42,45 @@ export class MealPlanResolver{
         @Ctx() ctx : Context,
         @Root() mealPlanCls : MealPlan
     ){
+        let residency = await ctx.prisma.residency.findUnique({
+               where: {
+                   studentId: ctx.identity.studentId
+               }
+        });
+
         return await ctx.prisma.preference.findMany({
             where: {
-                mealPlanId: mealPlanCls.mealPlanId
+                mealPlanId: mealPlanCls.mealPlanId,
+                residencyId: residency.residencyId
             }
         });
     }
 
-    @FieldResolver(type => [Student])
+    @FieldResolver(type => Student)
     async optedOut(
         @Ctx() ctx : Context,
         @Root() mealPlanCls : MealPlan
     ){
-        return await ctx.prisma.optedOut.findMany({
+        let residency = await ctx.prisma.residency.findUnique({
             where: {
-                mealPlanId: mealPlanCls.mealPlanId
+                studentId: ctx.identity.studentId
             }
         });
+
+        let res = await ctx.prisma.optedOut.findFirst({
+            where: {
+                mealPlanId: mealPlanCls.mealPlanId,
+                residencyId: residency.residencyId
+            }
+        });
+
+        if(res) {
+            return await ctx.prisma.student.findUnique({
+                where: {
+                    studentId: ctx.identity.studentId
+                }
+            });
+        }
+        return null;
     }
 }

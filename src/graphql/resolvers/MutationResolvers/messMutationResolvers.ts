@@ -143,7 +143,7 @@ export class messMutationResolver {
         @Arg('name') name : string,
         @Arg('type') type : string,
         @Arg('cupCount') cupCount : number,
-        @Arg('photoId') photoId : number,
+        @Arg('fileId') fileId : number,
         @Arg('date') date : string,
         @Arg('mealTime') mealtime : string,
     ){
@@ -170,9 +170,9 @@ export class messMutationResolver {
         if(mealtime.toLowerCase() == 'lunch') mealTime = MealTime.LUNCH;
         else mealTime = MealTime.DINNER;
 
-        let photoFile = await ctx.prisma.photo.findFirst({
-            where : {
-                photoId : photoId
+        let photoFile = await ctx.prisma.photo.create({
+            data : {
+                uploadedFileId: fileId
             }
         })
 
