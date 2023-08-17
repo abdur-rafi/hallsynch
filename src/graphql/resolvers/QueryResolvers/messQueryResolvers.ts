@@ -51,7 +51,15 @@ export class messQueryResolver {
                     gte: new Date(from),
                     lte: new Date(to)
                 }
-            }
+            },
+            orderBy: [
+                {
+                    day: 'asc',
+                },
+                {
+                    mealTime: 'asc'
+                }
+            ]
         });
     }
 

@@ -619,7 +619,7 @@ async function generatePreference(){
 
     residents.forEach(r =>{
         mealPlans.forEach(mp =>{
-            if(Math.random() < .7){
+            if(Math.random() < .3){
                 let vegs = mp.meal.items.filter(f => f.type == "VEG")
                 let rice = mp.meal.items.filter(f => f.type == "RICE")
                 let nonVeg = mp.meal.items.filter(f => f.type == "NON_VEG")
