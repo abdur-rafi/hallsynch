@@ -41,4 +41,15 @@ export class ResidencyResolver{
         })
         return manager != null;
     }
+    @FieldResolver(type => Number)
+    async messManagerTimes(
+        @Ctx() ctx : Context,
+        @Root() residency : Residency
+    ){
+        return await ctx.prisma.messManager.count({
+            where : {
+                residencyId : residency.residencyId
+            }
+        })
+    }
 }

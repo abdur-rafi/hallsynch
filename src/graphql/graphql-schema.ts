@@ -140,6 +140,9 @@ export class Residency{
 
     @Field()
     isCurrentMessManager : boolean;
+
+    @Field()
+    messManagerTimes : number;
     
 }
 
@@ -753,12 +756,6 @@ export class MessManagerApplication {
     applicationId : number;
 
     @Field()
-    preferredFrom : Date;
-
-    @Field()
-    preferredTo : Date;
-
-    @Field()
     appliedAt : Date;
 
     @Field()
@@ -767,11 +764,15 @@ export class MessManagerApplication {
     @Field()
     residencyId : number;
 
-    @Field(returns => Student)
-    student : Student;
 
     @Field(returns => Residency)
     residency : Residency;
+
+    @Field()
+    callId : number;
+
+    @Field(type => MessManagerApplicationCall)
+    call : ()=> MessManagerApplicationCall;
 }
 
 @ObjectType()
@@ -1047,5 +1048,16 @@ export class MessManagerApplicationCall{
 
     @Field(type => Authority)
     createdBy : Authority;
+
+    @Field()
+    applicationsCount : number;
+
+    @Field()
+    accepted : number;
+
+    
+    @Field(type => [MessManagerApplication])
+    applications : [MessManagerApplication];
+
 
 }

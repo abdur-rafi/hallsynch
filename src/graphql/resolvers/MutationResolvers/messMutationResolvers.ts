@@ -371,12 +371,9 @@ export class messMutationResolver {
     @Mutation(returns => MessManagerApplication)
     async applyMessManager(
         @Ctx() ctx : Context,
-        @Arg('preferredFrom') preferredFrom : string,
-        @Arg('preferredTo') preferredTo : string
+        @Arg('callId') callId : number
     ){
-        if(new Date(preferredFrom) > new Date(preferredTo)){
-            throw new Error("Invalid date range");
-        }
+        
 
         let application = await ctx.prisma.messManagerApplication.findFirst({
             where : {
@@ -385,12 +382,12 @@ export class messMutationResolver {
                         studentId : ctx.identity.studentId
                     }
                 },
-                status : 'PENDING'
+                callId : callId
             }
         });
 
         if(application) {
-            throw new Error("Already applied for Mess Manager which is pending");
+            throw new Error("Already applied for Mess Manager for this call");
         }
 
         // let existingMessManager = await ctx.prisma.messManager.findMany({
@@ -429,10 +426,9 @@ export class messMutationResolver {
 
         let newApplication = await ctx.prisma.messManagerApplication.create({
             data : {
-                preferredFrom : new Date(preferredFrom),
-                preferredTo : new Date(preferredTo),
                 residencyId: resident.residencyId,
-                appliedAt : new Date()
+                appliedAt : new Date(),
+                callId : callId
             }
         });
 
@@ -443,13 +439,14 @@ export class messMutationResolver {
     @Mutation(returns => MessManager)
     async approveMessManagerApplication(
         @Ctx() ctx : Context,
-        @Arg('messManagerApplicationId') messManagerApplicationId : number,
-        @Arg('from') from : string,
-        @Arg('to') to : string
+        @Arg('messManagerApplicationId') messManagerApplicationId : number
     ){
         let application = await ctx.prisma.messManagerApplication.findFirst({
             where : {
                 applicationId : messManagerApplicationId
+            },
+            include : {
+                call : true
             }
         });
 
@@ -461,20 +458,20 @@ export class messMutationResolver {
             throw new Error("Invalid state of application");
         }
 
-        if(new Date(from) > new Date(to)){
-            throw new Error("Invalid date range");
-        }
+        // if(new Date(from) > new Date(to)){
+        //     throw new Error("Invalid date range");
+        // }
 
-        if(new Date(from).getMonth() != new Date(application.preferredFrom).getMonth() ||
-           new Date(to).getMonth() != new Date(application.preferredTo).getMonth()) {
-            throw new Error("Application preferred month and approved month do not match");
-        }
+        // if(new Date(from).getMonth() != new Date(application.preferredFrom).getMonth() ||
+        //    new Date(to).getMonth() != new Date(application.preferredTo).getMonth()) {
+        //     throw new Error("Application preferred month and approved month do not match");
+        // }
 
         let result = await ctx.prisma.$transaction([
             ctx.prisma.messManager.create({
                 data : {
-                    from : new Date(from),
-                    to : new Date(to),
+                    from : application.call.from,
+                    to : application.call.to, 
                     residencyId : application.residencyId,
                     assingedAt : new Date()
                 }

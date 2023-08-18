@@ -854,20 +854,23 @@ async function generateMessManagerApplications(){
     let promises = []
     let residents = await prisma.residency.findMany();
 
+    let calls = await prisma.messManagerApplicationCall.findMany();
     residents.forEach(r =>{
-        if(Math.random() < .2){
-            promises.push(
-                prisma.messManagerApplication.create({
-                    data : {
-                        residencyId : r.residencyId,
-                        status : 'PENDING',
-                        appliedAt : new Date(Date.now() - 2000 * 60 * 60 * 24 * 30),
-                        preferredFrom : new Date(Date.now() - 1000 * 60 * 60 * 24 * 30),
-                        preferredTo : new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
-                    }
-                })
-            )
-        }
+        calls.forEach(c =>{
+
+            if(Math.random() < .08){
+                promises.push(
+                    prisma.messManagerApplication.create({
+                        data : {
+                            residencyId : r.residencyId,
+                            status : 'PENDING',
+                            appliedAt : new Date(Date.now() - 2000 * 60 * 60 * 24 * 30),
+                            callId : c.callId
+                        }
+                    })
+                )
+            }
+        })
     });
     
     await Promise.all(promises);
@@ -895,10 +898,10 @@ async function generateAll(){
     // await generateTempResidencyHistory();
     // await generateItem();
     // await generateMeal();
-    await generateMessManager();
+    // await generateMessManager();
     // await generateMealPlan();
     // await generateCupCount();
-    // await generateMessManagerApplications();
+    await generateMessManagerApplications();
 
     // await generateParticipation();
     // await generatePreference();

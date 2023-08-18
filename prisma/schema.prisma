@@ -519,7 +519,8 @@ model MessManagerApplicationCall {
 
   createdById Int
 
-  createdBy Authority @relation(fields: [createdById], references: [authorityId])
+  createdBy              Authority                @relation(fields: [createdById], references: [authorityId])
+  MessManagerApplication MessManagerApplication[]
 }
 
 model MessManager {
@@ -538,14 +539,15 @@ model MessManager {
 
 model MessManagerApplication {
   applicationId Int               @id @default(autoincrement())
-  preferredFrom DateTime          @db.Date
-  preferredTo   DateTime          @db.Date
   appliedAt     DateTime          @default(now())
   status        ApplicationStatus @default(PENDING)
 
   residencyId Int
 
   residency Residency @relation(fields: [residencyId], references: [residencyId])
+
+  callId Int
+  call   MessManagerApplicationCall @relation(fields: [callId], references: [callId])
 }
 
 model Complaint {

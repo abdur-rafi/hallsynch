@@ -1,26 +1,9 @@
 import {Ctx, FieldResolver, Resolver, Root} from "type-graphql";
-import {Announcement, MessManager, Student} from "../../graphql-schema";
+import {Announcement, MessManager, Residency, Student} from "../../graphql-schema";
 import {Context} from "../../interface";
 
 @Resolver(of => MessManager)
 export class MessManagerResolver{
-
-    @FieldResolver(type => Student)
-    async student(
-        @Ctx() ctx : Context,
-        @Root() messManager : MessManager
-    ){
-        if(!messManager) return null;
-        let res = await ctx.prisma.residency.findFirst({
-            where : {
-                residencyId : messManager.residencyId
-            },
-            include : {
-                student : true
-            }
-        });
-        return res.student;
-    }
 
     @FieldResolver(type => [Announcement])
     async announcements(
@@ -30,6 +13,18 @@ export class MessManagerResolver{
         return ctx.prisma.announcement.findMany({
             where : {
                 messManagerId: messManager.messManagerId
+            }
+        });
+    }
+
+    @FieldResolver(type => Residency)
+    async residency(
+        @Ctx() ctx : Context,
+        @Root() messManager : MessManager
+    ){
+        return ctx.prisma.residency.findUnique({
+            where : {
+                residencyId : messManager.residencyId
             }
         });
     }
