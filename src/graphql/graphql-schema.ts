@@ -738,16 +738,10 @@ export class MessManager {
     to : Date;
 
     @Field()
-    studentStudentId : number;
-
-    @Field()
     residencyId : number;
 
     @Field(type => Residency)
     residency : Residency;
-
-    @Field(returns => Student)
-    student : Student;
 
     @Field(returns => [Announcement], {nullable : true})
     announcements? : [Announcement];
@@ -1033,3 +1027,25 @@ export enum RatingType{
 registerEnumType(RatingType , {
     name : 'RatingType'
 })
+
+@ObjectType()
+export class MessManagerApplicationCall{
+    @Field()
+    callId : number;
+
+    @Field()
+    from : Date;
+
+    @Field()
+    to : Date;
+
+    @Field()
+    createdAt : Date;
+
+    @Field()
+    createdById : number;
+
+    @Field(type => Authority)
+    createdBy : Authority;
+
+}

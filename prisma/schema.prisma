@@ -27,13 +27,13 @@ model Student {
   residency  Residency?
 
   // residency Residency @relation(fields: [residencyId], references: [residencyId])
-  votes                   Vote[]
-  complaints              Complaint[]
-  applications            SeatApplication[]
-  tempResidency           TempResidency?
-  tempResidencyHistory    TempResidencyHistory[]
-  UploadedFile            UploadedFile[]
-  notifications           Notification[]
+  votes                Vote[]
+  complaints           Complaint[]
+  applications         SeatApplication[]
+  tempResidency        TempResidency?
+  tempResidencyHistory TempResidencyHistory[]
+  UploadedFile         UploadedFile[]
+  notifications        Notification[]
 }
 
 model Department {
@@ -299,9 +299,10 @@ model Authority {
   role        AuthorityRole
   password    String
 
-  applicationsHistory ApplicationApproveHistory[]
-  RejectionHistory    RejectionHistory[]
-  announcements       Announcement[]
+  applicationsHistory        ApplicationApproveHistory[]
+  RejectionHistory           RejectionHistory[]
+  announcements              Announcement[]
+  MessManagerApplicationCall MessManagerApplicationCall[]
 }
 
 enum AuthorityRole {
@@ -483,7 +484,6 @@ model FeedBackGiven {
   residency Residency @relation(fields: [residencyId], references: [residencyId])
 
   comment String?
-  
 
   @@id([residencyId, feedBackId])
 }
@@ -508,6 +508,20 @@ enum RatingType {
   MANAGEMENT
 }
 
+model MessManagerApplicationCall {
+  callId Int @id @default(autoincrement())
+
+  from DateTime
+
+  to DateTime
+
+  createdAt DateTime @default(now())
+
+  createdById Int
+
+  createdBy Authority @relation(fields: [createdById], references: [authorityId])
+}
+
 model MessManager {
   messManagerId Int      @id @default(autoincrement())
   from          DateTime
@@ -517,9 +531,9 @@ model MessManager {
   residencyId Int
   residency   Residency @relation(fields: [residencyId], references: [residencyId])
 
-  announcements    Announcement[]
-  MealPlan         MealPlan[]
-  Feedback         Feedback[]
+  announcements Announcement[]
+  MealPlan      MealPlan[]
+  Feedback      Feedback[]
 }
 
 model MessManagerApplication {

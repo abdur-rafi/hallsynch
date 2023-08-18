@@ -1,9 +1,10 @@
 import {Arg, Authorized, Ctx, Mutation} from "type-graphql";
-import {ratingTypes, roles} from "../../utility";
+import {addDay, ratingTypes, roles} from "../../utility";
 import {
     Announcement,
     CupCount, IntArray, MessManager,
     MessManagerApplication,
+    MessManagerApplicationCall,
     OptedOut,
     Preference,
     PreferenceInput
@@ -558,4 +559,28 @@ export class messMutationResolver {
         return "success";
     }
 
+    
+    @Mutation(returns => MessManagerApplicationCall)
+    async createCall(
+        @Ctx() ctx : Context,
+        @Arg('from') from : string,
+        @Arg('to') to : string,
+    ){
+        let fixedUpto = await ctx.prisma.messManagerApplicationCall.findFirst({
+            orderBy : {
+                to : "desc"
+            }
+        })
+        let fromDate = new Date(from);
+        if(fromDate > addDay(fixedUpto.to.toDateString())){
+            throw new Error("Gap in Calls");
+        }
+        return await ctx.prisma.messManagerApplicationCall.create({
+            data : {
+                from : new Date(from),
+                to : new Date(to),
+                createdById : ctx.identity.authorityId
+            }
+        })
+    }
 }
