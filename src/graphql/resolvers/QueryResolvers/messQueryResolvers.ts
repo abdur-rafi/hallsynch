@@ -130,9 +130,11 @@ export class messQueryResolver {
         if (sort.orderBy && sort.order) {
             if (sort.orderBy == 'Batch') {
                 order = {
-                    student: {
-                        batch: {
-                            year: (sort.order == sortVals.oldest) ? 'asc' : 'desc'
+                    residency : {
+                        student: {
+                            batch: {
+                                year: (sort.order == sortVals.oldest) ? 'asc' : 'desc'
+                            }
                         }
                     }
                 }
@@ -186,7 +188,11 @@ export class messQueryResolver {
     ) {
         return await ctx.prisma.messManager.findMany({
             where: {
-                studentStudentId: studentId
+                residency : {
+                    student : {
+                        studentId : studentId
+                    }
+                }
             },
             orderBy: {
                 assingedAt: 'desc'

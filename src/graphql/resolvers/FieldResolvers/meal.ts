@@ -10,11 +10,15 @@ export class MealResolver{
         @Ctx() ctx : Context,
         @Root() mealCls : Meal
     ){
-        return await ctx.prisma.item.findMany({
-            where: {
-                itemId: mealCls.mealId
+        let res = await ctx.prisma.meal.findUnique({
+            where : {
+                mealId : mealCls.mealId
+            },
+            include : {
+                items : true
             }
-        });
+        })
+        return res.items;
     }
 
     @FieldResolver(type => [MealPlan])
@@ -22,10 +26,14 @@ export class MealResolver{
         @Ctx() ctx : Context,
         @Root() mealCls : Meal
     ){
-        return await ctx.prisma.mealPlan.findMany({
-            where: {
-                mealId: mealCls.mealId
+        let res = await ctx.prisma.meal.findUnique({
+            where : {
+                mealId : mealCls.mealId
+            },
+            include : {
+                mealPlans : true
             }
-        });
+        })
+        return res.mealPlans;
     }
 }

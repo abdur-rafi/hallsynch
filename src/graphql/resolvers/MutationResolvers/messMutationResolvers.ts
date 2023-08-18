@@ -379,7 +379,11 @@ export class messMutationResolver {
 
         let application = await ctx.prisma.messManagerApplication.findFirst({
             where : {
-                studentId : ctx.identity.studentId,
+                residency : {
+                    student : {
+                        studentId : ctx.identity.studentId
+                    }
+                },
                 status : 'PENDING'
             }
         });
@@ -388,32 +392,29 @@ export class messMutationResolver {
             throw new Error("Already applied for Mess Manager which is pending");
         }
 
-        let existingMessManager = await ctx.prisma.messManager.findMany({
-            where : {
-                OR : [
-                    {
-                        from : {
-                            gte : new Date(preferredFrom),
-                            lte : new Date(preferredTo)
-                        }
-                    },
-                    {
-                        to : {
-                            gte : new Date(preferredFrom),
-                            lte : new Date(preferredTo)
-                        }
-                    }
-                ]
-            }
-        });
+        // let existingMessManager = await ctx.prisma.messManager.findMany({
+        //     where : {
+        //         OR : [
+        //             {
+        //                 from : {
+        //                     gte : new Date(preferredFrom),
+        //                     lte : new Date(preferredTo)
+        //                 }
+        //             },
+        //             {
+        //                 to : {
+        //                     gte : new Date(preferredFrom),
+        //                     lte : new Date(preferredTo)
+        //                 }
+        //             }
+        //         ]
+        //     }
+        // });
 
-        if(existingMessManager.length > 3){
-            throw new Error("More than 3 Mess Managers already exist for this time period");
-        }
+        // if(existingMessManager.length > 3){
+        //     throw new Error("More than 3 Mess Managers already exist for this time period");
+        // }
 
-        if(existingMessManager.filter(mm => mm.studentStudentId == ctx.identity.studentId).length > 0){
-            throw new Error("You are already a Mess Manager for this time period");
-        }
 
         let resident = await ctx.prisma.residency.findFirst({
             where : {
@@ -421,11 +422,14 @@ export class messMutationResolver {
             }
         });
 
+        // if(existingMessManager.filter(mm => mm.residencyId == resident.residencyId).length > 0){
+        //     throw new Error("You are already a Mess Manager for this time period");
+        // }
+
         let newApplication = await ctx.prisma.messManagerApplication.create({
             data : {
                 preferredFrom : new Date(preferredFrom),
                 preferredTo : new Date(preferredTo),
-                studentId : ctx.identity.studentId,
                 residencyId: resident.residencyId,
                 appliedAt : new Date()
             }
@@ -470,7 +474,6 @@ export class messMutationResolver {
                 data : {
                     from : new Date(from),
                     to : new Date(to),
-                    studentStudentId : application.studentId,
                     residencyId : application.residencyId,
                     assingedAt : new Date()
                 }

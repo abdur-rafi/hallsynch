@@ -28,8 +28,6 @@ model Student {
 
   // residency Residency @relation(fields: [residencyId], references: [residencyId])
   votes                   Vote[]
-  messManagerRoles        MessManager[]
-  messManagerApplications MessManagerApplication[]
   complaints              Complaint[]
   applications            SeatApplication[]
   tempResidency           TempResidency?
@@ -522,8 +520,6 @@ model MessManager {
   announcements    Announcement[]
   MealPlan         MealPlan[]
   Feedback         Feedback[]
-  Student          Student?       @relation(fields: [studentStudentId], references: [studentId])
-  studentStudentId Int?
 }
 
 model MessManagerApplication {
@@ -533,10 +529,8 @@ model MessManagerApplication {
   appliedAt     DateTime          @default(now())
   status        ApplicationStatus @default(PENDING)
 
-  studentId   Int
   residencyId Int
 
-  student   Student   @relation(fields: [studentId], references: [studentId])
   residency Residency @relation(fields: [residencyId], references: [residencyId])
 }
 

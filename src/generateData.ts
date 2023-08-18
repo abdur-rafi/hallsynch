@@ -671,7 +671,6 @@ async function generateMessManager(){
                         residencyId : r.residencyId,
                         from: new Date(2023, month_id % 12, 1),
                         to : new Date(2023, month_id % 12, 31),
-                        studentStudentId : r.studentId
                     }
                 })
             )
@@ -862,7 +861,6 @@ async function generateMessManagerApplications(){
                     data : {
                         residencyId : r.residencyId,
                         status : 'PENDING',
-                        studentId : r.studentId,
                         appliedAt : new Date(Date.now() - 2000 * 60 * 60 * 24 * 30),
                         preferredFrom : new Date(Date.now() - 1000 * 60 * 60 * 24 * 30),
                         preferredTo : new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
@@ -899,7 +897,7 @@ async function generateAll(){
     // await generateMeal();
     // await generateMessManager();
     // await generateMealPlan();
-    // await generateCupCount();
+    await generateCupCount();
     // await generateMessManagerApplications();
 
     // await generateParticipation();

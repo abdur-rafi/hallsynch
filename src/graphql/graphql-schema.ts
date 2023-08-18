@@ -771,9 +771,6 @@ export class MessManagerApplication {
     status : ApplicationStatus
 
     @Field()
-    studentId : number;
-
-    @Field()
     residencyId : number;
 
     @Field(returns => Student)

@@ -14,26 +14,14 @@ export class MessManagerApplicationResolver {
         return ApplicationStatus[app.status];
     }
 
-    @FieldResolver(type => Student)
-    async student(
-        @Ctx() ctx : Context,
-        @Root() app : MessManagerApplication
-    ){
-        return await ctx.prisma.student.findFirst({
-            where : {
-                studentId : app.studentId
-            }
-        })
-    }
-
     @FieldResolver(type => Residency)
     async residency(
         @Ctx() ctx : Context,
         @Root() app : MessManagerApplication
     ){
-        return await ctx.prisma.residency.findFirst({
+        return await ctx.prisma.residency.findUnique({
             where : {
-                studentId : app.studentId
+                residencyId : app.residencyId
             }
         })
     }

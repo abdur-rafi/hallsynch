@@ -5,3 +5,6 @@ temp seat : same
 room change : same + is it the curr room
 
 seat application : check file id array length
+
+
+multiple mess manager and feed back
