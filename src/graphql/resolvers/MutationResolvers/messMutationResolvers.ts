@@ -569,7 +569,11 @@ export class messMutationResolver {
             }
         })
         let fromDate = new Date(from);
-        if(fromDate > addDay(fixedUpto.to.toDateString())){
+        let fixedUptoDate = new Date().toDateString();
+        if(fixedUpto){
+            fixedUptoDate = fixedUpto.to.toDateString();
+        }
+        if(fromDate > addDay(fixedUptoDate)){
             throw new Error("Gap in Calls");
         }
         return await ctx.prisma.messManagerApplicationCall.create({
