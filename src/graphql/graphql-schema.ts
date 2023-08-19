@@ -673,6 +673,21 @@ export class CupCount {
 }
 
 @InputType()
+export class SingleCupCountInput {
+    @Field()
+    cupCount : number;
+
+    @Field()
+    itemId : number;
+}
+
+@InputType()
+export class MealPlanInput {
+    @Field(type => [SingleCupCountInput])
+    items : [SingleCupCountInput];
+}
+
+@InputType()
 export class SinglePreferenceInput {
     @Field()
     order : number;
