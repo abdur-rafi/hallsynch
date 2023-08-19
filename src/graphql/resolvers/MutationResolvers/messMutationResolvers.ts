@@ -313,19 +313,8 @@ export class messMutationResolver {
         @Arg('title') title : string,
         @Arg('details') details : string
     ) {
-        let authority = await ctx.prisma.authority.findFirst({
-            where : {
-                authorityId : ctx.identity.authorityId
-            }
-        });
 
-        let messManager = await ctx.prisma.messManager.findFirst({
-            where : {
-                messManagerId : ctx.identity.messManagerId
-            }
-        });
-
-        if(!authority && !messManager){
+        if(!ctx.identity.authorityId && !ctx.identity.messManagerId){
             throw new Error("Not authorized to make announcements");
         }
 
@@ -334,8 +323,8 @@ export class messMutationResolver {
                 title : title,
                 details : details,
                 createdAt : new Date(),
-                authorityId : authority?.authorityId ?? null,
-                messManagerId : messManager?.messManagerId ?? null
+                authorityId : ctx.identity.authorityId ?? null,
+                messManagerId : ctx.identity.messManagerId ?? null
             }
         });
 
