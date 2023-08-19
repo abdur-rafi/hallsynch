@@ -548,6 +548,8 @@ model MessManagerApplication {
 
   callId Int
   call   MessManagerApplicationCall @relation(fields: [callId], references: [callId])
+
+  @@unique([callId, residencyId])
 }
 
 model Complaint {

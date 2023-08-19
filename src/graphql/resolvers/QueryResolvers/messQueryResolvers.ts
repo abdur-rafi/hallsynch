@@ -6,6 +6,7 @@ import {
     MealPlan,
     MealPlanWithCount, MealPreferenceStats, MessApplicationsWithCount, MessManager, MessManagerApplication,
     MessManagerApplicationCall,
+    MessManagerCallWithAppsOfResident,
     OptedOutCount,
     ResidencyWithParticipationCount, SearchInput, SortInput
 } from "../../graphql-schema";
@@ -196,7 +197,7 @@ export class messQueryResolver {
                 }
             },
             orderBy: {
-                assingedAt: 'desc'
+                to: 'desc'
             }
         });
     }
@@ -489,5 +490,36 @@ export class messQueryResolver {
         return res.to.toString();
     }
 
+    @Query(returns => [MessManagerCallWithAppsOfResident])
+    async prevCallsWithAppOfResident(
+        @Ctx() ctx : Context
+    ){
+        let apps = await ctx.prisma.messManagerApplicationCall.findMany({
+            where : {
+                to : {
+                    gte : new Date()
+                }
+            },
+            orderBy : {
+                to : 'asc'
+            },
+            include : {
+                MessManagerApplication : {
+                    where : {
+                        residency : {
+                            studentId : ctx.identity.studentId
+                        }
+                    }
+                }
+            }
+        })
+        console.log(apps);
+        return apps.map(a =>({
+            call : a,
+            application : a.MessManagerApplication[0] ?? null
+        }))
+    }
+
+    
 
 }

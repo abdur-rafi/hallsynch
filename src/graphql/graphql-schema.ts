@@ -758,7 +758,7 @@ export class MessManagerApplication {
     @Field()
     appliedAt : Date;
 
-    @Field()
+    @Field(type => ApplicationStatus)
     status : ApplicationStatus
 
     @Field()
@@ -1060,4 +1060,13 @@ export class MessManagerApplicationCall{
     applications : [MessManagerApplication];
 
 
+}
+
+@ObjectType()
+export class MessManagerCallWithAppsOfResident{
+    @Field( type => MessManagerApplicationCall)
+    call : MessManagerApplicationCall;
+
+    @Field(type => MessManagerApplication, {nullable : true})
+    application? : MessManagerApplication;
 }
