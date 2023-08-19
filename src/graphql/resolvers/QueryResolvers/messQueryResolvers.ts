@@ -477,6 +477,17 @@ export class messQueryResolver {
         })
     }
 
-    
+    @Query(returns => String)
+    async callUntil(
+        @Ctx() ctx : Context
+    ){
+        let res = await ctx.prisma.messManagerApplicationCall.findFirst({
+            orderBy : {
+                to : 'desc'
+            }
+        })
+        return res.to.toString();
+    }
+
 
 }
