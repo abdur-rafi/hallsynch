@@ -71,4 +71,11 @@ export function addDay(date : string){
     return dt;
 }
 
+export function addDays(date : string, days : number){
+    let dt = new Date(date)
+    dt.setDate(dt.getDate() + days)
+    return dt;
+}
+
+
 export let ratingTypes = ['QUALITY', 'QUANTITY', 'MANAGEMENT']

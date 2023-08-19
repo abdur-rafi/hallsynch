@@ -464,13 +464,11 @@ model Announcement {
 model Feedback {
   feedbackId    Int      @id @default(autoincrement())
   startDate     DateTime // issue : different data type?
-  messManagerId Int
 
   startMealPlanId Int @unique
   endMealPlanId   Int @unique
 
   ratings       Rating[]
-  messManager   MessManager     @relation(fields: [messManagerId], references: [messManagerId])
   startMealPlan MealPlan        @relation(name: "StartMeal", fields: [startMealPlanId], references: [mealPlanId])
   endMealPlan   MealPlan        @relation(name: "EndMeal", fields: [endMealPlanId], references: [mealPlanId])
   FeedBackGiven FeedBackGiven[]
@@ -521,20 +519,21 @@ model MessManagerApplicationCall {
 
   createdBy              Authority                @relation(fields: [createdById], references: [authorityId])
   MessManagerApplication MessManagerApplication[]
+  MessManager            MessManager[]
 }
 
 model MessManager {
   messManagerId Int      @id @default(autoincrement())
-  from          DateTime
-  to            DateTime
   assingedAt    DateTime @default(now())
 
   residencyId Int
   residency   Residency @relation(fields: [residencyId], references: [residencyId])
 
+  callId Int
+  call   MessManagerApplicationCall @relation(fields: [callId], references: [callId])
+
   announcements Announcement[]
   MealPlan      MealPlan[]
-  Feedback      Feedback[]
 }
 
 model MessManagerApplication {

@@ -197,7 +197,9 @@ export class messQueryResolver {
                 }
             },
             orderBy: {
-                to: 'desc'
+                call : {
+                    to : 'asc'
+                }
             }
         });
     }
@@ -442,12 +444,16 @@ export class messQueryResolver {
     ){
         return await ctx.prisma.messManager.findMany({
             where : {
-                to : {
-                    gte : new Date()
+                call : {
+                    to : {
+                        gte : new Date()
+                    }
                 }
             },
             orderBy : {
-                from : 'asc'
+                call : {
+                    from : 'asc'
+                }
             }
         })
     }
@@ -458,10 +464,15 @@ export class messQueryResolver {
     ){
         let res = await ctx.prisma.messManager.findFirst({
             orderBy : {
-                to : 'desc'
+                call : {
+                    to : 'desc'
+                }
+            },
+            include : {
+                call : true
             }
         })
-        return res.to.toString();
+        return res.call.to.toString();
     }
 
     

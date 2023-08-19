@@ -734,11 +734,7 @@ export class MessManager {
     @Field()
     messManagerId : number;
 
-    @Field()
-    from : Date;
 
-    @Field()
-    to : Date;
 
     @Field()
     residencyId : number;
@@ -748,6 +744,12 @@ export class MessManager {
 
     @Field(returns => [Announcement], {nullable : true})
     announcements? : [Announcement];
+
+    @Field()
+    callId : number;
+
+    @Field(type => MessManagerApplicationCall)
+    call : ()=> MessManagerApplicationCall;
 }
 
 @ObjectType()

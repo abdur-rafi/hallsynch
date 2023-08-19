@@ -460,8 +460,7 @@ export class messMutationResolver {
         let result = await ctx.prisma.$transaction([
             ctx.prisma.messManager.create({
                 data : {
-                    from : application.call.from,
-                    to : application.call.to, 
+                    callId : application.call.callId,
                     residencyId : application.residencyId,
                     assingedAt : new Date()
                 }

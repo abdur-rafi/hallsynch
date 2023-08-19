@@ -1,6 +1,6 @@
 import {PrismaClient, RatingType} from '@prisma/client'
 import bcrypt from 'bcrypt'
-import { addDay } from './graphql/utility'
+import { addDay, addDays } from './graphql/utility'
 const prisma = new PrismaClient()
 
 async function generateDept(){
@@ -508,39 +508,59 @@ async function generateMeal(){
 
 async function generateMealPlan(){
     let meals = await prisma.meal.findMany();
-    let month = 7;
+    let months = [6,7];
     let year = 2023;
     let promises = []
 
-    let messManagers = await prisma.messManager.findMany();
-    let randMessManagerId = ()=>{
-        return messManagers[0].messManagerId;
-        // return messManagers[Math.floor(Math.random() * messManagers.length)].messManagerId;
-    }
+    // let messManagers = await prisma.messManager.findMany();
+    // let randMessManagerId = ()=>{
+    //     // return messManagers[0].messManagerId;
+    //     return messManagers[Math.floor(Math.random() * messManagers.length)].messManagerId;
+    // }
+    months.forEach(async month =>{
 
-    for(let j = 1; j < 32; ++j){
-        promises.push(
-            prisma.mealPlan.create({
-                data : {
-                    day : new Date(year, month, j),
-                    mealTime : "LUNCH",
-                    mealId : meals[Math.floor(Math.random() * meals.length)].mealId,
-                    messManagerId : randMessManagerId()
+        let mms = await prisma.messManager.findMany({
+            where : {
+                call : {
+                    to : {
+                        gte : new Date(year, month, 31) 
+                    },
+                    from : {
+                        lte : new Date(year, month, 1)
+                    }
                 }
-            })
-        )
-        promises.push(
-            prisma.mealPlan.create({
-                data : {
-                    day : new Date(year, month, j),
-                    mealTime : "DINNER",
-                    mealId : meals[Math.floor(Math.random() * meals.length)].mealId,
-                    messManagerId : randMessManagerId()
-                }
-            })
-        )
-    }
-    await Promise.all(promises);
+            }
+        })
+        console.log(mms);
+
+        for(let j = 1; j < 32; ++j){
+            promises.push(
+                prisma.mealPlan.create({
+                    data : {
+                        day : new Date(year, month, j),
+                        mealTime : "LUNCH",
+                        mealId : meals[Math.floor(Math.random() * meals.length)].mealId,
+                        messManagerId : mms[0].messManagerId
+                    }
+                }).catch(err =>{
+                    console.log(err)
+                })
+            )
+            promises.push(
+                prisma.mealPlan.create({
+                    data : {
+                        day : new Date(year, month, j),
+                        mealTime : "DINNER",
+                        mealId : meals[Math.floor(Math.random() * meals.length)].mealId,
+                        messManagerId : mms[0].messManagerId
+                    }
+                }).catch(err =>{
+                    console.log(err)
+                })
+            )
+        }
+    })
+    await Promise.all(promises).catch(err=>console.log(err) );
 
 }
 
@@ -659,23 +679,44 @@ async function generatePreference(){
     await Promise.all(promises);
 }
 
+async function generateCall(){
+    let months = [6,7,8,9]
+    let promises = [];
+    let auth = await prisma.authority.findFirst();
+    months.forEach((m, i) =>{
+        promises.push(
+            prisma.messManagerApplicationCall.create({
+                data : {
+                    from : new Date(2023, m, 1),
+                    to : addDays(new Date(2023, m + 1, 1).toISOString(), - 1),
+                    createdById : auth.authorityId
+                }
+            })
+        )
+    })
+    await Promise.all(promises);
+    
+}
+
 async function generateMessManager(){
     let residents = await prisma.residency.findMany();
     let promises = [];
     let month_id = 1;
-    residents.forEach(r =>{
-        if(Math.random() < .2){
-            promises.push(
-                prisma.messManager.create({
-                    data : {
-                        residencyId : r.residencyId,
-                        from: new Date(2023, month_id % 10, 1),
-                        to : new Date(2023, month_id % 10, 31),
-                    }
-                })
-            )
-            month_id++;
-        }
+    let calls = await prisma.messManagerApplicationCall.findMany();
+    calls.forEach(c =>{
+        residents.forEach(r =>{
+            if(Math.random() < .03){
+                promises.push(
+                    prisma.messManager.create({
+                        data : {
+                            residencyId : r.residencyId,
+                            callId : c.callId
+                        }
+                    })
+                )
+                month_id++;
+            }
+        })
     })
     await Promise.all(promises);
 }
@@ -741,54 +782,50 @@ async function generateAnnouncements(){
 async function generateFeedback(){
     let promises = []
     
-    let messManager = await prisma.messManager.findMany();
-    messManager.forEach(async m =>{
+    // let messManager = await prisma.messManager.findMany();
+    promises.push(prisma.mealPlan.findMany({
+        orderBy : [{
+            day : 'asc',
+        },{
+            mealTime : 'desc'
+        }]
+    }).then(mealPlans =>{
+        // console.log(mealPlans.length);
+        let starts = [];
+        let ends = []
+        for(let i = 0; i + 14 < mealPlans.length; i+= 14){
+            starts.push(mealPlans[i])
+            ends.push(mealPlans[i + 13]);
+        }
+        console.log(starts, ends)
+        promises.push(
+            prisma.feedback.createMany({
+                data : starts.map((s, i)=>({
+                    startMealPlanId : s.mealPlanId,
+                    endMealPlanId : ends[i].mealPlanId,
+                    startDate : addDay(ends[i].day.toString())
+                }))
+            }).catch(err=>{
+                console.log(err)
+            })
+        )
+        console.log(mealPlans.length);
 
-        promises.push(prisma.mealPlan.findMany({
-            where : {
-                messManagerId : m.messManagerId
-            },
-            orderBy : [{
-                day : 'asc',
-            },{
-                mealTime : 'desc'
-            }]
-        }).then(mealPlans =>{
-            console.log(mealPlans.length);
-            let starts = [];
-            let ends = []
-            for(let i = 0; i + 14 < mealPlans.length; i+= 14){
-                starts.push(mealPlans[i].mealPlanId)
-                ends.push(mealPlans[i + 13].mealPlanId);
-            }
-            console.log(starts, ends)
-            promises.push(
-                prisma.feedback.createMany({
-                    data : starts.map((s, i)=>({
-                        startMealPlanId : s,
-                        endMealPlanId : mealPlans[ends[i]].mealPlanId,
-                        messManagerId : m.messManagerId,
-                        startDate : addDay(mealPlans[ends[i]].day.toString())
-                    }))
-                }).catch(err=>{
-                    console.log(err)
-                })
-            )
-            console.log(mealPlans.length);
+    }))
+    // messManager.forEach(async m =>{
 
-        }))
 
-        // let mealPlans = await prisma.mealPlan.findMany({
-        //     where : {
-        //         messManagerId : m.messManagerId
-        //     },
-        //     orderBy : {
-        //         mealPlanId : 'asc'
-        //     }
-        // })
+    //     // let mealPlans = await prisma.mealPlan.findMany({
+    //     //     where : {
+    //     //         messManagerId : m.messManagerId
+    //     //     },
+    //     //     orderBy : {
+    //     //         mealPlanId : 'asc'
+    //     //     }
+    //     // })
         
         
-    })
+    // })
     await Promise.all(promises);
 }
 
@@ -806,7 +843,6 @@ async function generateRatings(){
             let mealsCount = await prisma.participation.count({
                 where : {
                     mealPlan : {
-                        messManagerId : f.messManagerId,
                         mealPlanId : {
                             gte : f.startMealPlanId,
                             lte : f.endMealPlanId
@@ -858,7 +894,7 @@ async function generateMessManagerApplications(){
     residents.forEach(r =>{
         calls.forEach(c =>{
 
-            if(Math.random() < .08){
+            if(Math.random() < .03){
                 promises.push(
                     prisma.messManagerApplication.create({
                         data : {
@@ -894,23 +930,27 @@ async function generateAll(){
     // await generateResidency()
     // await generateAuthority();
     // await generateApplications();
-    //
     // await generateTempResidencyHistory();
+    
+    
+    // await generateCall();
+    // await generateMessManager();
+    
     // await generateItem();
     // await generateMeal();
-    // await generateMessManager();
-    // await generateMealPlan();
+    // await generateMealPlan(); 
+
     // await generateCupCount();
-    await generateMessManagerApplications();
+    // await generateMessManagerApplications();
 
     // await generateParticipation();
     // await generatePreference();
 
     // await generateOptedOut();
-    //
+    
     // await generateAnnouncements();
-    // await generateFeedback();
-    // await generateRatings();
+    await generateFeedback();
+    await generateRatings();
 }
 
 generateAll();
