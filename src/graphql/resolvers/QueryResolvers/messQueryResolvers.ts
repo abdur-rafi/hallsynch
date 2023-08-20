@@ -185,14 +185,13 @@ export class messQueryResolver {
     @Authorized([roles.PROVOST] || [roles.STUDENT_MESS_MANAGER])
     @Query(returns => [MessManager])
     async messManagingExperiences(
-        @Ctx() ctx: Context,
-        @Arg('studentId') studentId: number
+        @Ctx() ctx: Context
     ) {
         return await ctx.prisma.messManager.findMany({
             where: {
                 residency : {
                     student : {
-                        studentId : studentId
+                        studentId : ctx.identity.studentId
                     }
                 }
             },
