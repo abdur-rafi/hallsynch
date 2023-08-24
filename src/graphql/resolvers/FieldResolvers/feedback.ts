@@ -5,17 +5,17 @@ import { Context } from "../../interface";
 @Resolver(of => Feedback)
 export class FeedbackResolver{
 
-    @FieldResolver(type => MessManager)
-    async messManager(
-        @Ctx() ctx : Context,
-        @Root() a : Feedback
-    ){
-        return await ctx.prisma.messManager.findUnique({
-            where : {
-                messManagerId : a.messManagerId
-            }
-        })
-    }
+    // @FieldResolver(type => MessManager)
+    // async messManager(
+    //     @Ctx() ctx : Context,
+    //     @Root() a : Feedback
+    // ){
+    //     return await ctx.prisma.messManager.findUnique({
+    //         where : {
+    //             messManagerId : a.messManagerId
+    //         }
+    //     })
+    // }
 
     @FieldResolver(type => MealPlan)
     async startMealPlan(

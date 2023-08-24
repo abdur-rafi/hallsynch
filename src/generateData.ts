@@ -832,9 +832,18 @@ async function generateFeedback(){
 async function generateRatings(){
     let promises = []
     let residents = await prisma.residency.findMany();
-    let feedbacks = await prisma.feedback.findMany();
+    let feedbacks = await prisma.feedback.findMany({
+        orderBy : {
+            startDate : "asc"
+        }
+    });
     feedbacks.pop();
     feedbacks.pop();
+    feedbacks.pop();
+    feedbacks.pop();
+    // feedbacks.pop();
+
+    console.log(feedbacks);
 
     let types = [RatingType.MANAGEMENT, RatingType.QUALITY, RatingType.QUANTITY]
     residents.forEach(r =>{
@@ -851,9 +860,9 @@ async function generateRatings(){
                     residencyId : r.residencyId
                 }
             })
-            console.log(mealsCount)
+            // console.log(mealsCount)
             if(mealsCount > 6){
-                console.log("here\n");
+                // console.log("here\n");
                 // console.log(promises)
                 promises.push(
                     prisma.rating.createMany({
@@ -949,7 +958,7 @@ async function generateAll(){
     // await generateOptedOut();
     
     // await generateAnnouncements();
-    await generateFeedback();
+    // await generateFeedback();
     await generateRatings();
 }
 

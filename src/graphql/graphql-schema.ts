@@ -983,15 +983,11 @@ export class Feedback {
     @Field()
     startDate: Date
     @Field()
-    messManagerId: number
-    @Field()
     startMealPlanId: number
     @Field()
     endMealPlanId: number
 
 
-    @Field(type => MessManager)
-    messManager: MessManager
     @Field(type => MealPlan)
     startMealPlan: MealPlan
     @Field(type => MealPlan)
