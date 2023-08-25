@@ -532,6 +532,9 @@ export class UploadedFile{
     @Field(type => Student)
     student : Student;
 
+    @Field()
+    newFileName : string;
+
     // @Field(type => [AttachedFile])
     // attachedFiles : [AttachedFile]
     //

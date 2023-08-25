@@ -173,15 +173,17 @@ buildSchema({
             })
         )
 
-        app.use(express.static(`${__dirname}/public`))
-
+        
         // app.use('/', (req, res, next)=>{
-        //     res.send('response')
-        // })
+            //     res.send('response')
+            // })
         app.use(cors({
             origin : ['http://localhost:3001'],
             credentials : true
         }));
+
+        app.use(express.static(path.join(path.resolve('.'), 'public')));
+
 
         app.post('/upload', (req, res, next) => {
             let t = getIdentity(req.headers);
@@ -223,7 +225,8 @@ buildSchema({
                                         data : {
                                             fileName : f.originalFilename,
                                             filePath : f.filepath,
-                                            studentId : t.studentId
+                                            studentId : t.studentId,
+                                            newFileName : f.newFilename
                                         }
                                     })
                                 )

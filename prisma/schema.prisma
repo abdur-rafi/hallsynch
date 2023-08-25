@@ -155,6 +155,7 @@ model UploadedFile {
 
   fileName String
   filePath String
+  newFileName String
 
   studentId Int
   student   Student @relation(fields: [studentId], references: [studentId])
@@ -338,7 +339,7 @@ model Notification {
 
 model Item {
   itemId Int      @id @default(autoincrement())
-  name   String
+  name   String @unique
   type   ItemType
 
   photoId Int?
