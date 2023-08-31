@@ -332,6 +332,7 @@ export class seatQueryResolver {
     async notifications(
         @Ctx() ctx : Context
     ){
+        if(!ctx.identity.studentId) return [];
         let t = await ctx.prisma.$transaction([
             ctx.prisma.notification.count({
                 where : {
@@ -343,6 +344,9 @@ export class seatQueryResolver {
                 where : {
                     studentId : ctx.identity.studentId
                 },
+                orderBy : {
+                    time : "desc"
+                }
 
             })
         ])
@@ -352,4 +356,6 @@ export class seatQueryResolver {
             notifications : t[1]
         }
     }
+
+    
 }

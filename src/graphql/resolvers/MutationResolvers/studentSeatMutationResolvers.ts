@@ -257,15 +257,43 @@ export class studentSeatMutationResolver {
         @Arg('reason') reason : string,
 
     ){
-        return await ctx.prisma.vote.update({
+        let res = (await ctx.prisma.$transaction([
+
+            ctx.prisma.notification.delete({
+                where : {
+                    voteId : voteId
+                }
+            })
+            ,
+            ctx.prisma.vote.update({
+                where : {
+                    voteId : voteId
+                },
+                data : {
+                    lastUpdated : new Date(),
+                    status : vote,
+                    reason : reason
+                }
+            })
+        ]));
+
+        return res[1];
+    }
+
+    
+    @Mutation(returns => Number)
+    async mark(
+        @Ctx() ctx : Context,
+        @Arg('notificationId') notificationId : number
+    ){
+        await ctx.prisma.notification.update({
             where : {
-                voteId : voteId
+                notificationId : notificationId
             },
             data : {
-                lastUpdated : new Date(),
-                status : vote,
-                reason : reason
+                seen : true
             }
         })
+        return 0;
     }
 }

@@ -15,13 +15,14 @@ export class VoteResolver{
     }
 
     @FieldResolver(type => SeatChangeApplication)
-    async roomChangeApplication(
+    async seatChangeApplication(
         @Ctx() ctx : Context,
         @Root() vote : Vote
     ){
+        console.log(vote)
         return await ctx.prisma.seatChangeApplication.findUnique({
             where : {
-                applicationId : vote.seatChangeApplicationId
+                seatChangeApplicationId : vote.seatChangeApplicationId
             }
         })
     }
