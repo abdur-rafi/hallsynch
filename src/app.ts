@@ -13,10 +13,18 @@ import { PrismaClient } from "@prisma/client";
 import { loginMutationResolver} from "./graphql/resolvers/MutationResolvers/loginMutationResolver";
 import { studentSeatMutationResolver } from "./graphql/resolvers/MutationResolvers/studentSeatMutationResolvers";
 import { provostSeatMutationResolver} from "./graphql/resolvers/MutationResolvers/provostSeatMutationResolvers";
-import { messMutationResolver} from "./graphql/resolvers/MutationResolvers/messMutationResolvers";
+
+import { MealMutationResolvers} from "./graphql/resolvers/MutationResolvers/mess/mealMutationResolvers";
+import { AnnouncementMutationResolvers } from "./graphql/resolvers/MutationResolvers/mess/announcementMutationResolvers";
+import { MessManagerMutationResolvers} from "./graphql/resolvers/MutationResolvers/mess/messManagerMutationResolvers";
+import { FeedbackMutationResolvers} from "./graphql/resolvers/MutationResolvers/mess/feedbackMutationResolvers";
+
 import { basicResolver} from "./graphql/resolvers/QueryResolvers/basicResolvers";
 import { seatQueryResolver } from "./graphql/resolvers/QueryResolvers/seatQueryResolvers";
-import { messQueryResolver } from "./graphql/resolvers/QueryResolvers/messQueryResolvers";
+import { MealQueryResolvers} from "./graphql/resolvers/QueryResolvers/mess/mealQueryResolvers";
+import { AnnouncementQueryResolvers} from "./graphql/resolvers/QueryResolvers/mess/announcementQueryResolvers";
+import { MessManagerQueryResolvers} from "./graphql/resolvers/QueryResolvers/mess/messManagerQueryResolvers";
+import { StatsFeedbackQueryResolvers } from "./graphql/resolvers/QueryResolvers/mess/statsFeedbackQueryResolvers";
 
 import { StudentResolver } from "./graphql/resolvers/FieldResolvers/student";
 import { DepartmentResolver } from "./graphql/resolvers/FieldResolvers/department";
@@ -66,11 +74,17 @@ buildSchema({
     resolvers: [
         basicResolver,
         seatQueryResolver,
-        messQueryResolver,
+        MealQueryResolvers,
+        AnnouncementQueryResolvers,
+        MessManagerQueryResolvers,
+        StatsFeedbackQueryResolvers,
         loginMutationResolver,
         studentSeatMutationResolver,
         provostSeatMutationResolver,
-        messMutationResolver,
+        MealMutationResolvers,
+        AnnouncementMutationResolvers,
+        MessManagerMutationResolvers,
+        FeedbackMutationResolvers,
         StudentResolver,
         DepartmentResolver,
         BatchResolver,
@@ -112,45 +126,10 @@ buildSchema({
 
     const server = new ApolloServer<Context>({
         schema: schema,
-        plugins: [ApolloServerPluginLandingPageLocalDefault(), {
-            // async serverWillStart() {
-            //     return {
-            //         async drainServer() {
-            //             subscriptionServer.close();
-            //         }
-            //     };
-            // }
-        }],
-        // context : ({req}) : Context =>{
-        //     return {
-        //         identity : getIdentity(req.headers),
-        //         prisma : client
-        //     }
-        // }
-        // context : ({req}) : Context =>{
-        //     let token = ''
-        //     let userId : number | undefined;
-        //     if(req.headers.authorization){
-        //         token = req.headers.authorization.replace('Bearer ', '')
-        //     }
-        //     if(token.length > 0){
-        //         let payload = jwt.verify(token, process.env.JWTSECRET!) as string;
-        //         userId = parseInt(payload)
-
-        //     }
-        //     return({
-        //         prisma : prisma,
-        //         userId : userId
-        //     })
-        // }
+        plugins: [ApolloServerPluginLandingPageLocalDefault(), {}],
     })
 
     server.start().then(() => {
-        // server.applyMiddleware({
-        //     app,
-        //     path: '/graphql'
-        // });
-
         app.use(
             '/graphql',
             cors<cors.CorsRequest>({
@@ -173,10 +152,6 @@ buildSchema({
             })
         )
 
-        
-        // app.use('/', (req, res, next)=>{
-            //     res.send('response')
-            // })
         app.use(cors({
             origin : ['http://localhost:3001'],
             credentials : true
@@ -253,12 +228,3 @@ buildSchema({
     })
 
 })
-
-// app.get('/', (req, res)=>{
-//     res.send("hello world");
-// })
-
-
-// app.listen(3000, ()=>{
-//     console.log('server listening');
-// })

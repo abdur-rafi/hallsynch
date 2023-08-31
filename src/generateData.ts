@@ -940,14 +940,14 @@ async function generateAll(){
     // await generateAuthority();
     // await generateApplications();
     // await generateTempResidencyHistory();
-    
-    
+
+
     // await generateCall();
     // await generateMessManager();
-    
+
     // await generateItem();
     // await generateMeal();
-    // await generateMealPlan(); 
+    // await generateMealPlan();
 
     // await generateCupCount();
     // await generateMessManagerApplications();
@@ -956,7 +956,7 @@ async function generateAll(){
     // await generatePreference();
 
     // await generateOptedOut();
-    
+
     // await generateAnnouncements();
     // await generateFeedback();
     await generateRatings();
