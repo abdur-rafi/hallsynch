@@ -1,5 +1,6 @@
 import {Arg, Authorized, Ctx, Query} from "type-graphql";
 import {
+    DeptWiseResident,
     FilterInput, Floor, FullSeatStat, FullStudentStat, NotificationWithCount, Room,
     SearchInput, Seat,
     SeatApplication,
@@ -378,6 +379,35 @@ export class seatQueryResolver {
             totalTempResidents : totalTempResident,
             totalAttached : totalAttached
         }
+    }
+
+    @Query(returns => [DeptWiseResident])
+    async departmentWiseResidentStats(
+        @Ctx() ctx : Context
+    ){
+        let result : DeptWiseResident[] = [];
+        let depts = await ctx.prisma.department.findMany({
+            select : {
+                shortName : true,
+                departmentId : true
+            }
+        });
+
+        for (const dept of depts) {
+            let count = await ctx.prisma.residency.count({
+                where : {
+                    student : {
+                        departmentId : dept.departmentId
+                    }
+                }
+            });
+            result.push({
+                deptName : dept.shortName,
+                totalResidents : count
+            })
+        }
+
+        return result;
     }
 
 

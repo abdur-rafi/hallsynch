@@ -923,6 +923,14 @@ export class FullStudentStat {
     totalAttached : number;
 }
 
+@ObjectType()
+export class DeptWiseResident {
+    @Field()
+    deptName : string;
+
+    @Field()
+    totalResidents : number;
+}
 
 @ObjectType()
 export class Notification {
