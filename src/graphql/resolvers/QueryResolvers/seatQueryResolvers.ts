@@ -1,6 +1,6 @@
 import {Arg, Authorized, Ctx, Query} from "type-graphql";
 import {
-    FilterInput, Floor, NotificationWithCount, Room,
+    FilterInput, Floor, FullSeatStat, FullStudentStat, NotificationWithCount, Room,
     SearchInput, Seat,
     SeatApplication,
     SeatApplicationsWithCount,
@@ -324,6 +324,60 @@ export class seatQueryResolver {
                 seatLabel : 'asc'
             }
         })
+    }
+
+    @Query(returns => FullSeatStat)
+    async fullSeatStats(
+        @Ctx() ctx : Context
+    ){
+        let totalSeat = await ctx.prisma.seat.count();
+
+        let freeSeat = await ctx.prisma.seat.count({
+            where : {
+                residency : null,
+                tempResidency : null
+            }
+        });
+
+        let totalRooms = await ctx.prisma.room.count();
+
+        let freeRooms = await ctx.prisma.room.count({
+            where : {
+                seats : {
+                    some : {
+                        residency : null,
+                        tempResidency : null
+                    }
+                }
+            }
+        });
+
+        return {
+            totalSeats : totalSeat,
+            freeSeats : freeSeat,
+            totalRooms : totalRooms,
+            freeRooms : freeRooms
+        };
+    }
+
+    @Query(returns => FullStudentStat)
+    async fullStudentStats(
+        @Ctx() ctx : Context
+    ) {
+        let totalStudent = await ctx.prisma.student.count();
+
+        let totalResident = await ctx.prisma.residency.count();
+
+        let totalTempResident = await ctx.prisma.tempResidency.count();
+
+        let totalAttached = totalStudent - totalResident - totalTempResident;
+
+        return {
+            totalStudents : totalStudent,
+            totalResidents : totalResident,
+            totalTempResidents : totalTempResident,
+            totalAttached : totalAttached
+        }
     }
 
 

@@ -20,8 +20,8 @@ async function generateDept(){
 
     let deptCodes = [
         '05',
-        '03', 
-        '02', 
+        '03',
+        '02',
         '01'
     ]
     let n = deptShorts.length
@@ -52,7 +52,7 @@ async function generateBatches(){
 
     let n = batches.length
     batches.forEach(async (batch, index)=>{
-        
+
         promises.push(prisma.batch.create({
             data : {
                 year : batch
@@ -126,7 +126,7 @@ async function generateFloors(){
     let floors = [1, 2, 3, 4, 5]
     let charCount = [3, 3, 4, 4, 3]
     let promises = []
-    
+
 
     floors.forEach((f, i)=>{
         promises.push(prisma.floor.create({
@@ -143,7 +143,7 @@ async function generateFloors(){
 async function generateRooms(){
     let floors = await prisma.floor.findMany()
     let promises = []
-    
+
     floors.forEach(f =>{
         let roomCount = 15 + Math.floor(Math.random() * 10);
         for(let i = 1; i <= roomCount; ++i){
@@ -185,7 +185,7 @@ async function generateResidency(){
 
     let promises = []
     students.forEach( async st =>{
-        
+
         if (st.residencyStatus == 'RESIDENT'){
             console.log('here');
             if(seatIndex >= seats.length - 10){
@@ -201,9 +201,9 @@ async function generateResidency(){
                 )
             }
             else{
-                
+
                 let seat = seats[seatIndex++]
-    
+
                 // while(true){
                 //     seat = seats[randIndex()]
                 //     let residents = await prisma.residency.findMany({
@@ -214,7 +214,7 @@ async function generateResidency(){
                 //     if(residents.length < seat.roomCapacity )
                 //         break;
                 // }
-    
+
                 promises.push(
                     prisma.residency.create({
                         data : {
@@ -312,12 +312,12 @@ async function generateApplications(){
     let promises = []
     let students = await prisma.student.findMany({
     })
-    
+
     students.forEach(async s =>{
         if(s.residencyStatus == 'ATTACHED'){
 
             if(Math.random() > .5) return;
-    
+
             promises.push(prisma.newApplication.create({
                 data : {
                     application : {
@@ -406,7 +406,7 @@ async function generateItem(){
 
 
     await Promise.all(promises);
-    
+
 }
 
 
@@ -460,7 +460,7 @@ async function generateMeal(){
                         {
                             itemId : nonVeg[0].itemId
                         },
-                        
+
                     ]
                 }
             }
@@ -484,7 +484,7 @@ async function generateMeal(){
                         {
                             itemId : nonVeg[2].itemId
                         }
-                        
+
                     ]
                 }
             }
@@ -508,7 +508,7 @@ async function generateMeal(){
 
 async function generateMealPlan(){
     let meals = await prisma.meal.findMany();
-    let months = [6,7];
+    let months = [7,8,9];
     let year = 2023;
     let promises = []
 
@@ -523,7 +523,7 @@ async function generateMealPlan(){
             where : {
                 call : {
                     to : {
-                        gte : new Date(year, month, 31) 
+                        gte : new Date(year, month, 31)
                     },
                     from : {
                         lte : new Date(year, month, 1)
@@ -582,7 +582,7 @@ async function generateCupCount(){
                     data : {
                         cupcount : 50,
                         itemId : item.itemId,
-                        mealPlanId : mp.mealPlanId 
+                        mealPlanId : mp.mealPlanId
                     }
                 })
             )
@@ -613,7 +613,7 @@ async function generateParticipation(){
         })
     })
     await Promise.all(promises);
-   
+
 }
 
 function shuffleArray(array) {
@@ -672,7 +672,7 @@ async function generatePreference(){
                 //             })
                 //         )
                 //     })
-                // }) 
+                // })
             }
         })
     })
@@ -695,13 +695,12 @@ async function generateCall(){
         )
     })
     await Promise.all(promises);
-    
+
 }
 
 async function generateMessManager(){
     let residents = await prisma.residency.findMany();
     let promises = [];
-    let month_id = 1;
     let calls = await prisma.messManagerApplicationCall.findMany();
     calls.forEach(c =>{
         residents.forEach(r =>{
@@ -714,7 +713,6 @@ async function generateMessManager(){
                         }
                     })
                 )
-                month_id++;
             }
         })
     })
@@ -781,7 +779,7 @@ async function generateAnnouncements(){
 
 async function generateFeedback(){
     let promises = []
-    
+
     // let messManager = await prisma.messManager.findMany();
     promises.push(prisma.mealPlan.findMany({
         orderBy : [{
@@ -823,8 +821,8 @@ async function generateFeedback(){
     //     //         mealPlanId : 'asc'
     //     //     }
     //     // })
-        
-        
+
+
     // })
     await Promise.all(promises);
 }
@@ -917,7 +915,7 @@ async function generateMessManagerApplications(){
             }
         })
     });
-    
+
     await Promise.all(promises);
 }
 
@@ -940,26 +938,26 @@ async function generateAll(){
     // await generateAuthority();
     // await generateApplications();
     // await generateTempResidencyHistory();
-
-
+    // //
+    // //
     // await generateCall();
+    // await generateMessManagerApplications();
     // await generateMessManager();
-
+    //
     // await generateItem();
     // await generateMeal();
-    // await generateMealPlan();
+    await generateMealPlan();
 
     // await generateCupCount();
-    // await generateMessManagerApplications();
-
+    //
     // await generateParticipation();
     // await generatePreference();
 
     // await generateOptedOut();
-
+    //
     // await generateAnnouncements();
     // await generateFeedback();
-    await generateRatings();
+    // await generateRatings();
 }
 
 generateAll();

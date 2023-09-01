@@ -894,6 +894,37 @@ export class IntArray{
 
 
 @ObjectType()
+export class FullSeatStat {
+    @Field()
+    totalSeats : number;
+
+    @Field()
+    freeSeats : number;
+
+    @Field()
+    totalRooms : number;
+
+    @Field()
+    freeRooms : number;
+}
+
+@ObjectType()
+export class FullStudentStat {
+    @Field()
+    totalStudents : number;
+
+    @Field()
+    totalResidents : number;
+
+    @Field()
+    totalTempResidents : number;
+
+    @Field()
+    totalAttached : number;
+}
+
+
+@ObjectType()
 export class Notification {
     @Field()
     notificationId : number;
