@@ -156,10 +156,15 @@ export class MealMutationResolvers {
         else itemType = ItemType.NON_VEG;
 
         let photoFile = null;
+        console.log(name,type, fileId);
         if(fileId != -1) {
             photoFile = await ctx.prisma.photo.create({
-                data: {
-                    uploadedFileId: fileId
+                data : {
+                    file : {
+                        connect : {
+                            uploadedFileId : fileId
+                        }
+                    }
                 }
             })
         }
@@ -209,6 +214,13 @@ export class MealMutationResolvers {
                 meal: {
                     create: {
                         createdAt: new Date(date),
+                        items : {
+                            connect : items.items.map(item => {
+                                return {
+                                    itemId : item.itemId
+                                }
+                            })
+                        }
                     }
                 },
                 messManager: {
