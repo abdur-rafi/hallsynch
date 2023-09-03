@@ -174,7 +174,8 @@ export class StatsFeedbackQueryResolvers {
                 feedback : {
                     startMealPlan : {
                         day : {
-                            gte : new Date(date)
+                            gte : new Date(date),
+                            lte : new Date()
                         }
                     }
                 }
