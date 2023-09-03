@@ -296,4 +296,34 @@ export class studentSeatMutationResolver {
         })
         return 0;
     }
+
+    @Authorized([roles.STUDENT])
+    @Mutation(returns => Number)
+    async deleteNotification(
+        @Ctx() ctx : Context,
+        @Arg('notificationId') notificationId : number
+    ){
+
+        let notification = await ctx.prisma.notification.findUnique({
+            where : {
+                notificationId : notificationId
+            },
+            include : {
+                student : true
+            }
+        })
+        if(notification.student.studentId != ctx.identity.studentId){  
+            throw new Error("Not authorized");
+        }
+
+        await ctx.prisma.notification.delete({
+            where : {
+                notificationId : notificationId,
+            }
+        })
+
+        return 0;
+    }
+
+    
 }
