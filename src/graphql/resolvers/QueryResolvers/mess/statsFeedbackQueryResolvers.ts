@@ -25,7 +25,8 @@ export class StatsFeedbackQueryResolvers {
         let res = await ctx.prisma.mealPlan.findMany({
             where : {
                 day : {
-                    gte : new Date(from)
+                    gte : new Date(from),
+                    lte : new Date()
                 },
                 mealTime : getMealTime(mealTime)
             },
@@ -77,7 +78,8 @@ export class StatsFeedbackQueryResolvers {
         let mealCount = await ctx.prisma.mealPlan.count({
             where : {
                 day : {
-                    gte : new Date(from)
+                    gte : new Date(from),
+                    lte : new Date()
                 }
             }
         })

@@ -869,7 +869,6 @@ async function generateRatings(){
                 }
             })
             // console.log(mealsCount)
-            if(mealsCount > 6){
                 // console.log("here\n");
                 // console.log(promises)
                 promises.push(
@@ -895,7 +894,6 @@ async function generateRatings(){
                         console.log(err)
                     })
                 )
-            }
             promises.push(mealsCount);
 
         })
