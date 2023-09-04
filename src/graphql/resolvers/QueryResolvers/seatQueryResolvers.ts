@@ -1,7 +1,7 @@
 import {Arg, Authorized, Ctx, Query} from "type-graphql";
 import {
     DeptWiseResident,
-    FilterInput, Floor, FullSeatStat, FullStudentStat, NotificationWithCount, Room,
+    FilterInput, Floor, FullSeatStat, FullStudentStat, IntArray, NotificationWithCount, Room,
     SearchInput, Seat,
     SeatApplication,
     SeatApplicationsWithCount,
@@ -70,7 +70,7 @@ export class seatQueryResolver {
                             in : enumVal
                         }
                     })
-            }0
+            }
             if(filters.type){
                 let ors : Prisma.SeatApplicationWhereInput[] = [];
                 if(filters.type.includes(applicationTypes.new) ){
@@ -408,6 +408,87 @@ export class seatQueryResolver {
         }
 
         return result;
+    }
+
+    @Query(returns => [Number])
+    async allFloors(
+        @Ctx() ctx : Context
+    ) {
+        let res = await ctx.prisma.floor.findMany({
+            orderBy : {
+                floorNo : 'asc'
+            }
+        })
+
+        let arr : Number[] = [];
+        for (const floor of res) {
+            arr.push(floor.floorNo);
+        }
+
+        return arr;
+    }
+
+    @Query(returns => [Room])
+    async selectedFloorRooms(
+        @Ctx() ctx : Context,
+        @Arg('floorNo') floorNo : number,
+        @Arg('roomStatus') roomStatus : string,
+        @Arg('residentType') residentType : string
+    ){
+        let ands : Prisma.RoomWhereInput[] = [];
+
+        if(roomStatus.toLowerCase() == 'free'){
+            ands.push({
+                seats : {
+                    some : {
+                        residency : null,
+                        tempResidency : null
+                    }
+                }
+            })
+        } else if(roomStatus.toLowerCase() == 'occupied'){
+            ands.push({
+                seats : {
+                    none : {
+                        residency : null,
+                    }
+                }
+            })
+        }
+
+        if(residentType.toLowerCase() == 'resident'){
+            ands.push({
+                seats : {
+                    some : {
+                        NOT : {
+                            residency : null
+                        }
+                    }
+                }
+            })
+        } else if(residentType.toLowerCase() == 'temp resident'){
+            ands.push({
+                seats : {
+                    some : {
+                        NOT : {
+                            tempResidency : null
+                        }
+                    }
+                }
+            })
+        }
+
+        return await ctx.prisma.room.findMany({
+            where : {
+                floor : {
+                    floorNo : floorNo
+                },
+                AND : ands
+            },
+            orderBy : {
+                roomNo : 'asc'
+            }
+        });
     }
 
 

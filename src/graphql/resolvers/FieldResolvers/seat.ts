@@ -17,7 +17,7 @@ export class SeatResolver{
         })
     }
 
-    @FieldResolver(type => Room)
+    @FieldResolver(type => Residency)
     async residency(
         @Ctx() ctx : Context,
         @Root() seat : Seat
