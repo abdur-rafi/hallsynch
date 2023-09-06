@@ -342,6 +342,8 @@ export class SeatApplication{
     @Field(type => [AttachedFile], {nullable : true})
     attachedFiles : [AttachedFile]
 
+    @Field(type => [Revision], {nullable : true})
+    revisions : [Revision]
 
 }
 

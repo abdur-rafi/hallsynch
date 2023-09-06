@@ -1,7 +1,8 @@
 import {Arg, Authorized, Ctx, Mutation} from "type-graphql";
 import {roles} from "../../utility";
-import {IntArray, NewApplication, Notification, SeatChangeApplication, TempApplication, Vote} from "../../graphql-schema";
+import {IntArray, NewApplication, Notification, SeatApplication, SeatChangeApplication, TempApplication, Vote} from "../../graphql-schema";
 import {Context} from "../../interface";
+import { ApplicationStatus } from "@prisma/client";
 
 
 export class studentSeatMutationResolver {
@@ -323,6 +324,49 @@ export class studentSeatMutationResolver {
         })
 
         return 0;
+    }
+
+    @Authorized(roles.STUDENT)
+    @Mutation(returns => SeatApplication)
+    async reSubmitApplication(
+        @Ctx() ctx : Context,
+        @Arg('applicationId') applicationId : number,
+        @Arg('removedFilesIds') removedFileIds : IntArray,
+        @Arg('addedFileIds') addedFileIds : IntArray
+    ){
+        let applicaiton = await ctx.prisma.seatApplication.findUnique({
+            where : {
+                applicationId : applicationId
+            }
+        })
+        if(applicaiton.status != ApplicationStatus.REVISE){
+            throw new Error("Invalid state of application");
+        }
+        let res = await ctx.prisma.$transaction([
+            ctx.prisma.attachedFiles.deleteMany({
+                where : {
+                    uploadedFileId : {
+                        in : removedFileIds.array
+                    }
+                }
+            }),
+            ctx.prisma.attachedFiles.createMany({
+                data : addedFileIds.array.map(v => ({
+                    uploadedFileId : v,
+                    applicationId : applicationId
+                }))
+            }),
+            ctx.prisma.seatApplication.update({
+                where : {
+                    applicationId : applicationId
+                },
+                data : {
+                    status : ApplicationStatus.PENDING
+                }
+            })
+        ])
+
+        return res[2];
     }
 
     

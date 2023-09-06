@@ -1,5 +1,5 @@
 import { Ctx, FieldResolver, Resolver, Root } from "type-graphql";
-import { ApplicationStatus, NewApplication, SeatChangeApplication, SeatApplication, Student, TempApplication, AttachedFile } from "../../graphql-schema";
+import { ApplicationStatus, NewApplication, SeatChangeApplication, SeatApplication, Student, TempApplication, AttachedFile, Revision } from "../../graphql-schema";
 import { Context } from "../../interface";
 
 @Resolver(of => SeatApplication)
@@ -80,5 +80,19 @@ export class SeatApplicationResolver{
         return r;
     }
     
+    @FieldResolver(type => [Revision])
+    async revisions(
+        @Ctx() ctx : Context,
+        @Root() app : SeatApplication
+    ){
+        return await ctx.prisma.revision.findMany({
+            where : {
+                applicationId : app.applicationId
+            },
+            orderBy : {
+                createdAt : 'desc'
+            }
+        })
+    }
     
 }

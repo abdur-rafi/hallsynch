@@ -265,6 +265,13 @@ export class provostSeatMutationResolver {
                     applicationId : application.applicationId,
                     reason : reason
                 }
+            }),
+            ctx.prisma.notification.create({
+                data : {
+                    text : "Your application needs to be revised",
+                    applicationId : application.applicationId,
+                    studentId : application.studentId
+                }
             })
         ])
 
