@@ -5,7 +5,7 @@ import {
     SearchInput, Seat,
     SeatApplication,
     SeatApplicationsWithCount,
-    SortInput, StatusWithDefaultSelect,
+    SortInput, StatusWithDefaultSelect, Student,
     Vote
 } from "../../graphql-schema";
 import {Context} from "../../interface";
@@ -489,6 +489,33 @@ export class seatQueryResolver {
                 roomNo : 'asc'
             }
         });
+    }
+
+    @Query(returns => [Student])
+    async selectedRoomStudents(
+        @Ctx() ctx : Context,
+        @Arg('roomId') roomId : number
+    ) {
+        return await ctx.prisma.student.findMany({
+            where : {
+                OR: [
+                    {
+                        residency: {
+                            seat: {
+                                roomId: roomId
+                            }
+                        }
+                    },
+                    {
+                        tempResidency: {
+                            seat: {
+                                roomId: roomId
+                            }
+                        }
+                    }
+                ]
+            }
+        })
     }
 
 
