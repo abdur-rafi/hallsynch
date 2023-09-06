@@ -1,6 +1,6 @@
 import {Arg, Authorized, Ctx, Query} from "type-graphql";
-import {roles} from "../../../utility";
-import {Item, MealPlan} from "../../../graphql-schema";
+import {addDays, roles} from "../../../utility";
+import {Item, Meal, MealPlan} from "../../../graphql-schema";
 import {Context} from "../../../interface";
 import {MealTime} from "@prisma/client";
 
@@ -62,4 +62,30 @@ export class MealQueryResolvers {
     ) {
         return await ctx.prisma.item.findMany();
     }
+
+
+    @Query(returns => [MealPlan])
+    async getAddedMealPlansByDateTime(
+        @Ctx() ctx: Context,
+        @Arg('mealTime') mealTime : string
+    ) {
+        let mealTimeEnum : MealTime;
+        if(mealTime.toLowerCase() == 'lunch') mealTimeEnum = MealTime.LUNCH;
+        else mealTimeEnum = MealTime.DINNER;
+
+        return await ctx.prisma.mealPlan.findMany({
+            where: {
+                mealTime: mealTimeEnum,
+                day : {
+                    gte : addDays(new Date().toString(), -7)
+                }
+            },
+            orderBy: [
+                {
+                    day: 'asc',
+                }
+            ]
+        });
+    }
+
 }
