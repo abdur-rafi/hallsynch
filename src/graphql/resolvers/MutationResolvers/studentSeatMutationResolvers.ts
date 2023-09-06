@@ -1,6 +1,6 @@
 import {Arg, Authorized, Ctx, Mutation} from "type-graphql";
 import {roles} from "../../utility";
-import {IntArray, NewApplication, SeatChangeApplication, TempApplication, Vote} from "../../graphql-schema";
+import {IntArray, NewApplication, Notification, SeatChangeApplication, TempApplication, Vote} from "../../graphql-schema";
 import {Context} from "../../interface";
 
 
@@ -281,12 +281,12 @@ export class studentSeatMutationResolver {
     }
 
     
-    @Mutation(returns => Number)
+    @Mutation(returns => Notification)
     async mark(
         @Ctx() ctx : Context,
         @Arg('notificationId') notificationId : number
     ){
-        await ctx.prisma.notification.update({
+        let res = await ctx.prisma.notification.update({
             where : {
                 notificationId : notificationId
             },
@@ -294,7 +294,7 @@ export class studentSeatMutationResolver {
                 seen : true
             }
         })
-        return 0;
+        return res;
     }
 
     @Authorized([roles.STUDENT])

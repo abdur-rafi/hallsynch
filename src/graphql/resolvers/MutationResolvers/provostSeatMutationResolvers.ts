@@ -156,6 +156,13 @@ export class provostSeatMutationResolver {
                 data : {
                     status : 'ACCEPTED'
                 }
+            }),
+            ctx.prisma.notification.create({
+                data : {
+                    text : "Your application has been accepted",
+                    applicationId : seatChangeApplication.application.applicationId,
+                    studentId : seatChangeApplication.application.studentId
+                }
             })
         ])
 
@@ -213,6 +220,13 @@ export class provostSeatMutationResolver {
                 },
                 data : {
                     residencyStatus : 'TEMP_RESIDENT'
+                }
+            }),
+            ctx.prisma.notification.create({
+                data : {
+                    text : "Your application has been accepted",
+                    applicationId : application.applicationId,
+                    studentId : application.studentId
                 }
             })
         ])
