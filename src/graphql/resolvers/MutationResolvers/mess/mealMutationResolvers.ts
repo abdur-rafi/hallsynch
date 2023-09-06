@@ -189,7 +189,8 @@ export class MealMutationResolvers {
         @Ctx() ctx: Context,
         @Arg('date') date: string,
         @Arg('mealTime') mealtime: string,
-        @Arg('items') items: MealPlanInput
+        @Arg('items') items: MealPlanInput,
+        @Arg('mealId', {nullable : true}) mealId? : number
     ) {
 
         let mealTime: MealTime;
@@ -206,23 +207,31 @@ export class MealMutationResolvers {
         if (existingMealPlan) {
             throw new Error("Meal plan for this time already exists\n");
         }
+        let mealConnOrCreate : any = {
+            create: {
+                createdAt: new Date(date),
+                items : {
+                    connect : items.items.map(item => {
+                        return {
+                            itemId : item.itemId
+                        }
+                    })
+                }
+            }
+        }
+        if(mealId){
+            mealConnOrCreate = {
+                connect : {
+                    mealId : mealId
+                }
+            }
+        }
 
         let newMealPlan = await ctx.prisma.mealPlan.create({
             data: {
                 day: new Date(date),
                 mealTime: mealTime,
-                meal: {
-                    create: {
-                        createdAt: new Date(date),
-                        items : {
-                            connect : items.items.map(item => {
-                                return {
-                                    itemId : item.itemId
-                                }
-                            })
-                        }
-                    }
-                },
+                meal: mealConnOrCreate,
                 messManager: {
                     connect: {
                         messManagerId: ctx.identity.messManagerId
