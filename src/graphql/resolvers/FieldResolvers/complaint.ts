@@ -1,9 +1,8 @@
 import {Ctx, FieldResolver, Resolver, Root} from "type-graphql";
-import {Announcement, Authority, MessManager, Student} from "../../graphql-schema";
+import {Student} from "../../graphql-schema";
 import {Context} from "../../interface";
 import { Complaint } from "../../graphql-schema";
-import { ComplaintPayload } from "@prisma/client";
-import { ComplaintType } from "@prisma/client";
+import { ComplaintType } from "../../graphql-schema";
 
 
 @Resolver(of => Complaint )
