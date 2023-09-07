@@ -932,6 +932,39 @@ export class DeptWiseResident {
     totalResidents : number;
 }
 
+@InputType()
+export class StudentFilterInput {
+    @Field(type => [String])
+    batch : String[];
+
+    @Field(type => [String])
+    dept : String[];
+
+    @Field(type => [String])
+    residencyStatus : String[];
+
+    @Field(type => [String])
+    levelTerm : String[];
+}
+
+@ObjectType()
+export class StudentsWithCount {
+    @Field(returns => [Student])
+    students : Student[];
+
+    @Field()
+    count : number;
+}
+
+@ObjectType()
+export class ResidencyStatusWithDefaultSelect{
+    @Field()
+    status : String;
+
+    @Field()
+    select : Boolean;
+}
+
 @ObjectType()
 export class Notification {
     @Field()

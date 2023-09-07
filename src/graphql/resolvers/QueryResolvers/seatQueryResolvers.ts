@@ -1,15 +1,15 @@
 import {Arg, Authorized, Ctx, Query} from "type-graphql";
 import {
     DeptWiseResident,
-    FilterInput, Floor, FullSeatStat, FullStudentStat, IntArray, NotificationWithCount, Room,
+    FilterInput, Floor, FullSeatStat, FullStudentStat, NotificationWithCount, ResidencyStatusWithDefaultSelect, Room,
     SearchInput, Seat,
     SeatApplication,
     SeatApplicationsWithCount,
-    SortInput, StatusWithDefaultSelect, Student,
+    SortInput, StatusWithDefaultSelect, Student, StudentFilterInput, StudentsWithCount,
     Vote
 } from "../../graphql-schema";
 import {Context} from "../../interface";
-import {ApplicationStatus, Prisma} from "@prisma/client";
+import {ApplicationStatus, Prisma, ResidencyStatus} from "@prisma/client";
 import { applicationTypes, params, roles, sortVals } from '../../utility'
 
 
@@ -518,6 +518,146 @@ export class seatQueryResolver {
         })
     }
 
+    @Query(returns => StudentsWithCount)
+    async retrieveStudents(
+        @Ctx() ctx: Context,
+        @Arg('page') page: number,
+        @Arg('filters', {nullable: true}) filters?: StudentFilterInput,
+        @Arg('sort', {nullable: true}) sort?: SortInput,
+        @Arg('search', {nullable: true}) search?: SearchInput,
+    ) {
+        let ands = []
+        if (filters) {
+            if (filters.batch.length) {
+                ands.push({
+                    batch: {
+                        year: {
+                            in: filters.batch as string[]
+                        }
+                    }
+                })
+            }
+
+            if (filters.dept.length) {
+                ands.push({
+                    department: {
+                        shortName: {
+                            in: filters.dept as string[]
+                        }
+                    }
+                })
+            }
+
+            if (filters.residencyStatus.length) {
+                console.log(filters.residencyStatus);
+                let enumVal: ResidencyStatus[] = [];
+
+                if (filters.residencyStatus.includes('ATTACHED')) {
+                    enumVal.push(ResidencyStatus.ATTACHED)
+                }
+                if (filters.residencyStatus.includes('RESIDENT')) {
+                    enumVal.push(ResidencyStatus.RESIDENT);
+                }
+                if (filters.residencyStatus.includes('TEMP_RESIDENT')) {
+                    enumVal.push(ResidencyStatus.TEMP_RESIDENT);
+                }
+
+                if (enumVal)
+                    ands.push({
+                        residencyStatus: {
+                            in: enumVal
+                        }
+                    })
+            }
+
+            if (filters.levelTerm.length) {
+                ands.push({
+                    levelTerm: {
+                        label: {
+                            in: filters.levelTerm as string[]
+                        }
+                    }
+                })
+            }
+        }
+
+        if (search && search.searchBy && search.searchBy.trim().length > 0) {
+            ands.push({
+                OR: [
+                    {
+                        name: {
+                            contains: search.searchBy as string
+                        }
+                    },
+                    {
+                        student9DigitId: {
+                            contains: search.searchBy as string
+                        }
+                    }
+                ]
+            })
+        }
+
+        let order = {}
+        if (sort) {
+            if (sort.orderBy && sort.order) {
+                if (sort.orderBy == 'Batch')
+                    order = {
+                        batch: {
+                            year: sort.order == 'asc' ? 'asc' : 'desc'
+                        }
+                    }
+                else
+                    order = {
+                        levelTerm: {
+                            label: sort.order == 'asc' ? 'asc' : 'desc'
+                        }
+                    }
+            }
+        }
+
+        let result = await ctx.prisma.$transaction([
+            ctx.prisma.student.count({
+                where: {
+                    AND: ands
+                }
+            }),
+
+            ctx.prisma.student.findMany({
+                take: params.studentPerPageCount,
+                skip: (page - 1) * params.studentPerPageCount,
+                where: {
+                    AND: ands
+                },
+                orderBy: order
+            }),
+        ])
+
+        return {
+            students: result[1],
+            count: result[0]
+        }
+    }
+
+    @Query(returns => [ResidencyStatusWithDefaultSelect])
+    async residencyStatus(
+        @Ctx() ctx : Context
+    ){
+        return [
+            {
+                status : 'ATTACHED',
+                select : true
+            },
+            {
+                status : 'RESIDENT',
+                select : true
+            },
+            {
+                status : 'TEMP_RESIDENT',
+                select : true
+            }
+        ]
+    }
 
     @Authorized([roles.STUDENT])
     @Query(returns => NotificationWithCount)
