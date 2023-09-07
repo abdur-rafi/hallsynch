@@ -214,6 +214,10 @@ export class Student{
     @Field(type => [TempResidencyHistory])
     tempResidencyHistory? : [TempResidencyHistory]
     // @Field(type =>)
+
+    // field about complaints
+    @Field(type => [Complaint])
+    complaints : [Complaint]
     
 }
 @ObjectType()

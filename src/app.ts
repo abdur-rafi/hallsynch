@@ -68,6 +68,7 @@ import { FeedbackResolver } from "./graphql/resolvers/FieldResolvers/feedback";
 import { MessManagerApplicationCallResolver } from "./graphql/resolvers/FieldResolvers/messManagerApplicationCall";
 import { NotificationResolver } from "./graphql/resolvers/FieldResolvers/notifications";
 import { ComplaintResolver } from "./graphql/resolvers/FieldResolvers/complaint";
+import { ComplaintQueryResolvers } from "./graphql/resolvers/QueryResolvers/complaintQueryResolver";
 
 
 const client = new PrismaClient()
@@ -119,7 +120,8 @@ buildSchema({
         FeedbackResolver,
         MessManagerApplicationCallResolver,
         NotificationResolver,
-        ComplaintResolver
+        ComplaintResolver,
+        ComplaintQueryResolvers
     ],
     authChecker: authChecker
 }).then(schema => {

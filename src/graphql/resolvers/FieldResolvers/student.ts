@@ -1,6 +1,7 @@
 import { Ctx, FieldResolver, Resolver, Root } from "type-graphql";
 import { Batch, Department, LevelTerm, Residency, ResidencyStatus, Student, TempResidencyHistory } from "../../graphql-schema";
 import { Context } from "../../interface";
+import { Complaint } from "../../graphql-schema";
 
 @Resolver(of => Student)
 export class StudentResolver{
@@ -72,5 +73,18 @@ export class StudentResolver{
             }
         })
     }
+
+    @FieldResolver(type => [Complaint])
+    async complaints(
+        @Ctx() ctx : Context,
+        @Root() student : Student
+    ){
+        return await ctx.prisma.complaint.findMany({
+            where : {
+                studentId : student.studentId
+            }
+        })
+    }
+    
     
 }
