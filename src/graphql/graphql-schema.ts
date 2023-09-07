@@ -833,6 +833,54 @@ export class Announcement {
     messManager? : MessManager;
 }
 
+@ObjectType()
+export class Complaint {
+    @Field()
+    complaintId : number;
+
+    @Field()
+    title : string;
+
+    @Field()
+    details : string;
+
+    @Field()
+    createdAt : Date;
+
+    @Field(type => ComplaintType)
+    type : ComplaintType;
+
+    @Field(returns => [Student])
+    students : Student[];
+
+    @Field()
+    studentId : number;
+
+    // @Field({nullable : true})
+    // authorityId? : number;
+
+    // @Field({nullable : true})
+    // messManagerId? : number;
+
+    // @Field(returns => Authority, {nullable : true})
+    // authority? : Authority;
+
+    // @Field(returns => MessManager, {nullable : true})
+    // messManager? : MessManager;
+}
+
+// enum for complaint type
+export enum ComplaintType {
+    RESOURCE,
+    STUDENT,
+    STUFF
+}
+
+registerEnumType(ComplaintType , {
+    name : 'ComplaintType'
+})
+
+
 
 @InputType()
 export class FilterInput{
