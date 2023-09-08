@@ -54,11 +54,20 @@ export class ComplaintQueryResolvers {
     @Query(returns => [Complaint])
     async getComplaintsByType(
         @Ctx() ctx: Context,
-        @Arg('type') type: ComplaintType
+        @Arg('type') type: String
     ) {
+        let complaintType: ComplaintType;
+        if (type.includes("resource")) {
+            complaintType = ComplaintType.RESOURCE;
+        } else if (type.includes("stuff")) {
+            complaintType = ComplaintType.STUFF;
+        } else if (type.includes("student")) {
+            complaintType = ComplaintType.STUDENT;
+        }
+
         return await ctx.prisma.complaint.findMany({
             where: {
-                type: type
+                type: complaintType
             },
             orderBy: {
                 createdAt: 'desc'
@@ -70,12 +79,20 @@ export class ComplaintQueryResolvers {
     @Query(returns => [Complaint])
     async getComplaintsByTypeAndStudent(
         @Ctx() ctx: Context,
-        @Arg('type') type: ComplaintType,
+        @Arg('type') type: String,
         @Arg('studentId') studentId: number
     ) {
+        let complaintType: ComplaintType;
+        if (type.includes("resource")) {
+            complaintType = ComplaintType.RESOURCE;
+        } else if (type.includes("stuff")) {
+            complaintType = ComplaintType.STUFF;
+        } else if (type.includes("student")) {
+            complaintType = ComplaintType.STUDENT;
+        }
         return await ctx.prisma.complaint.findMany({
             where: {
-                type: type,
+                type: complaintType,
                 studentId: studentId
             },
             orderBy: {
