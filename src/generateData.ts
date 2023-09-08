@@ -949,7 +949,9 @@ async function generateComplaints(){
                             createdAt : new Date(2023, m, 2),
                             studentId : r.studentId
                         }
+
                     })
+
                 )
             }
         })
@@ -997,7 +999,8 @@ async function generateAll(){
     // //
     // await generateAnnouncements();
     // await generateFeedback();
-    await generateRatings();
+    // await generateRatings();
+    await generateComplaints();
 }
 
 generateAll();
