@@ -1,6 +1,7 @@
 import {PrismaClient, RatingType} from '@prisma/client'
 import bcrypt from 'bcrypt'
 import { addDay, addDays } from './graphql/utility'
+import { ComplaintType } from '@prisma/client'
 const prisma = new PrismaClient()
 
 async function generateDept(){
@@ -928,6 +929,34 @@ async function generateMessManagerApplications(){
 }
 
 // generateComplaints function, generates complaints from july to december 2023
+async function generateComplaints(){
+    let promises = []
+    let residents = await prisma.residency.findMany();
+    let months = [7,8,9,10]
+    // let a variable type of ComplaintType, which converts string to type ComplaintType
+    let types = [ComplaintType.RESOURCE, ComplaintType.STUFF, ComplaintType.STUDENT]
+
+    residents.forEach(r =>{
+        months.forEach(m =>{
+            if(Math.random() < .1){
+                promises.push(
+                    prisma.complaint.create({
+                        data : {
+                            title : 'title',
+                            details : 'details',
+                            // type from random type from types array
+                            type : types[Math.floor(Math.random() * types.length)],
+                            createdAt : new Date(2023, m, 2),
+                            studentId : r.studentId
+                        }
+                    })
+                )
+            }
+        })
+    }  )
+    await Promise.all(promises);
+}
+
 
 
 function busy(){
