@@ -553,7 +553,7 @@ model MessManagerApplication {
 }
 
 model Complaint {
-  complainId Int           @id @default(autoincrement())
+  complaintId Int           @id @default(autoincrement())
   // issue : longer id?
   title      String
   details    String

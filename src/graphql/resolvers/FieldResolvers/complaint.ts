@@ -9,7 +9,7 @@ import { ComplaintType } from "../../graphql-schema";
 export class ComplaintResolver{
 
     @FieldResolver(type => String)
-    async complaintType(
+    async type(
         @Ctx() ctx : Context,
         @Root() complaint : Complaint
     ){

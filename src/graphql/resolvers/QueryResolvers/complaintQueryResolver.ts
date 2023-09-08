@@ -29,7 +29,7 @@ export class ComplaintQueryResolvers {
     ) {
         return await ctx.prisma.complaint.findFirst({
             where: {
-                complainId: complaintId
+                complaintId: complaintId
             }
         });
     }
