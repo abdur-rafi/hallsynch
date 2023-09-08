@@ -84,4 +84,24 @@ export class ComplaintQueryResolvers {
         });
     }
 
+    // query for complaints from a specific date
+    @Authorized([roles.STUDENT_RESIDENT])
+    @Query(returns => [Complaint])
+    async getComplaintsFromDate(
+        @Ctx() ctx: Context,
+        @Arg('date') date : string,
+    ) {
+        return await ctx.prisma.complaint.findMany({
+            where: {
+                createdAt: {
+                    gte: new Date(date)
+                }
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
+        });
+    }
+
+
 }

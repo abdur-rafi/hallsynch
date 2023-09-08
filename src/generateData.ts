@@ -927,6 +927,9 @@ async function generateMessManagerApplications(){
     await Promise.all(promises);
 }
 
+// generateComplaints function, generates complaints from july to december 2023
+
+
 function busy(){
     for(let i = 0; i < 100000000; ++i){
         let j = 0;
