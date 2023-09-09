@@ -1,10 +1,6 @@
-import {Arg, Authorized, Ctx, Query} from "type-graphql";
-// import {roles} from "../../../utility";
-// import {Announcement} from "../../../graphql-schema";
-// import {Context} from "../../../interface";
-import { roles } from "../../utility";
+import {Arg, Ctx, Query} from "type-graphql";
 import { Context } from "../../interface";
-import { Complaint, FilterInput, complaintTypeFilerInput , SearchInput, SortInput } from "../../graphql-schema";
+import { Complaint, complaintTypeFilerInput , SearchInput, SortInput } from "../../graphql-schema";
 import { ComplaintType } from "@prisma/client";
 import { Prisma } from "@prisma/client";
 
@@ -26,7 +22,7 @@ export class ComplaintQueryResolvers {
 
 //@Authorized([roles.PROVOST])
 @Query(returns => [Complaint])
-async getComplaints2(
+async getSelectedComplaints(
     @Ctx() ctx: Context,
     @Arg('filters', { nullable: true }) filters?: complaintTypeFilerInput,
     @Arg('sort', { nullable: true }) sort?: SortInput,
