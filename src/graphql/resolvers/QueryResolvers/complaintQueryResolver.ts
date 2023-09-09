@@ -24,62 +24,78 @@ export class ComplaintQueryResolvers {
         });
     }
 
-
-    //@Authorized([roles.PROVOST])
-    @Query(returns => [Complaint])
-    async getComplaints2(
-        @Ctx() ctx : Context,
-        @Arg('page') page : number,
-        @Arg('filters', {nullable: true}) filters? : complaintTypeFilerInput,
-        @Arg('sort', {nullable: true}) sort? : SortInput,
-        @Arg('search', {nullable: true}) search? : SearchInput,
-    ) {
-        let ands : Prisma.ComplaintWhereInput[] = [];
-        if(filters) {
-            if(filters.type.length) {
-                ands.push({
-                    type: {
-                        in: filters.type as ComplaintType[]
-                    }
-                });
-            }
-        }
-        if(search && search.searchBy && search.searchBy.trim().length > 0) {
+//@Authorized([roles.PROVOST])
+@Query(returns => [Complaint])
+async getComplaints2(
+    @Ctx() ctx: Context,
+    @Arg('filters', { nullable: true }) filters?: complaintTypeFilerInput,
+    @Arg('sort', { nullable: true }) sort?: SortInput,
+    @Arg('search', { nullable: true }) search?: SearchInput,
+    @Arg('startDate', { nullable: true }) startDate?: string, // Add startDate argument
+    @Arg('studentId', { nullable: true }) studentId?: number, // Add studentId argument
+) {
+    let ands: Prisma.ComplaintWhereInput[] = [];
+    if (filters) {
+        if (filters.type.length) {
             ands.push({
-                OR: [
-                    {
-                        student : {
-                            student9DigitId: {
-                                contains: search.searchBy as string
-                            }
-                        }
-                    }
-                ]
+                type: {
+                    in: filters.type as ComplaintType[]
+                }
             });
         }
-        let order : Prisma.ComplaintOrderByWithRelationInput = {}
-        if(sort) {
-            if(sort.orderBy && sort.order) {
-                if(sort.orderBy === 'createdAt') {
-                    order = {
-                        createdAt: (sort.order === 'asc') ? 'asc' : 'desc'
+    }
+    if (search && search.searchBy && search.searchBy.trim().length > 0) {
+        ands.push({
+            OR: [
+                {
+                    student: {
+                        student9DigitId: {
+                            contains: search.searchBy as string
+                        }
                     }
                 }
-            }
-        }        
-
-        let result = await ctx.prisma.$transaction([
-            ctx.prisma.complaint.findMany({
-                where: {
-                    AND: ands
-                },
-                orderBy: order,
-                skip: (page - 1) * 10,
-                take: 10
-            })
-        ]);
-        return result[0];
+            ]
+        });
     }
+
+    // Add condition to filter by startDate
+    if (startDate) {
+        ands.push({
+            createdAt: {
+                gte: new Date(startDate) // Assuming startDate is in ISO date string format
+            }
+        });
+    }
+
+    // Add condition to filter by studentId
+    if (studentId) {
+        ands.push({
+            student: {
+                studentId : studentId
+            }
+        });
+    }
+
+    let order: Prisma.ComplaintOrderByWithRelationInput = {}
+    if (sort) {
+        if (sort.orderBy && sort.order) {
+            if (sort.orderBy === 'createdAt') {
+                order = {
+                    createdAt: (sort.order === 'asc') ? 'asc' : 'desc'
+                }
+            }
+        }
+    }
+
+    const complaints = await ctx.prisma.complaint.findMany({
+        where: {
+            AND: ands
+        },
+        orderBy: order,
+    });
+
+    return complaints;
+}
 
 
 
