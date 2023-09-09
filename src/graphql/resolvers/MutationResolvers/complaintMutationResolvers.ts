@@ -16,11 +16,11 @@ export class ComplaintMutationResolvers {
         @Arg('type') type: String,
     ) {
         let complaintType: ComplaintType;
-        if (type.includes("resource")) {
+        if (type.toLowerCase().includes("resource")) {
             complaintType = ComplaintType.RESOURCE;
-        } else if (type.includes("stuff")) {
+        } else if (type.toLowerCase().includes("stuff")) {
             complaintType = ComplaintType.STUFF;
-        } else if (type.includes("student")) {
+        } else if (type.toLowerCase().includes("student")) {
             complaintType = ComplaintType.STUDENT;
         }
 
