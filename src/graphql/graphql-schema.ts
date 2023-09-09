@@ -854,8 +854,8 @@ export class Complaint {
     @Field(type => ComplaintType)
     type : ComplaintType;
 
-    @Field(returns => [Student])
-    students : Student[];
+    @Field(returns => Student)
+    student : Student;
 
     @Field()
     studentId : number;
@@ -904,6 +904,12 @@ export class FilterInput{
     @Field(type => [String])
     lt : String[];
 
+}
+
+@InputType()
+export class complaintTypeFilerInput{
+    @Field(type => [String])
+    type : String[];
 }
 
 @InputType()
