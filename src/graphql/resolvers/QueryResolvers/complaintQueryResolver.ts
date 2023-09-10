@@ -42,15 +42,11 @@ async getSelectedComplaints(
     }
     if (search && search.searchBy && search.searchBy.trim().length > 0) {
         ands.push({
-            OR: [
-                {
-                    student: {
-                        student9DigitId: {
-                            contains: search.searchBy as string
-                        }
-                    }
-                }
-            ]
+            
+            title : {
+                contains : search.searchBy as string
+            }
+                
         });
     }
 

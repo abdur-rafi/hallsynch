@@ -932,18 +932,18 @@ async function generateMessManagerApplications(){
 async function generateComplaints(){
     let promises = []
     let residents = await prisma.residency.findMany();
-    let months = [7,8,9,10]
+    let months = [6,7,8]
     // let a variable type of ComplaintType, which converts string to type ComplaintType
     let types = [ComplaintType.RESOURCE, ComplaintType.STUFF, ComplaintType.STUDENT]
 
     residents.forEach(r =>{
         months.forEach(m =>{
-            if(Math.random() < .1){
+            if(Math.random() < .05){
                 promises.push(
                     prisma.complaint.create({
                         data : {
-                            title : 'title',
-                            details : 'details',
+                            title : 'This Is Title Of A Complaint',
+                            details : 'details adsfoiaj lasjd ljadkl;fj lasjd l;asjld; fjlaskdfj l;asdj l;ajsdf lja;sld fj;lasjdf fk\n asldkjf  laskdf la;sk/dfj alksd ;lasdjf lk\n alskdjf lasjdlk\n \n a;sdjl; kasdfjal;sd flasdjf',
                             // type from random type from types array
                             type : types[Math.floor(Math.random() * types.length)],
                             createdAt : new Date(2023, m, 2),
