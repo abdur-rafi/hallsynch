@@ -18,7 +18,7 @@ export class ComplaintMutationResolvers {
         let complaintType: ComplaintType;
         if (type.toLowerCase().includes("resource")) {
             complaintType = ComplaintType.RESOURCE;
-        } else if (type.toLowerCase().includes("stuff")) {
+        } else if (type.toLowerCase().includes("staff")) {
             complaintType = ComplaintType.STUFF;
         } else if (type.toLowerCase().includes("student")) {
             complaintType = ComplaintType.STUDENT;
