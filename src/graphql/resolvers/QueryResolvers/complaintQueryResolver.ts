@@ -1,15 +1,14 @@
 import {Arg, Ctx, Query} from "type-graphql";
-import { Context } from "../../interface";
-import { Complaint, complaintTypeFilerInput , SearchInput, SortInput } from "../../graphql-schema";
-import { ComplaintType } from "@prisma/client";
-import { Prisma } from "@prisma/client";
-
+import {Context} from "../../interface";
+import {Complaint, complaintTypeFilerInput, SearchInput, SortInput} from "../../graphql-schema";
+import {ComplaintType} from "@prisma/client";
+import {Prisma} from "@prisma/client";
 
 
 export class ComplaintQueryResolvers {
 
     //@Authorized([roles.STUDENT_RESIDENT])
-    @Query(returns => [Complaint])
+    @Query(() => [Complaint])
     async getComplaints(
         @Ctx() ctx: Context,
     ) {
@@ -21,79 +20,77 @@ export class ComplaintQueryResolvers {
     }
 
 //@Authorized([roles.PROVOST])
-@Query(returns => [Complaint])
-async getSelectedComplaints(
-    @Ctx() ctx: Context,
-    @Arg('filters', { nullable: true }) filters?: complaintTypeFilerInput,
-    @Arg('sort', { nullable: true }) sort?: SortInput,
-    @Arg('search', { nullable: true }) search?: SearchInput,
-    @Arg('startDate', { nullable: true }) startDate?: string, // Add startDate argument
-    @Arg('studentId', { nullable: true }) studentId?: number, // Add studentId argument
-) {
-    let ands: Prisma.ComplaintWhereInput[] = [];
-    if (filters) {
-        if (filters.type.length) {
+    @Query(() => [Complaint])
+    async getSelectedComplaints(
+        @Ctx() ctx: Context,
+        @Arg('filters', {nullable: true}) filters?: complaintTypeFilerInput,
+        @Arg('sort', {nullable: true}) sort?: SortInput,
+        @Arg('search', {nullable: true}) search?: SearchInput,
+        @Arg('startDate', {nullable: true}) startDate?: string, // Add startDate argument
+        @Arg('studentId', {nullable: true}) studentId?: number, // Add studentId argument
+    ) {
+        let ands: Prisma.ComplaintWhereInput[] = [];
+        if (filters) {
+            if (filters.type.length) {
+                ands.push({
+                    type: {
+                        in: filters.type as ComplaintType[]
+                    }
+                });
+            }
+        }
+        if (search && search.searchBy && search.searchBy.trim().length > 0) {
             ands.push({
-                type: {
-                    in: filters.type as ComplaintType[]
+
+                title: {
+                    contains: search.searchBy as string
+                }
+
+            });
+        }
+
+        // Add condition to filter by startDate
+        if (startDate) {
+            ands.push({
+                createdAt: {
+                    gte: new Date(startDate) // Assuming startDate is in ISO date string format
                 }
             });
         }
-    }
-    if (search && search.searchBy && search.searchBy.trim().length > 0) {
-        ands.push({
-            
-            title : {
-                contains : search.searchBy as string
-            }
-                
-        });
-    }
 
-    // Add condition to filter by startDate
-    if (startDate) {
-        ands.push({
-            createdAt: {
-                gte: new Date(startDate) // Assuming startDate is in ISO date string format
-            }
-        });
-    }
+        // Add condition to filter by studentId
+        if (studentId) {
+            ands.push({
+                student: {
+                    studentId: studentId
+                }
+            });
+        }
 
-    // Add condition to filter by studentId
-    if (studentId) {
-        ands.push({
-            student: {
-                studentId : studentId
-            }
-        });
-    }
-
-    let order: Prisma.ComplaintOrderByWithRelationInput = {}
-    if (sort) {
-        if (sort.orderBy && sort.order) {
-            if (sort.orderBy === 'createdAt') {
-                order = {
-                    createdAt: (sort.order === 'asc') ? 'asc' : 'desc'
+        let order: Prisma.ComplaintOrderByWithRelationInput = {}
+        if (sort) {
+            if (sort.orderBy && sort.order) {
+                if (sort.orderBy === 'createdAt') {
+                    order = {
+                        createdAt: (sort.order === 'asc') ? 'asc' : 'desc'
+                    }
                 }
             }
         }
+
+        const complaints = await ctx.prisma.complaint.findMany({
+            where: {
+                AND: ands
+            },
+            orderBy: order,
+        });
+
+        return complaints;
     }
-
-    const complaints = await ctx.prisma.complaint.findMany({
-        where: {
-            AND: ands
-        },
-        orderBy: order,
-    });
-
-    return complaints;
-}
-
-
 
 
     //@Authorized([roles.STUDENT_RESIDENT])
-    @Query(returns => Complaint)
+    @Query(() => Complaint)
     async getComplaint(
         @Ctx() ctx: Context,
         @Arg('complaintId') complaintId: number
@@ -106,7 +103,7 @@ async getSelectedComplaints(
     }
 
     //@Authorized([roles.PROVOST])
-    @Query(returns => [Complaint])
+    @Query(() => [Complaint])
     async getComplaintsByStudent(
         @Ctx() ctx: Context,
         @Arg('studentId') studentId: number
@@ -122,7 +119,7 @@ async getSelectedComplaints(
     }
 
     //@Authorized([roles.PROVOST])
-    @Query(returns => [Complaint])
+    @Query(() => [Complaint])
     async getComplaintsByType(
         @Ctx() ctx: Context,
         @Arg('type') type: String
@@ -147,7 +144,7 @@ async getSelectedComplaints(
     }
 
     //@Authorized([roles.STUDENT_RESIDENT])
-    @Query(returns => [Complaint])
+    @Query(() => [Complaint])
     async getComplaintsByTypeAndStudent(
         @Ctx() ctx: Context,
         @Arg('type') type: String,
@@ -174,10 +171,10 @@ async getSelectedComplaints(
 
     // query for complaints from a specific date
     //@Authorized([roles.STUDENT_RESIDENT])
-    @Query(returns => [Complaint])
+    @Query(() => [Complaint])
     async getComplaintsFromDate(
         @Ctx() ctx: Context,
-        @Arg('date') date : string,
+        @Arg('date') date: string,
     ) {
         return await ctx.prisma.complaint.findMany({
             where: {
@@ -190,6 +187,4 @@ async getSelectedComplaints(
             }
         });
     }
-
-
 }

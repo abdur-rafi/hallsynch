@@ -6,7 +6,7 @@ import {Context} from "../../../interface";
 export class AnnouncementQueryResolvers {
 
     @Authorized([roles.STUDENT_RESIDENT])
-    @Query(returns => [Announcement])
+    @Query(() => [Announcement])
     async getAnnouncements(
         @Ctx() ctx: Context,
     ) {
@@ -18,7 +18,7 @@ export class AnnouncementQueryResolvers {
     }
 
     @Authorized([roles.STUDENT_RESIDENT])
-    @Query(returns => Announcement)
+    @Query(() => Announcement)
     async getAnnouncement(
         @Ctx() ctx: Context,
         @Arg('announcementId') announcementId: number

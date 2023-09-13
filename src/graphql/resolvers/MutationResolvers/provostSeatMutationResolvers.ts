@@ -6,60 +6,60 @@ import {Context} from "../../interface";
 export class provostSeatMutationResolver {
 
     @Authorized(roles.PROVOST)
-    @Mutation(returns => Residency)
+    @Mutation(() => Residency)
     async approveNewApplication(
-        @Ctx() ctx : Context,
-        @Arg('newApplicationId') newApplicationId : number,
-        @Arg('seatId') seatId : number
-    ){
+        @Ctx() ctx: Context,
+        @Arg('newApplicationId') newApplicationId: number,
+        @Arg('seatId') seatId: number
+    ) {
         let newApplication = await ctx.prisma.newApplication.findUnique({
-            where :  {
-                newApplicationId : newApplicationId
+            where: {
+                newApplicationId: newApplicationId
             },
-            include :{
-                application : true
+            include: {
+                application: true
             }
         })
-        if(newApplication.application.status != 'PENDING'){
+        if (newApplication.application.status != 'PENDING') {
             throw new Error("Invalid state of application");
         }
 
         let result = await ctx.prisma.$transaction([
             ctx.prisma.residency.create({
-                data : {
-                    from : new Date(),
-                    seatId : seatId,
-                    studentId : newApplication.application.studentId
+                data: {
+                    from: new Date(),
+                    seatId: seatId,
+                    studentId: newApplication.application.studentId
                 }
             }),
             ctx.prisma.applicationApproveHistory.create({
-                data : {
-                    applicationId : newApplication.application.applicationId,
-                    seatId : seatId,
-                    authorityId : ctx.identity.authorityId
+                data: {
+                    applicationId: newApplication.application.applicationId,
+                    seatId: seatId,
+                    authorityId: ctx.identity.authorityId
                 }
             }),
             ctx.prisma.seatApplication.update({
-                where : {
-                    applicationId : newApplication.application.applicationId
+                where: {
+                    applicationId: newApplication.application.applicationId
                 },
-                data : {
-                    status : 'ACCEPTED'
+                data: {
+                    status: 'ACCEPTED'
                 }
             }),
             ctx.prisma.student.update({
-                where : {
-                    studentId : newApplication.application.studentId
+                where: {
+                    studentId: newApplication.application.studentId
                 },
-                data : {
-                    residencyStatus : 'RESIDENT'
+                data: {
+                    residencyStatus: 'RESIDENT'
                 }
             }),
             ctx.prisma.notification.create({
-                data : {
-                    text : "Your application has been accepted",
-                    applicationId : newApplication.application.applicationId,
-                    studentId : newApplication.application.studentId
+                data: {
+                    text: "Your application has been accepted",
+                    applicationId: newApplication.application.applicationId,
+                    studentId: newApplication.application.studentId
                 }
             })
         ])
@@ -70,98 +70,96 @@ export class provostSeatMutationResolver {
     }
 
     @Authorized(roles.PROVOST)
-    @Mutation(returns => SeatApplication)
+    @Mutation(() => SeatApplication)
     async rejectApplication(
-        @Ctx() ctx : Context,
-        @Arg('applicationId') applicationId : number
-    ){
+        @Ctx() ctx: Context,
+        @Arg('applicationId') applicationId: number
+    ) {
         let application = await ctx.prisma.seatApplication.findUnique({
-            where :  {
-                applicationId : applicationId
+            where: {
+                applicationId: applicationId
             }
         })
-        if(application.status != 'PENDING'){
+        if (application.status != 'PENDING') {
             throw new Error("Invalid state of application");
         }
 
         let result = await ctx.prisma.$transaction([
             ctx.prisma.seatApplication.update({
-                where : {
-                    applicationId : application.applicationId
+                where: {
+                    applicationId: application.applicationId
                 },
-                data : {
-                    status : 'REJECTED'
+                data: {
+                    status: 'REJECTED'
                 }
             }),
             ctx.prisma.rejectionHistory.create({
-                data : {
-                    applicationId : application.applicationId,
-                    authorityId : ctx.identity.authorityId
+                data: {
+                    applicationId: application.applicationId,
+                    authorityId: ctx.identity.authorityId
                 }
             }),
             ctx.prisma.notification.create({
-                data : {
-                    text : "Your application has been rejected",
-                    studentId : application.studentId,
-                    applicationId : application.applicationId
+                data: {
+                    text: "Your application has been rejected",
+                    studentId: application.studentId,
+                    applicationId: application.applicationId
                 }
             })
         ])
 
         return result[0];
-
-
     }
 
 
     @Authorized(roles.PROVOST)
-    @Mutation(returns => Residency)
+    @Mutation(() => Residency)
     async approveSeatChangeApplication(
-        @Ctx() ctx : Context,
-        @Arg('seatChangeApplicationId') seatChangeApplicationId : number,
-        @Arg('seatId') seatId : number
-    ){
+        @Ctx() ctx: Context,
+        @Arg('seatChangeApplicationId') seatChangeApplicationId: number,
+        @Arg('seatId') seatId: number
+    ) {
         let seatChangeApplication = await ctx.prisma.seatChangeApplication.findUnique({
-            where :  {
-                seatChangeApplicationId : seatChangeApplicationId
+            where: {
+                seatChangeApplicationId: seatChangeApplicationId
             },
-            include :{
-                application : true
+            include: {
+                application: true
             }
         })
-        if(seatChangeApplication.application.status != 'PENDING'){
+        if (seatChangeApplication.application.status != 'PENDING') {
             throw new Error("Invalid state of application");
         }
 
         let result = await ctx.prisma.$transaction([
             ctx.prisma.residency.update({
-                where : {
-                    studentId : seatChangeApplication.application.studentId
+                where: {
+                    studentId: seatChangeApplication.application.studentId
                 },
-                data : {
-                    seatId : seatId
+                data: {
+                    seatId: seatId
                 }
             }),
             ctx.prisma.applicationApproveHistory.create({
-                data : {
-                    applicationId : seatChangeApplication.application.applicationId,
-                    seatId : seatId,
-                    authorityId : ctx.identity.authorityId
+                data: {
+                    applicationId: seatChangeApplication.application.applicationId,
+                    seatId: seatId,
+                    authorityId: ctx.identity.authorityId
                 }
             }),
             ctx.prisma.seatApplication.update({
-                where : {
-                    applicationId : seatChangeApplication.application.applicationId
+                where: {
+                    applicationId: seatChangeApplication.application.applicationId
                 },
-                data : {
-                    status : 'ACCEPTED'
+                data: {
+                    status: 'ACCEPTED'
                 }
             }),
             ctx.prisma.notification.create({
-                data : {
-                    text : "Your application has been accepted",
-                    applicationId : seatChangeApplication.application.applicationId,
-                    studentId : seatChangeApplication.application.studentId
+                data: {
+                    text: "Your application has been accepted",
+                    applicationId: seatChangeApplication.application.applicationId,
+                    studentId: seatChangeApplication.application.studentId
                 }
             })
         ])
@@ -171,62 +169,61 @@ export class provostSeatMutationResolver {
     }
 
 
-
     @Authorized(roles.PROVOST)
-    @Mutation(returns => TempResidency)
+    @Mutation(() => TempResidency)
     async approveTempSeatApplication(
-        @Ctx() ctx : Context,
-        @Arg('applicationId') applicationId : number,
-        @Arg('seatId') seatId : number,
-        @Arg('days') days : number,
-        @Arg('from') from : string
-    ){
+        @Ctx() ctx: Context,
+        @Arg('applicationId') applicationId: number,
+        @Arg('seatId') seatId: number,
+        @Arg('days') days: number,
+        @Arg('from') from: string
+    ) {
         let application = await ctx.prisma.seatApplication.findUnique({
-            where :  {
-                applicationId : applicationId
+            where: {
+                applicationId: applicationId
             }
         })
-        if(application.status != 'PENDING'){
+        if (application.status != 'PENDING') {
             throw new Error("Invalid state of application");
         }
 
         let result = await ctx.prisma.$transaction([
             ctx.prisma.tempResidency.create({
-                data : {
-                    from : from,
-                    seatId : seatId,
-                    studentId : application.studentId,
-                    days : days
+                data: {
+                    from: from,
+                    seatId: seatId,
+                    studentId: application.studentId,
+                    days: days
                 }
             }),
             ctx.prisma.applicationApproveHistory.create({
-                data : {
-                    applicationId : application.applicationId,
-                    seatId : seatId,
-                    authorityId : ctx.identity.authorityId
+                data: {
+                    applicationId: application.applicationId,
+                    seatId: seatId,
+                    authorityId: ctx.identity.authorityId
                 }
             }),
             ctx.prisma.seatApplication.update({
-                where : {
-                    applicationId : application.applicationId
+                where: {
+                    applicationId: application.applicationId
                 },
-                data : {
-                    status : 'ACCEPTED'
+                data: {
+                    status: 'ACCEPTED'
                 }
             }),
             ctx.prisma.student.update({
-                where : {
-                    studentId : application.studentId
+                where: {
+                    studentId: application.studentId
                 },
-                data : {
-                    residencyStatus : 'TEMP_RESIDENT'
+                data: {
+                    residencyStatus: 'TEMP_RESIDENT'
                 }
             }),
             ctx.prisma.notification.create({
-                data : {
-                    text : "Your application has been accepted",
-                    applicationId : application.applicationId,
-                    studentId : application.studentId
+                data: {
+                    text: "Your application has been accepted",
+                    applicationId: application.applicationId,
+                    studentId: application.studentId
                 }
             })
         ])
@@ -236,41 +233,41 @@ export class provostSeatMutationResolver {
 
 
     @Authorized(roles.PROVOST)
-    @Mutation(returns => Revision)
+    @Mutation(() => Revision)
     async reviseApplication(
-        @Ctx() ctx : Context,
-        @Arg('applicationId') applicationId : number,
-        @Arg('reason') reason : string
-    ){
+        @Ctx() ctx: Context,
+        @Arg('applicationId') applicationId: number,
+        @Arg('reason') reason: string
+    ) {
         let application = await ctx.prisma.seatApplication.findUnique({
-            where :  {
-                applicationId : applicationId
+            where: {
+                applicationId: applicationId
             }
         })
-        if(application.status != 'PENDING'){
+        if (application.status != 'PENDING') {
             throw new Error("Invalid state of application");
         }
 
         let result = await ctx.prisma.$transaction([
             ctx.prisma.seatApplication.update({
-                where : {
-                    applicationId : application.applicationId
+                where: {
+                    applicationId: application.applicationId
                 },
-                data : {
-                    status : 'REVISE'
+                data: {
+                    status: 'REVISE'
                 }
             }),
             ctx.prisma.revision.create({
-                data : {
-                    applicationId : application.applicationId,
-                    reason : reason
+                data: {
+                    applicationId: application.applicationId,
+                    reason: reason
                 }
             }),
             ctx.prisma.notification.create({
-                data : {
-                    text : "Your application needs to be revised",
-                    applicationId : application.applicationId,
-                    studentId : application.studentId
+                data: {
+                    text: "Your application needs to be revised",
+                    applicationId: application.applicationId,
+                    studentId: application.studentId
                 }
             })
         ])

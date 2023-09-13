@@ -1,305 +1,285 @@
-import { Field, InputType, ObjectType, registerEnumType } from "type-graphql";
-
-
+import {Field, InputType, ObjectType, registerEnumType} from "type-graphql";
 
 
 @ObjectType()
-export class Department{
+export class Department {
     @Field()
-    departmentId : number;
+    departmentId: number;
 
     @Field()
-    name : string
+    name: string
 
     @Field()
-    shortName : string
-    
-    @Field()
-    deptCode : string
-    
-    @Field(type => [Student])
-    students : [Student]
-}
-
-@ObjectType()
-export class Batch{
-    @Field()
-    batchId : number;
+    shortName: string
 
     @Field()
-    year : string
+    deptCode: string
 
     @Field(type => [Student])
-    students : [Student]
+    students: [Student]
 }
 
 @ObjectType()
-export class LevelTerm{
+export class Batch {
     @Field()
-    levelTermId : number;
+    batchId: number;
 
     @Field()
-    label : string
+    year: string
 
     @Field(type => [Student])
-    students : [Student]
+    students: [Student]
+}
+
+@ObjectType()
+export class LevelTerm {
+    @Field()
+    levelTermId: number;
+
+    @Field()
+    label: string
+
+    @Field(type => [Student])
+    students: [Student]
 }
 
 
 @ObjectType()
-export class ApplicationApproveHistory{
+export class ApplicationApproveHistory {
     @Field()
-    applicationId : number;
+    applicationId: number;
 
     @Field()
-    seatId : number;
+    seatId: number;
 
     @Field()
-    authorityId : number;
-
+    authorityId: number;
 }
 
 
 @ObjectType()
-export class Floor{
+export class Floor {
     @Field()
-    floorId : number;
+    floorId: number;
 
     @Field()
-    floorNo : number;
+    floorNo: number;
 
     @Field()
-    roomLabelLen : number;
+    roomLabelLen: number;
 
     @Field(type => [Room])
-    rooms : [Room]
-
+    rooms: [Room]
 }
 
 
 @ObjectType()
-export class Seat{
+export class Seat {
     @Field()
-    seatId : number;
+    seatId: number;
 
 
     @Field()
-    seatLabel : string;
-    
+    seatLabel: string;
+
 
     @Field()
-    roomId : number;
+    roomId: number;
 
     @Field(type => Room)
-    room : ()=> Room;
+    room: () => Room;
 
-    @Field(type => Residency, {nullable : true})
-    residency? : () => Residency;
-
+    @Field(type => Residency, {nullable: true})
+    residency?: () => Residency;
 }
 
 @ObjectType()
-export class Room{
+export class Room {
     @Field()
-    roomId : number;
+    roomId: number;
 
     @Field()
-    roomNo : number;
+    roomNo: number;
 
     @Field()
-    floorId : number;
+    floorId: number;
 
     @Field(type => Floor)
-    floor : Floor;
+    floor: Floor;
 
     @Field(type => [Seat])
-    seats : [Seat];
-
-    
+    seats: [Seat];
 }
 
 @ObjectType()
-export class Residency{
+export class Residency {
     @Field()
-    residencyId : number;
+    residencyId: number;
 
     @Field()
-    from : Date
+    from: Date
 
     @Field()
-    studentId : number
-    
+    studentId: number
+
     @Field()
-    seatId : number
-    
-    // @Field(type => Student)
-    // student : Student
+    seatId: number
 
     @Field(type => Seat)
-    seat : Seat
+    seat: Seat
 
     @Field()
-    isCurrentMessManager : boolean;
+    isCurrentMessManager: boolean;
 
     @Field()
-    messManagerTimes : number;
-    
+    messManagerTimes: number;
 }
 
 @ObjectType()
-export class TempResidency{
+export class TempResidency {
     @Field()
-    residencyId : number;
+    residencyId: number;
 
     @Field()
-    from : Date
+    from: Date
 
     @Field()
-    studentId : number
-    
-    @Field()
-    seatId : number
-    
-    @Field()
-    days : number
+    studentId: number
 
-    // @Field(type => Student)
-    // student : Student
+    @Field()
+    seatId: number
+
+    @Field()
+    days: number
 
     @Field(type => Seat)
-    seat : Seat
-    
+    seat: Seat
 }
 
-
-
 @ObjectType()
-export class Student{
+export class Student {
     @Field()
-    studentId : number
+    studentId: number
     @Field()
-    student9DigitId : string
+    student9DigitId: string
     @Field()
-    name : string 
+    name: string
     @Field()
-    phone : string
+    phone: string
     @Field()
-    email : string
+    email: string
     @Field(type => ResidencyStatus)
-    residencyStatus : ResidencyStatus
+    residencyStatus: ResidencyStatus
 
 
     @Field()
-    departmentId : number 
+    departmentId: number
     @Field()
-    batchId : number
+    batchId: number
     @Field()
-    levelTermId : number
+    levelTermId: number
 
     @Field(type => Department)
-    department : Department
+    department: Department
 
     @Field(type => Batch)
-    batch : Batch
-    
+    batch: Batch
+
     @Field(type => LevelTerm)
-    levelTerm : LevelTerm
+    levelTerm: LevelTerm
 
-    @Field(type => Residency, {nullable : true})
-    residency? : Residency
+    @Field(type => Residency, {nullable: true})
+    residency?: Residency
 
-    @Field(type =>[SeatApplication])
-    applications : [SeatApplication]
+    @Field(type => [SeatApplication])
+    applications: [SeatApplication]
 
     @Field(type => [TempResidencyHistory])
-    tempResidencyHistory? : [TempResidencyHistory]
-    // @Field(type =>)
+    tempResidencyHistory?: [TempResidencyHistory]
 
-    // field about complaints
     @Field(type => [Complaint])
-    complaints : [Complaint]
-    
+    complaints: [Complaint]
 }
+
 @ObjectType()
-export class TempResidencyHistory{
+export class TempResidencyHistory {
     @Field()
-    tempResidencyHistoryId : number
-    
+    tempResidencyHistoryId: number
+
     @Field()
-    from : Date
-    
+    from: Date
+
     @Field()
-    to : Date 
-    
+    to: Date
+
     @Field()
-    studentId : number
-    
+    studentId: number
+
     @Field()
-    seatId : number;
+    seatId: number;
 
     @Field(type => Seat)
-    seat : Seat;
+    seat: Seat;
 }
 
-export enum ResidencyStatus{
+export enum ResidencyStatus {
     ATTACHED,
     RESIDENT,
     TEMP_RESIDENT
 }
 
 
-registerEnumType(ResidencyStatus , {
-    name : 'ResidencyStatus'
+registerEnumType(ResidencyStatus, {
+    name: 'ResidencyStatus'
 })
 
 @ObjectType()
-export class UserWithToken{
-    @Field(type => Student, {nullable : true})
-    student? : Student
+export class UserWithToken {
+    @Field(type => Student, {nullable: true})
+    student?: Student
 
     @Field()
-    token : string
-    
-    @Field(type => Authority, {nullable : true})
-    authority? : ()=> Authority
+    token: string
 
-    @Field(type => MessManager, {nullable : true})
-    messManager? : ()=> MessManager
+    @Field(type => Authority, {nullable: true})
+    authority?: () => Authority
+
+    @Field(type => MessManager, {nullable: true})
+    messManager?: () => MessManager
 }
 
 @ObjectType()
-export class Authority{
+export class Authority {
     @Field()
-    authorityId : number
+    authorityId: number
     @Field()
-    name : string
+    name: string
     @Field()
-    email : string 
+    email: string
     @Field()
-    phone : string
+    phone: string
     @Field()
-    password : string
+    password: string
     @Field(type => AuthorityRole)
-    role :  AuthorityRole
+    role: AuthorityRole
 
-    @Field(type => [Announcement], {nullable : true})
-    announcements? : [Announcement]
-
+    @Field(type => [Announcement], {nullable: true})
+    announcements?: [Announcement]
 }
 
-export enum AuthorityRole{
+export enum AuthorityRole {
     PROVOST,
     ASSISTANT_PROVOST,
     DINING_STUFF
 }
 
 
-registerEnumType(AuthorityRole , {
-    name : 'AuthorityRole'
+registerEnumType(AuthorityRole, {
+    name: 'AuthorityRole'
 })
 
 
-export enum ApplicationStatus{
+export enum ApplicationStatus {
     PENDING,
     ACCEPTED,
     REJECTED,
@@ -307,54 +287,50 @@ export enum ApplicationStatus{
 }
 
 
-registerEnumType(ApplicationStatus , {
-    name : 'ApplicationStatus'
+registerEnumType(ApplicationStatus, {
+    name: 'ApplicationStatus'
 })
 
-
-
-
 @ObjectType()
-export class SeatApplication{
+export class SeatApplication {
     @Field()
-    applicationId : number;
+    applicationId: number;
 
     @Field()
-    createdAt : Date
+    createdAt: Date
 
     @Field()
-    lastUpdate : Date
+    lastUpdate: Date
 
     @Field(type => ApplicationStatus)
-    status : ApplicationStatus
+    status: ApplicationStatus
 
     @Field()
-    studentId : number
-    
+    studentId: number
+
     @Field(type => Student)
-    student : Student    
+    student: Student
 
-    @Field(type => NewApplication, {nullable : true})
-    newApplication? : () => NewApplication
+    @Field(type => NewApplication, {nullable: true})
+    newApplication?: () => NewApplication
 
-    @Field(type => TempApplication, {nullable : true})
-    tempApplication? : () => TempApplication
+    @Field(type => TempApplication, {nullable: true})
+    tempApplication?: () => TempApplication
 
-    @Field(type => SeatChangeApplication, {nullable : true})
-    seatChangeApplication? : () => SeatChangeApplication
+    @Field(type => SeatChangeApplication, {nullable: true})
+    seatChangeApplication?: () => SeatChangeApplication
 
-    @Field(type => [AttachedFile], {nullable : true})
-    attachedFiles : [AttachedFile]
+    @Field(type => [AttachedFile], {nullable: true})
+    attachedFiles: [AttachedFile]
 
-    @Field(type => [Revision], {nullable : true})
-    revisions : [Revision]
-
+    @Field(type => [Revision], {nullable: true})
+    revisions: [Revision]
 }
 
 @ObjectType()
-export class NewSeatQuestionnaire{
+export class NewSeatQuestionnaire {
     @Field()
-    questionnaireId : number;
+    questionnaireId: number;
 
     @Field()
     q1: boolean;
@@ -363,514 +339,472 @@ export class NewSeatQuestionnaire{
     q2: boolean;
 
     @Field(type => NewApplication)
-    application : ()=> NewApplication
+    application: () => NewApplication
 }
 
 @ObjectType()
-export class TempQuestionnaire{
+export class TempQuestionnaire {
     @Field()
-    questionnaireId : number;
+    questionnaireId: number;
 
     @Field(type => TempApplication)
-    application : ()=> TempApplication
+    application: () => TempApplication
 }
 
-
 @ObjectType()
-export class NewApplication{
+export class NewApplication {
     @Field()
-    newApplicationId : number;
+    newApplicationId: number;
 
     @Field()
-    applicationId : number;
+    applicationId: number;
 
     @Field()
-    questionnaireId : number;
+    questionnaireId: number;
 
     @Field(type => SeatApplication)
-    application : SeatApplication
+    application: SeatApplication
 
     @Field(type => NewSeatQuestionnaire)
-    questionnaire : NewSeatQuestionnaire
-
-
-    
+    questionnaire: NewSeatQuestionnaire
 }
 
 @ObjectType()
-export class TempApplication{
-    
+export class TempApplication {
     @Field()
-    from : Date
+    from: Date
 
     @Field()
-    days : number
-    
-    @Field()
-    applicationId : number;
+    days: number
 
     @Field()
-    questionnaireId : number;
-    
+    applicationId: number;
+
     @Field()
-    prefSeatId : number;
+    questionnaireId: number;
+
+    @Field()
+    prefSeatId: number;
 
 
     @Field(type => SeatApplication)
-    application : SeatApplication
+    application: SeatApplication
 
     @Field(type => TempQuestionnaire)
-    questionnaire : TempQuestionnaire
+    questionnaire: TempQuestionnaire
 
     @Field(type => Seat)
-    prefSeat : Seat
-
+    prefSeat: Seat
 }
 
-
 @ObjectType()
-export class SeatChangeApplication{
-    
+export class SeatChangeApplication {
     @Field()
-    seatChangeApplicationId : number
-    
-    @Field()
-    reason : string;
+    seatChangeApplicationId: number
 
     @Field()
-    applicationId : number;
-    
+    reason: string;
+
     @Field()
-    toSeatId : number;
+    applicationId: number;
+
+    @Field()
+    toSeatId: number;
 
     @Field(type => SeatApplication)
-    application : SeatApplication
+    application: SeatApplication
 
     @Field(type => Seat)
-    toSeat : Seat
+    toSeat: Seat
 
     @Field(type => [Vote])
-    votes : [Vote]
-
+    votes: [Vote]
 }
 
 @ObjectType()
-export class Revision{
-    
+export class Revision {
     @Field()
-    revisionId : number
-    
-    @Field()
-    reason : string;
+    revisionId: number
 
     @Field()
-    createdAt : Date;
-    
+    reason: string;
+
     @Field()
-    applicationId : number;
+    createdAt: Date;
+
+    @Field()
+    applicationId: number;
 
     @Field(type => SeatApplication)
-    application : SeatApplication
+    application: SeatApplication
 }
 
 @ObjectType()
-export class Vote{
+export class Vote {
     @Field()
-    voteId : number
+    voteId: number
 
     @Field()
-    reason : string
-    
+    reason: string
+
     @Field()
-    lastUpdated : Date;
+    lastUpdated: Date;
 
     @Field(type => VoteStatus)
-    status : VoteStatus;
-    
-    @Field()
-    seatChangeApplicationId : number;
+    status: VoteStatus;
 
     @Field()
-    studentId : number;
+    seatChangeApplicationId: number;
+
+    @Field()
+    studentId: number;
 
     @Field(type => SeatChangeApplication)
-    seatChangeApplication : SeatChangeApplication
+    seatChangeApplication: SeatChangeApplication
 
     @Field(type => Student)
-    student : Student;
-    
- 
+    student: Student;
 }
 
 @ObjectType()
-export class AttachedFile{
+export class AttachedFile {
     @Field()
-    applicationId : number;
+    applicationId: number;
 
     @Field()
-    uploadedFileId : number;
+    uploadedFileId: number;
 
     @Field(type => UploadedFile)
-    uploadedFile : ()=> UploadedFile
+    uploadedFile: () => UploadedFile
 
     @Field(type => SeatApplication)
-    application : SeatApplication
-
-
-
+    application: SeatApplication
 }
 
 @ObjectType()
-export class UploadedFile{
+export class UploadedFile {
+    @Field()
+    uploadedFileId: number;
 
     @Field()
-    uploadedFileId : number;
+    fileName: string;
 
     @Field()
-    fileName : string;
+    filePath: string;
 
     @Field()
-    filePath : string;
-
-    @Field()
-    studentId : number;
+    studentId: number;
 
     @Field(type => Student)
-    student : Student;
+    student: Student;
 
     @Field()
-    newFileName : string;
-
-    // @Field(type => [AttachedFile])
-    // attachedFiles : [AttachedFile]
-    //
-    // @Field(type => [Photo])
-    // photos : [Photo]
-
+    newFileName: string;
 }
 
-export enum MealTime{
+export enum MealTime {
     LUNCH,
     DINNER
 }
 
-registerEnumType(MealTime , {
-    name : 'MealTime'
+registerEnumType(MealTime, {
+    name: 'MealTime'
 })
 
 
-export enum ItemType{
+export enum ItemType {
     RICE,
     VEG,
     NON_VEG
 }
 
-registerEnumType(ItemType , {
-    name : 'ItemType'
+registerEnumType(ItemType, {
+    name: 'ItemType'
 })
 
-export enum VoteStatus{
+export enum VoteStatus {
     YES,
     NO,
     NOT_VOTED
 }
-registerEnumType(VoteStatus , {
-    name : 'VoteStatus'
+
+registerEnumType(VoteStatus, {
+    name: 'VoteStatus'
 })
 
 
 @ObjectType()
 export class Photo {
     @Field()
-    photoId : number;
+    photoId: number;
 
     @Field()
-    uploadedFileId : number;
+    uploadedFileId: number;
 
-    @Field(returns => UploadedFile)
-    file : UploadedFile;
-
-    // @Field(returns => [Item])
-    // item: [Item];
+    @Field(() => UploadedFile)
+    file: UploadedFile;
 }
 
 @ObjectType()
-export class Item{
+export class Item {
     @Field()
-    itemId : number;
+    itemId: number;
 
     @Field()
-    name : string;
+    name: string;
 
-    @Field(returns => ItemType)
-    type : ItemType;
+    @Field(() => ItemType)
+    type: ItemType;
 
-    @Field({nullable : true})
-    photoId? : number;
+    @Field({nullable: true})
+    photoId?: number;
 
-    @Field(returns => Photo, {nullable : true})
-    photo? : Photo;
+    @Field(() => Photo, {nullable: true})
+    photo?: Photo;
 
-    @Field(returns => [Meal])
-    meals : [Meal];
+    @Field(() => [Meal])
+    meals: [Meal];
 
-    @Field(returns => [CupCount])
-    cupCounts : [CupCount];
-
-    // @Field(returns => [Preference])
-    // preferences : [Preference];
+    @Field(() => [CupCount])
+    cupCounts: [CupCount];
 }
 
 @ObjectType()
 export class Meal {
     @Field()
-    mealId : number;
+    mealId: number;
 
     @Field()
-    createdAt : Date;
+    createdAt: Date;
 
-    @Field(returns => [Item])
-    items : [Item];
+    @Field(() => [Item])
+    items: [Item];
 
-    @Field(returns => [MealPlan])
-    mealPlans : [MealPlan];
+    @Field(() => [MealPlan])
+    mealPlans: [MealPlan];
 }
 
 @ObjectType()
 export class MealPlan {
     @Field()
-    mealPlanId : number;
+    mealPlanId: number;
 
     @Field()
     day: Date;
 
-    @Field(returns => MealTime)
-    mealTime : MealTime;
+    @Field(() => MealTime)
+    mealTime: MealTime;
 
     @Field()
-    mealId : number;
+    mealId: number;
 
-    @Field(returns => Meal)
-    meal : Meal;
+    @Field(() => Meal)
+    meal: Meal;
 
-    @Field(returns => [CupCount])
-    cupCount : [CupCount];
+    @Field(() => [CupCount])
+    cupCount: [CupCount];
 
-    @Field(returns => [Preference], {nullable : true})
-    preferences? : [Preference];
+    @Field(() => [Preference], {nullable: true})
+    preferences?: [Preference];
 
-    @Field(returns => Student, {nullable : true})
-    optedOut? : Student;
+    @Field(() => Student, {nullable: true})
+    optedOut?: Student;
 }
 
 @ObjectType()
 export class CupCount {
     @Field()
-    cupcount : number;
+    cupcount: number;
 
     @Field()
-    mealPlanId : number;
+    mealPlanId: number;
 
     @Field()
-    itemId : number;
+    itemId: number;
 
-    @Field(returns => MealPlan)
-    mealPlan : MealPlan;
+    @Field(() => MealPlan)
+    mealPlan: MealPlan;
 
-    @Field(returns => Item)
-    item : Item;
+    @Field(() => Item)
+    item: Item;
 }
 
 @InputType()
 export class SingleCupCountInput {
     @Field()
-    cupCount : number;
+    cupCount: number;
 
     @Field()
-    itemId : number;
+    itemId: number;
 }
 
 @InputType()
 export class MealPlanInput {
     @Field(type => [SingleCupCountInput])
-    items : [SingleCupCountInput];
+    items: [SingleCupCountInput];
 }
 
 @InputType()
 export class SinglePreferenceInput {
     @Field()
-    order : number;
+    order: number;
 
     @Field()
-    itemId : number;
+    itemId: number;
 }
 
 @InputType()
 export class PreferenceInput {
     @Field(type => [SinglePreferenceInput])
-    preferences : [SinglePreferenceInput];
+    preferences: [SinglePreferenceInput];
 }
 
 @ObjectType()
 export class Preference {
     @Field()
-    order : number;
+    order: number;
 
     @Field()
-    mealPlanId : number;
+    mealPlanId: number;
 
     @Field()
-    itemId : number;
+    itemId: number;
 
     @Field()
-    studentId : number;
+    studentId: number;
 
-    @Field(returns => MealPlan)
-    mealPlan : MealPlan;
+    @Field(() => MealPlan)
+    mealPlan: MealPlan;
 
-    @Field(returns => Item)
-    item : Item;
+    @Field(() => Item)
+    item: Item;
 
-    @Field(returns => Student)
-    student : Student;
+    @Field(() => Student)
+    student: Student;
 }
 
 @ObjectType()
 export class OptedOut {
     @Field()
-    mealPlanId : number;
+    mealPlanId: number;
 
     @Field()
-    residencyId : number;
+    residencyId: number;
 
     @Field()
-    time : Date;
+    time: Date;
 
-    @Field(returns => MealPlan)
-    mealPlan : MealPlan;
+    @Field(() => MealPlan)
+    mealPlan: MealPlan;
 
-    @Field(returns => Residency)
-    residency : Residency;
+    @Field(() => Residency)
+    residency: Residency;
 }
 
 @ObjectType()
 export class MessManager {
     @Field()
-    messManagerId : number;
-
+    messManagerId: number;
 
 
     @Field()
-    residencyId : number;
+    residencyId: number;
 
     @Field(type => Residency)
-    residency : Residency;
+    residency: Residency;
 
-    @Field(returns => [Announcement], {nullable : true})
-    announcements? : [Announcement];
+    @Field(() => [Announcement], {nullable: true})
+    announcements?: [Announcement];
 
     @Field()
-    callId : number;
+    callId: number;
 
     @Field(type => MessManagerApplicationCall)
-    call : ()=> MessManagerApplicationCall;
+    call: () => MessManagerApplicationCall;
 }
 
 @ObjectType()
 export class MessManagerApplication {
     @Field()
-    applicationId : number;
+    applicationId: number;
 
     @Field()
-    appliedAt : Date;
+    appliedAt: Date;
 
     @Field(type => ApplicationStatus)
-    status : ApplicationStatus
+    status: ApplicationStatus
 
     @Field()
-    residencyId : number;
+    residencyId: number;
 
-
-    @Field(returns => Residency)
-    residency : Residency;
+    @Field(() => Residency)
+    residency: Residency;
 
     @Field()
-    callId : number;
+    callId: number;
 
     @Field(type => MessManagerApplicationCall)
-    call : ()=> MessManagerApplicationCall;
+    call: () => MessManagerApplicationCall;
 }
 
 @ObjectType()
-export class MessApplicationsWithCount{
-    @Field(returns => [MessManagerApplication])
-    applications : MessManagerApplication[];
+export class MessApplicationsWithCount {
+    @Field(() => [MessManagerApplication])
+    applications: MessManagerApplication[];
 
     @Field()
-    count : number;
+    count: number;
 }
 
 @ObjectType()
 export class Announcement {
     @Field()
-    announcementId : number;
+    announcementId: number;
 
     @Field()
-    title : string;
+    title: string;
 
     @Field()
-    details : string;
+    details: string;
 
     @Field()
-    createdAt : Date;
+    createdAt: Date;
 
-    @Field({nullable : true})
-    authorityId? : number;
+    @Field({nullable: true})
+    authorityId?: number;
 
-    @Field({nullable : true})
-    messManagerId? : number;
+    @Field({nullable: true})
+    messManagerId?: number;
 
-    @Field(returns => Authority, {nullable : true})
-    authority? : Authority;
+    @Field(() => Authority, {nullable: true})
+    authority?: Authority;
 
-    @Field(returns => MessManager, {nullable : true})
-    messManager? : MessManager;
+    @Field(() => MessManager, {nullable: true})
+    messManager?: MessManager;
 }
 
 @ObjectType()
 export class Complaint {
     @Field()
-    complaintId : number;
+    complaintId: number;
 
     @Field()
-    title : string;
+    title: string;
 
     @Field()
-    details : string;
+    details: string;
 
     @Field()
-    createdAt : Date;
+    createdAt: Date;
 
     @Field(type => ComplaintType)
-    type : ComplaintType;
+    type: ComplaintType;
 
-    @Field(returns => Student)
-    student : Student;
+    @Field(() => Student)
+    student: Student;
 
     @Field()
-    studentId : number;
-
-    // @Field({nullable : true})
-    // authorityId? : number;
-
-    // @Field({nullable : true})
-    // messManagerId? : number;
-
-    // @Field(returns => Authority, {nullable : true})
-    // authority? : Authority;
-
-    // @Field(returns => MessManager, {nullable : true})
-    // messManager? : MessManager;
+    studentId: number;
 }
 
 // enum for complaint type
@@ -880,235 +814,230 @@ export enum ComplaintType {
     STUFF
 }
 
-registerEnumType(ComplaintType , {
-    name : 'ComplaintType'
+registerEnumType(ComplaintType, {
+    name: 'ComplaintType'
 })
 
 
-
 @InputType()
-export class FilterInput{
+export class FilterInput {
 
     @Field(type => [String])
-    batch : String[];
+    batch: String[];
 
     @Field(type => [String])
-    dept : String[];
+    dept: String[];
 
     @Field(type => [String])
-    status : String[];
+    status: String[];
 
     @Field(type => [String])
-    type : String[];
+    type: String[];
 
     @Field(type => [String])
-    lt : String[];
+    lt: String[];
 
 }
 
 @InputType()
-export class complaintTypeFilerInput{
+export class complaintTypeFilerInput {
     @Field(type => [String])
-    type : String[];
+    type: String[];
 }
 
 @InputType()
-export class SortInput{
+export class SortInput {
 
-    @Field({nullable : true})
-    orderBy? : String;
+    @Field({nullable: true})
+    orderBy?: String;
 
-    @Field({nullable : true})
-    order? : String;
+    @Field({nullable: true})
+    order?: String;
 }
 
 @InputType()
-export class SearchInput{
-    @Field({nullable : true})
-    searchBy? : String;
+export class SearchInput {
+    @Field({nullable: true})
+    searchBy?: String;
 }
 
 @ObjectType()
-export class SeatApplicationsWithCount{
-    @Field(returns => [SeatApplication])
-    applications : SeatApplication[];
+export class SeatApplicationsWithCount {
+    @Field(() => [SeatApplication])
+    applications: SeatApplication[];
 
     @Field()
-    count : number;
+    count: number;
 }
 
 @ObjectType()
-export class StatusWithDefaultSelect{
+export class StatusWithDefaultSelect {
     @Field()
-    status : String;
+    status: String;
 
     @Field()
-    select : Boolean;
+    select: Boolean;
 };
 
 @InputType()
-export class IntArray{
+export class IntArray {
     @Field(type => [Number])
-    array : [number]
+    array: [number]
 }
-
 
 @ObjectType()
 export class FullSeatStat {
     @Field()
-    totalSeats : number;
+    totalSeats: number;
 
     @Field()
-    freeSeats : number;
+    freeSeats: number;
 
     @Field()
-    totalRooms : number;
+    totalRooms: number;
 
     @Field()
-    freeRooms : number;
+    freeRooms: number;
 }
 
 @ObjectType()
 export class FullStudentStat {
     @Field()
-    totalStudents : number;
+    totalStudents: number;
 
     @Field()
-    totalResidents : number;
+    totalResidents: number;
 
     @Field()
-    totalTempResidents : number;
+    totalTempResidents: number;
 
     @Field()
-    totalAttached : number;
+    totalAttached: number;
 }
 
 @ObjectType()
 export class DeptWiseResident {
     @Field()
-    deptName : string;
+    deptName: string;
 
     @Field()
-    totalResidents : number;
+    totalResidents: number;
 }
 
 @InputType()
 export class StudentFilterInput {
     @Field(type => [String])
-    batch : String[];
+    batch: String[];
 
     @Field(type => [String])
-    dept : String[];
+    dept: String[];
 
     @Field(type => [String])
-    residencyStatus : String[];
+    residencyStatus: String[];
 
     @Field(type => [String])
-    levelTerm : String[];
+    levelTerm: String[];
 }
 
 @ObjectType()
 export class StudentsWithCount {
-    @Field(returns => [Student])
-    students : Student[];
+    @Field(() => [Student])
+    students: Student[];
 
     @Field()
-    count : number;
+    count: number;
 }
 
 @ObjectType()
-export class ResidencyStatusWithDefaultSelect{
+export class ResidencyStatusWithDefaultSelect {
     @Field()
-    status : String;
+    status: String;
 
     @Field()
-    select : Boolean;
+    select: Boolean;
 }
 
 @ObjectType()
 export class Notification {
     @Field()
-    notificationId : number;
+    notificationId: number;
 
-    @Field({nullable : true})
-    applicationId? : number;
+    @Field({nullable: true})
+    applicationId?: number;
 
-    @Field({nullable : true})
-    voteId? : number;
-
-    @Field()
-    studentId : number;
+    @Field({nullable: true})
+    voteId?: number;
 
     @Field()
-    text : string;
+    studentId: number;
 
     @Field()
-    time : Date
+    text: string;
 
     @Field()
-    seen : Boolean
+    time: Date
 
-    @Field(returns => SeatApplication, {nullable : true})
-    application? : SeatApplication;
+    @Field()
+    seen: Boolean
 
-    @Field(returns => Vote, {nullable : true})
-    vote? : Vote;
+    @Field(() => SeatApplication, {nullable: true})
+    application?: SeatApplication;
 
-    @Field(returns => Student)
-    student : Student;
+    @Field(() => Vote, {nullable: true})
+    vote?: Vote;
+
+    @Field(() => Student)
+    student: Student;
 }
 
 @ObjectType()
-export class NotificationWithCount{
+export class NotificationWithCount {
     @Field(type => [Notification])
-    notifications : [Notification];
+    notifications: [Notification];
 
     @Field()
-    unseenCount : number
+    unseenCount: number
 }
 
 @ObjectType()
-export class MealPlanWithCount{
+export class MealPlanWithCount {
     @Field(type => MealPlan)
-    mealPlan : MealPlan;
+    mealPlan: MealPlan;
 
     @Field()
-    _count : number;
-
+    _count: number;
 }
 
 @ObjectType()
-export class ResidencyWithParticipationCount{
+export class ResidencyWithParticipationCount {
     @Field(type => Residency)
-    residency : Residency;
+    residency: Residency;
 
     @Field()
-    _count : number;
-
+    _count: number;
 }
 
 
 @ObjectType()
-export class OptedOutCount{
+export class OptedOutCount {
     @Field()
-    optedOut : number;
+    optedOut: number;
 
     @Field()
-    total : number;
+    total: number;
 
 }
 
 @ObjectType()
-export class MealPreferenceStats{
+export class MealPreferenceStats {
     @Field()
-    count : number;
+    count: number;
 
     @Field()
-    order : number;
+    order: number;
 
     @Field()
-    item : Item;
-
+    item: Item;
 }
 
 @ObjectType()
@@ -1122,7 +1051,6 @@ export class Feedback {
     @Field()
     endMealPlanId: number
 
-
     @Field(type => MealPlan)
     startMealPlan: MealPlan
     @Field(type => MealPlan)
@@ -1130,91 +1058,86 @@ export class Feedback {
 }
 
 @ObjectType()
-export class Rating{
+export class Rating {
     @Field()
-    rating : number;
+    rating: number;
 
     @Field(type => RatingType)
-    type : RatingType;
+    type: RatingType;
 
     @Field()
-    feedbackId : number;
+    feedbackId: number;
 
     @Field()
-    residencyId : number;
+    residencyId: number;
 
     @Field(type => Feedback)
-    feedback : Feedback;
+    feedback: Feedback;
 
     @Field(type => Residency)
-    residency : Residency;
+    residency: Residency;
 
     @Field()
-    giventAt : Date
-
+    givenAt: Date
 }
-
 
 @ObjectType()
-export class FeedbackWithRating{
+export class FeedbackWithRating {
     @Field()
-    avg : number;
+    avg: number;
 
     @Field()
-    feedback : Feedback;
+    feedback: Feedback;
 
     @Field(type => RatingType)
-    type : RatingType;
-
+    type: RatingType;
 }
 
-export enum RatingType{
+export enum RatingType {
     QUALITY,
     QUANTITY,
     MANAGEMENT
 }
-registerEnumType(RatingType , {
-    name : 'RatingType'
+
+registerEnumType(RatingType, {
+    name: 'RatingType'
 })
 
 @ObjectType()
-export class MessManagerApplicationCall{
+export class MessManagerApplicationCall {
     @Field()
-    callId : number;
+    callId: number;
 
     @Field()
-    from : Date;
+    from: Date;
 
     @Field()
-    to : Date;
+    to: Date;
 
     @Field()
-    createdAt : Date;
+    createdAt: Date;
 
     @Field()
-    createdById : number;
+    createdById: number;
 
     @Field(type => Authority)
-    createdBy : Authority;
+    createdBy: Authority;
 
     @Field()
-    applicationsCount : number;
+    applicationsCount: number;
 
     @Field()
-    accepted : number;
+    accepted: number;
 
-    
     @Field(type => [MessManagerApplication])
-    applications : [MessManagerApplication];
-
-
+    applications: [MessManagerApplication];
 }
 
 @ObjectType()
-export class MessManagerCallWithAppsOfResident{
-    @Field( type => MessManagerApplicationCall)
-    call : MessManagerApplicationCall;
+export class MessManagerCallWithAppsOfResident {
+    @Field(type => MessManagerApplicationCall)
+    call: MessManagerApplicationCall;
 
-    @Field(type => MessManagerApplication, {nullable : true})
-    application? : MessManagerApplication;
+    @Field(type => MessManagerApplication, {nullable: true})
+    application?: MessManagerApplication;
 }

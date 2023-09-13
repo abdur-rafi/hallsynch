@@ -1,14 +1,14 @@
 import {Authorized, Ctx, Mutation} from "type-graphql";
-import { Arg } from "type-graphql";
-import { roles } from "../../utility";
-import { Context } from "../../interface";
-import { Complaint } from "../../graphql-schema";
-import { ComplaintType } from "@prisma/client";
+import {Arg} from "type-graphql";
+import {roles} from "../../utility";
+import {Context} from "../../interface";
+import {Complaint} from "../../graphql-schema";
+import {ComplaintType} from "@prisma/client";
 
 export class ComplaintMutationResolvers {
 
     @Authorized(roles.STUDENT_RESIDENT)
-    @Mutation(returns => Complaint)
+    @Mutation(() => Complaint)
     async addComplaint(
         @Ctx() ctx: Context,
         @Arg('title') title: string,

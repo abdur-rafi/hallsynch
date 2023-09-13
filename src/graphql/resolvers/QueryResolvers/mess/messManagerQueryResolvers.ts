@@ -13,12 +13,12 @@ import {Prisma} from "@prisma/client";
 export class MessManagerQueryResolvers {
 
     @Authorized([roles.PROVOST])
-    @Query(returns => MessApplicationsWithCount)
+    @Query(() => MessApplicationsWithCount)
     async messManagerApplications(
         @Ctx() ctx: Context,
-        @Arg('page') page : number,
-        @Arg('sort', {nullable : true}) sort? : SortInput,
-        @Arg('search', {nullable : true}) search? : SearchInput
+        @Arg('page') page: number,
+        @Arg('sort', {nullable: true}) sort?: SortInput,
+        @Arg('search', {nullable: true}) search?: SearchInput
     ) {
         let ands = [];
         if (search && search.searchBy && search.searchBy.trim().length > 0) {
@@ -46,7 +46,7 @@ export class MessManagerQueryResolvers {
         if (sort.orderBy && sort.order) {
             if (sort.orderBy == 'Batch') {
                 order = {
-                    residency : {
+                    residency: {
                         student: {
                             batch: {
                                 year: (sort.order == sortVals.oldest) ? 'asc' : 'desc'
@@ -78,13 +78,13 @@ export class MessManagerQueryResolvers {
         ])
 
         return {
-            count : res[0],
-            applications : res[1]
+            count: res[0],
+            applications: res[1]
         }
     }
 
     @Authorized([roles.PROVOST])
-    @Query(returns => MessManagerApplication)
+    @Query(() => MessManagerApplication)
     async messManagerApplicationDetails(
         @Ctx() ctx: Context,
         @Arg('applicationId') applicationId: number
@@ -97,116 +97,116 @@ export class MessManagerQueryResolvers {
     }
 
     @Authorized([roles.PROVOST] || [roles.STUDENT_MESS_MANAGER])
-    @Query(returns => [MessManager])
+    @Query(() => [MessManager])
     async messManagingExperiences(
         @Ctx() ctx: Context
     ) {
         return await ctx.prisma.messManager.findMany({
             where: {
-                residency : {
-                    student : {
-                        studentId : ctx.identity.studentId
+                residency: {
+                    student: {
+                        studentId: ctx.identity.studentId
                     }
                 }
             },
             orderBy: {
-                call : {
-                    to : 'asc'
+                call: {
+                    to: 'asc'
                 }
             }
         });
     }
 
-    @Query(returns => [MessManager])
+    @Query(() => [MessManager])
     async assingedMessManagers(
-        @Ctx() ctx : Context
-    ){
+        @Ctx() ctx: Context
+    ) {
         return await ctx.prisma.messManager.findMany({
-            where : {
-                call : {
-                    to : {
-                        gte : new Date()
+            where: {
+                call: {
+                    to: {
+                        gte: new Date()
                     }
                 }
             },
-            orderBy : {
-                call : {
-                    from : 'asc'
+            orderBy: {
+                call: {
+                    from: 'asc'
                 }
             }
         })
     }
 
-    @Query(returns => String)
+    @Query(() => String)
     async messManagerAssignedTill(
-        @Ctx() ctx : Context
-    ){
+        @Ctx() ctx: Context
+    ) {
         let res = await ctx.prisma.messManager.findFirst({
-            orderBy : {
-                call : {
-                    to : 'desc'
+            orderBy: {
+                call: {
+                    to: 'desc'
                 }
             },
-            include : {
-                call : true
+            include: {
+                call: true
             }
         })
         return res.call.to.toString();
     }
 
 
-    @Query(returns => [MessManagerApplicationCall])
+    @Query(() => [MessManagerApplicationCall])
     async prevCalls(
-        @Ctx() ctx : Context
-    ){
+        @Ctx() ctx: Context
+    ) {
         return await ctx.prisma.messManagerApplicationCall.findMany({
-            where : {
-                to : {
-                    gte : new Date()
+            where: {
+                to: {
+                    gte: new Date()
                 }
             }
         })
     }
 
-    @Query(returns => String)
+    @Query(() => String)
     async callUntil(
-        @Ctx() ctx : Context
-    ){
+        @Ctx() ctx: Context
+    ) {
         let res = await ctx.prisma.messManagerApplicationCall.findFirst({
-            orderBy : {
-                to : 'desc'
+            orderBy: {
+                to: 'desc'
             }
         })
         return res.to.toString();
     }
 
-    @Query(returns => [MessManagerCallWithAppsOfResident])
+    @Query(() => [MessManagerCallWithAppsOfResident])
     async prevCallsWithAppOfResident(
-        @Ctx() ctx : Context
-    ){
+        @Ctx() ctx: Context
+    ) {
         let apps = await ctx.prisma.messManagerApplicationCall.findMany({
-            where : {
-                to : {
-                    gte : new Date()
+            where: {
+                to: {
+                    gte: new Date()
                 }
             },
-            orderBy : {
-                to : 'asc'
+            orderBy: {
+                to: 'asc'
             },
-            include : {
-                MessManagerApplication : {
-                    where : {
-                        residency : {
-                            studentId : ctx.identity.studentId
+            include: {
+                MessManagerApplication: {
+                    where: {
+                        residency: {
+                            studentId: ctx.identity.studentId
                         }
                     }
                 }
             }
         })
         console.log(apps);
-        return apps.map(a =>({
-            call : a,
-            application : a.MessManagerApplication[0] ?? null
+        return apps.map(a => ({
+            call: a,
+            application: a.MessManagerApplication[0] ?? null
         }))
     }
 

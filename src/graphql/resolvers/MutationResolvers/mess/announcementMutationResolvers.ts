@@ -6,7 +6,7 @@ import {Context} from "../../../interface";
 export class AnnouncementMutationResolvers {
 
     @Authorized(roles.STUDENT_MESS_MANAGER || roles.PROVOST)
-    @Mutation(returns => Announcement)
+    @Mutation(() => Announcement)
     async addAnnouncement(
         @Ctx() ctx: Context,
         @Arg('title') title: string,
@@ -31,7 +31,7 @@ export class AnnouncementMutationResolvers {
     }
 
     @Authorized(roles.STUDENT_MESS_MANAGER || roles.PROVOST)
-    @Mutation(returns => Announcement)
+    @Mutation(() => Announcement)
     async removeAnnouncement(
         @Ctx() ctx: Context,
         @Arg('announcementId') announcementId: number

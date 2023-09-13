@@ -42,16 +42,18 @@ export class loginMutationResolver {
                             studentId : student.studentId
                         }
                     },
-                    assingedAt : {
-                        lte : new Date(),
-                        gt : new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7)
-                    }
-                    // from : {
-                    //     lte : new Date()
-                    // },
-                    // to : {
-                    //     gt : new Date()
+                    // assingedAt : {
+                    //     lte : new Date(),
+                    //     gt : new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7)
                     // }
+                    call: {
+                        from: {
+                            lte: new Date(),
+                        },
+                        to: {
+                            gte: new Date(),
+                        }
+                    }
                 }
             })
 

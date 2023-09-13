@@ -69,7 +69,7 @@ import { MessManagerApplicationCallResolver } from "./graphql/resolvers/FieldRes
 import { NotificationResolver } from "./graphql/resolvers/FieldResolvers/notifications";
 import { ComplaintResolver } from "./graphql/resolvers/FieldResolvers/complaint";
 import { ComplaintQueryResolvers } from "./graphql/resolvers/QueryResolvers/complaintQueryResolver";
-import { ComplaintMutationResolvers } from "./graphql/resolvers/MutationResolvers/complaintMutationREsolvers";
+import { ComplaintMutationResolvers } from "./graphql/resolvers/MutationResolvers/complaintMutationResolvers";
 
 
 const client = new PrismaClient()
@@ -195,8 +195,7 @@ buildSchema({
                 }
                 try {
                     console.log("files=================", files)
-                    const file = files.file[0];
-                    
+
                     // const fileName = encodeURIComponent(file.originalFilename.replace(/\s/g, "-"));
                     // renames the file in the directory
                     // fs.renameSync(file.filepath, path.join(uploadFolder, fileName));

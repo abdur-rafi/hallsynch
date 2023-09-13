@@ -15,57 +15,57 @@ import {Prisma} from "@prisma/client";
 export class StatsFeedbackQueryResolvers {
 
     // @Authorized([roles.PROVOST])
-    @Query(returns => [MealPlanWithCount])
+    @Query(() => [MealPlanWithCount])
     async participants(
-        @Ctx() ctx : Context,
-        @Arg('from') from : string,
-        @Arg('mealTime') mealTime : string
-    ){
+        @Ctx() ctx: Context,
+        @Arg('from') from: string,
+        @Arg('mealTime') mealTime: string
+    ) {
 
         let res = await ctx.prisma.mealPlan.findMany({
-            where : {
-                day : {
-                    gte : new Date(from),
-                    lte : new Date()
+            where: {
+                day: {
+                    gte: new Date(from),
+                    lte: new Date()
                 },
-                mealTime : getMealTime(mealTime)
+                mealTime: getMealTime(mealTime)
             },
-            include : {
-                _count : {
-                    select : {
-                        Participation : true
+            include: {
+                _count: {
+                    select: {
+                        Participation: true
                     }
                 }
             },
-            orderBy : {
-                day : 'asc'
+            orderBy: {
+                day: 'asc'
             }
         })
         return res.map(r => ({
-            mealPlan : r,
-            _count : r._count.Participation
+            mealPlan: r,
+            _count: r._count.Participation
         }));
 
     }
 
 
     // @Authorized([roles.PROVOST])
-    @Query(returns => [ResidencyWithParticipationCount])
+    @Query(() => [ResidencyWithParticipationCount])
     async absentees(
-        @Ctx() ctx : Context,
-        @Arg('from') from : string,
-        @Arg('take') take : number
-    ){
+        @Ctx() ctx: Context,
+        @Arg('from') from: string,
+        @Arg('take') take: number
+    ) {
 
         let res = await ctx.prisma.residency.findMany({
-            include : {
-                _count : {
-                    select : {
-                        Participation : {
-                            where : {
-                                mealPlan : {
-                                    day : {
-                                        gte : new Date(from)
+            include: {
+                _count: {
+                    select: {
+                        Participation: {
+                            where: {
+                                mealPlan: {
+                                    day: {
+                                        gte: new Date(from)
                                     }
                                 }
                             }
@@ -76,175 +76,168 @@ export class StatsFeedbackQueryResolvers {
         })
 
         let mealCount = await ctx.prisma.mealPlan.count({
-            where : {
-                day : {
-                    gte : new Date(from),
-                    lte : new Date()
+            where: {
+                day: {
+                    gte: new Date(from),
+                    lte: new Date()
                 }
             }
         })
 
 
-        let s = res.map(r =>({
-            residency : r,
-            _count : mealCount - r._count.Participation
+        let s = res.map(r => ({
+            residency: r,
+            _count: mealCount - r._count.Participation
         }))
-        s.sort((a, b)=> b._count - a._count)
-        // console.log(res);
+        s.sort((a, b) => b._count - a._count)
 
         return s.slice(0, take);
     }
 
 
-
     // @Authorized([roles.STUDENT_MESS_MANAGER])
-    @Query(returns => OptedOutCount)
+    @Query(() => OptedOutCount)
     async optedOutStats(
-        @Ctx() ctx : Context,
-        @Arg('date') date : string,
-        @Arg('mealTime') mealTime : string
-    ){
+        @Ctx() ctx: Context,
+        @Arg('date') date: string,
+        @Arg('mealTime') mealTime: string
+    ) {
 
         let optedOutCount = await ctx.prisma.optedOut.count({
-            where : {
-                mealPlan : {
-                    day : new Date(date),
-                    mealTime : getMealTime(mealTime)
+            where: {
+                mealPlan: {
+                    day: new Date(date),
+                    mealTime: getMealTime(mealTime)
                 }
             }
         })
         let totalResidents = await ctx.prisma.residency.count();
 
         return {
-            optedOut : optedOutCount,
-            total : totalResidents
+            optedOut: optedOutCount,
+            total: totalResidents
         }
     }
 
     // @Authorized([roles.STUDENT_MESS_MANAGER])
-    @Query(returns => [MealPreferenceStats])
+    @Query(() => [MealPreferenceStats])
     async mealPreferenceStats(
-        @Ctx() ctx : Context,
-        @Arg('date') date : string,
-        @Arg('mealTime') mealTime : string
-    ){
+        @Ctx() ctx: Context,
+        @Arg('date') date: string,
+        @Arg('mealTime') mealTime: string
+    ) {
 
         let preferences = await ctx.prisma.preference.groupBy({
-            where : {
-                mealPlan : {
-                    day : new Date(date),
-                    mealTime : getMealTime(mealTime)
+            where: {
+                mealPlan: {
+                    day: new Date(date),
+                    mealTime: getMealTime(mealTime)
                 }
             },
-            by : ['order', 'itemId'],
-            _count : {
-                residencyId : true
+            by: ['order', 'itemId'],
+            _count: {
+                residencyId: true
             }
         })
 
         let items = await ctx.prisma.item.findMany({
-            where : {
-                itemId : {
-                    in : preferences.map(p => p.itemId)
+            where: {
+                itemId: {
+                    in: preferences.map(p => p.itemId)
                 }
             }
         })
 
-        // console.log(items);
-        // console.log(preferences);
-
-        return preferences.map(p =>({
-            count : p._count.residencyId,
-            order : p.order,
-            item : items.filter(i => i.itemId == p.itemId)[0]
+        return preferences.map(p => ({
+            count: p._count.residencyId,
+            order: p.order,
+            item: items.filter(i => i.itemId == p.itemId)[0]
         }))
-
-        console.log(preferences)
     }
 
     // @Authorized([roles.STUDENT_MESS_MANAGER])
-    @Query(returns => [FeedbackWithRating])
+    @Query(() => [FeedbackWithRating])
     async ratings(
-        @Ctx() ctx : Context,
-        @Arg('date') date : string
-    ){
+        @Ctx() ctx: Context,
+        @Arg('date') date: string
+    ) {
         let res = await ctx.prisma.rating.groupBy({
-            by : ['type', 'feedbackId'],
-            where : {
-                feedback : {
-                    startMealPlan : {
-                        day : {
-                            gte : new Date(date),
-                            lte : new Date()
+            by: ['type', 'feedbackId'],
+            where: {
+                feedback: {
+                    startMealPlan: {
+                        day: {
+                            gte: new Date(date),
+                            lte: new Date()
                         }
                     }
                 }
             },
-            _avg : {
-                rating : true
+            _avg: {
+                rating: true
             },
-            orderBy : {
-                feedbackId : 'asc'
+            orderBy: {
+                feedbackId: 'asc'
             }
         })
 
         let feedbacks = await ctx.prisma.feedback.findMany({
-            where : {
-                feedbackId : {
-                    in : res.map(r => r.feedbackId)
+            where: {
+                feedbackId: {
+                    in: res.map(r => r.feedbackId)
                 }
             }
         })
 
         return res.map(r => ({
-            avg : r._avg.rating,
-            type : r.type,
-            feedback : feedbacks.filter(f => f.feedbackId == r.feedbackId)[0]
+            avg: r._avg.rating,
+            type: r.type,
+            feedback: feedbacks.filter(f => f.feedbackId == r.feedbackId)[0]
         }))
 
 
-
     }
+
     @Authorized(roles.STUDENT_RESIDENT)
-    @Query(returns => [Feedback])
+    @Query(() => [Feedback])
     async pendingFeedbacks(
-        @Ctx() ctx : Context
-    ){
-        console.log( "identity in fb", ctx.identity);
+        @Ctx() ctx: Context
+    ) {
+        console.log("identity in fb", ctx.identity);
         let lastFeedBack = await ctx.prisma.feedBackGiven.findFirst({
-            where : {
-                residency : {
-                    studentId : ctx.identity.studentId
+            where: {
+                residency: {
+                    studentId: ctx.identity.studentId
                 }
             },
-            orderBy : {
-                feedBack : {
-                    startDate : 'desc'
+            orderBy: {
+                feedBack: {
+                    startDate: 'desc'
                 }
             },
-            include : {
-                feedBack : true
+            include: {
+                feedBack: true
             }
         })
-        // console.log(lastFeedBack)
-        let where : Prisma.FeedbackWhereInput = {};
-        if(lastFeedBack){
+
+        let where: Prisma.FeedbackWhereInput = {};
+        if (lastFeedBack) {
             where = {
-                feedbackId : {
-                    gt : lastFeedBack.feedBackId
+                feedbackId: {
+                    gt: lastFeedBack.feedBackId
                 }
             }
         }
         where = {
-            ... where,
-            startDate : {
-                lte : new Date()
+            ...where,
+            startDate: {
+                lte: new Date()
             }
         }
         let res = await ctx.prisma.feedback.findMany({
-            where : where
+            where: where
         })
-        console.log("res",res);
+        console.log("res", res);
         return res;
     }
 }

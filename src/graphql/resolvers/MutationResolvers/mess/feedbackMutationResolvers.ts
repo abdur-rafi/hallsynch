@@ -7,7 +7,7 @@ import {RatingType} from "@prisma/client";
 export class FeedbackMutationResolvers {
 
     @Authorized(roles.STUDENT_RESIDENT)
-    @Mutation(returns => String)
+    @Mutation(() => String)
     async postFeedback(
         @Ctx() ctx: Context,
         @Arg('ratings') ratings: IntArray,

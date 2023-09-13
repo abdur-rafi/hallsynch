@@ -7,7 +7,7 @@ import {ItemType, MealTime} from "@prisma/client";
 export class MealMutationResolvers {
 
     @Authorized(roles.STUDENT_RESIDENT)
-    @Mutation(returns => [Preference])
+    @Mutation(() => [Preference])
     async addPreferences(
         @Ctx() ctx: Context,
         @Arg('mealPlanId') mealPlanId: number,
@@ -74,7 +74,7 @@ export class MealMutationResolvers {
     }
 
     @Authorized(roles.STUDENT_RESIDENT)
-    @Mutation(returns => OptedOut)
+    @Mutation(() => OptedOut)
     async optOut(
         @Ctx() ctx: Context,
         @Arg('mealPlanId') mealPlanId: number
@@ -128,8 +128,8 @@ export class MealMutationResolvers {
         return newOptedOut;
     }
 
-    @Authorized(roles.STUDENT_MESS_MANAGER)
-    @Mutation(returns => Item)
+    // @Authorized(roles.STUDENT_MESS_MANAGER)
+    @Mutation(() => Item)
     async addNewItem(
         @Ctx() ctx: Context,
         @Arg('name') name: string,
@@ -183,8 +183,8 @@ export class MealMutationResolvers {
         return newItem;
     }
 
-    @Authorized(roles.STUDENT_MESS_MANAGER)
-    @Mutation(returns => MealPlan)
+    // @Authorized(roles.STUDENT_MESS_MANAGER)
+    @Mutation(() => MealPlan)
     async addNewMealPlan(
         @Ctx() ctx: Context,
         @Arg('date') date: string,
@@ -207,6 +207,7 @@ export class MealMutationResolvers {
         if (existingMealPlan) {
             throw new Error("Meal plan for this time already exists\n");
         }
+
         let mealConnOrCreate : any = {
             create: {
                 createdAt: new Date(date),
@@ -219,10 +220,21 @@ export class MealMutationResolvers {
                 }
             }
         }
+
         if(mealId){
             mealConnOrCreate = {
                 connect : {
                     mealId : mealId
+                },
+                create: {
+                    createdAt: new Date(date),
+                    items : {
+                        connect : items.items.map(item => {
+                            return {
+                                itemId : item.itemId
+                            }
+                        })
+                    }
                 }
             }
         }
@@ -269,7 +281,7 @@ export class MealMutationResolvers {
     }
 
     @Authorized(roles.STUDENT_MESS_MANAGER)
-    @Mutation(returns => MealPlan)
+    @Mutation(() => MealPlan)
     async addOldMealPlan(
         @Ctx() ctx: Context,
         @Arg('date') date: string,

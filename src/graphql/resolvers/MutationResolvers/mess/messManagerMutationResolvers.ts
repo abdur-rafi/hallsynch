@@ -6,7 +6,7 @@ import {Context} from "../../../interface";
 export class MessManagerMutationResolvers {
 
     @Authorized(roles.STUDENT_RESIDENT)
-    @Mutation(returns => MessManagerApplication)
+    @Mutation(() => MessManagerApplication)
     async applyMessManager(
         @Ctx() ctx: Context,
         @Arg('callId') callId: number
@@ -48,7 +48,7 @@ export class MessManagerMutationResolvers {
     }
 
     @Authorized(roles.PROVOST)
-    @Mutation(returns => MessManager)
+    @Mutation(() => MessManager)
     async approveMessManagerApplication(
         @Ctx() ctx: Context,
         @Arg('messManagerApplicationId') messManagerApplicationId: number
@@ -72,10 +72,10 @@ export class MessManagerMutationResolvers {
 
         let result = await ctx.prisma.$transaction([
             ctx.prisma.messManager.create({
-                data : {
-                    callId : application.call.callId,
-                    residencyId : application.residencyId,
-                    assingedAt : new Date()
+                data: {
+                    callId: application.call.callId,
+                    residencyId: application.residencyId,
+                    assingedAt: new Date()
                 }
             }),
             ctx.prisma.messManagerApplication.update({
@@ -92,7 +92,7 @@ export class MessManagerMutationResolvers {
     }
 
     @Authorized(roles.PROVOST)
-    @Mutation(returns => MessManagerApplication)
+    @Mutation(() => MessManagerApplication)
     async rejectMessManagerApplication(
         @Ctx() ctx: Context,
         @Arg('messManagerApplicationId') messManagerApplicationId: number
@@ -123,7 +123,7 @@ export class MessManagerMutationResolvers {
         return result;
     }
 
-    @Mutation(returns => MessManagerApplicationCall)
+    @Mutation(() => MessManagerApplicationCall)
     async createCall(
         @Ctx() ctx: Context,
         @Arg('from') from: string,
