@@ -178,7 +178,7 @@ buildSchema({
             console.log(t);
             const uploadFolder = path.join(path.resolve('.'), "public");
             const form = formidable({
-                maxFileSize: 5 * 1024 * 1024,
+                maxFileSize: 500 * 1024 * 1024,
                 uploadDir: uploadFolder,
                 allowEmptyFiles: false,
                 keepExtensions : true
