@@ -30,24 +30,24 @@
          npm install
        ```
    4. ensure postgres database is ready with a new schema
-   5. at the src folder, there is a generateData.ts file which will generate dummy data. From terminal, Run
-      ```bash
-         ts-node src/generateData.ts
-      ``` 
-   7. create a .env file at the root folder. In this file, add an arbitrary value for variable <b>JWTSECRET</b>
+   5. create a .env file at the root folder. In this file, add an arbitrary value for variable <b>JWTSECRET</b>
       for example:  
       ```bash
         JWTSECRET="helloworld"
       ```
-   8. also add the postgres database url variable <b>DATABASE_URL</b>
+   6. also add the postgres database url variable <b>DATABASE_URL</b>
       for example:  
       ```bash
         DATABASE_URL="postgresql://postgres:hisham@localhost:5432/hallsync_v2?schema=public"
       ```
-   9. From terminal, Run
+   7. From terminal, Run
       ```bash
          npx prisma migrate dev
-      ``` 
+      ```
+   8. at the src folder, there is a generateData.ts file which will generate dummy data. From terminal, Run
+      ```bash
+         ts-node src/generateData.ts
+      ```
    9. lastly, run
       ```bash
         npm start
