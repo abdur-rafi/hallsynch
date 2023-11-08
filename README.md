@@ -72,6 +72,7 @@ typescript, nodejs, express, apollo, graphql, postgres, prisma
 
 ## API Reference:<a name="api-reference"></a>
 * [Sample API Reference](https://docs.google.com/spreadsheets/d/1bzbqjXmUxGidomrpJ0jKK2NfvzD0NaEjbHeG4WBwJVg/edit?usp=sharing)
+* [Postman API Reference (Partial)](https://documenter.getpostman.com/view/15751570/2s93zE2zcf)
 
 ## Modules & Features:<a name="features"></a>
 * [Full Features Demo](https://docs.google.com/presentation/d/1hdAMp-Ch___syEhl3d1bdcaObi3pzTZ3jvrld7EXEGo/edit?usp=sharing)
