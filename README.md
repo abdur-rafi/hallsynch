@@ -44,7 +44,11 @@
       ```bash
         DATABASE_URL="postgresql://postgres:hisham@localhost:5432/hallsync_v2?schema=public"
       ```
-   9. open terminal and run
+   9. From terminal, Run
+      ```bash
+         npx prisma migrate dev
+      ``` 
+   9. lastly, run
       ```bash
         npm start
       ```
